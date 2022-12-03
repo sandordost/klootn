@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private IDatabaseManager databaseManager;
+    public PlayerManager playerManager;
+    public LobbyManager lobbyManager;
+    public GameCommandsManager gameCommandsManager;
+    public GameStateManager gameStateManager;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public DataManager()
+	{
+        databaseManager = new SQLDatabaseManager();
+	}
+
+	private void Start()
+	{
+		
+	}
 }

@@ -15,9 +15,3 @@ public class SceneManager : MonoBehaviour
 		UnityEngine.SceneManagement.SceneManager.LoadScene(klootnSceneNames[klootnScene]);
 	}
 }
-
-public enum KlootnScene
-{
-	MainMenu,
-	GameBallThrow
-}
