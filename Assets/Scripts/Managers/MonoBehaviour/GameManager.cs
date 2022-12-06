@@ -8,12 +8,6 @@ public class GameManager : MonoBehaviour
 	public SceneManager sceneManager;
 	public SettingsManager settingsManager;
 
-	public GameManager()
-	{
-		sceneManager = new SceneManager();
-		settingsManager = new SettingsManager();
-	}
-
 	void Start()
     {
         DontDestroyOnLoad(gameObject);
