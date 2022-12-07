@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "944533292885",
+    "project_id": "klootn-5cb11",
+    "storage_bucket": "klootn-5cb11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944533292885:android:54ae2f79008a52d7a551dc",
+        "android_client_info": {
+          "package_name": "com.Sandordost.KLOOTN"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "944533292885-blgfcjtsgui4rhjhej120jjlhudb48lv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRe7KWy0SjV1BiVX5--PN8st4-svypKNU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944533292885-blgfcjtsgui4rhjhej120jjlhudb48lv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "944533292885-vrmiiqpvgudnr710o5g90tfoa7nh7v2t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Sandordost.KLOOTN"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
