@@ -1,10 +1,11 @@
 # [Aa]ssets/AssetStoreTools*
 
 # Firebase & Analytics
-/[Aa]ssets/Editor Default Resources/
+/[Aa]ssets/[Ee]ditor [Dd]efault [Rr]esources/
 /[Aa]ssets/[Ff]irebase/
-/[Aa]ssets/ExternalDependencyManager/
-/[Aa]ssets/Plugins/
+/[Aa]ssets/[Ee]xternal[Dd]ependency[Mm]anager/
+/[Aa]ssets/[Pp]lugins/
+/[Aa]ssets/[Ss]treaming[Aa]ssets/
 
 # Extra folders
 /[Ll]ibrary/
