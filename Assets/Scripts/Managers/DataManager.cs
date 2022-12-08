@@ -4,19 +4,31 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-    private IDatabaseManager databaseManager;
+    public IDatabaseManager databaseManager;
     public PlayerManager playerManager;
     public LobbyManager lobbyManager;
     public GameCommandsManager gameCommandsManager;
     public GameStateManager gameStateManager;
-
-	public DataManager()
-	{
-        databaseManager = new SQLDatabaseManager();
-	}
-
+	public DatabaseOption databaseOption;
+	
 	private void Start()
 	{
-		
+		SetDatabaseManager(databaseOption);
+	}
+
+	public void SetDatabaseManager(DatabaseOption option)
+	{
+		switch (option)
+		{
+			case DatabaseOption.Firebase:
+				databaseManager = new FirebaseManager();
+				break;
+			case DatabaseOption.SQLDatabase:
+				databaseManager = new SQLDatabaseManager();
+				break;
+			case DatabaseOption.Firestore:
+				databaseManager = new FirestoreManager();
+				break;
+		}
 	}
 }

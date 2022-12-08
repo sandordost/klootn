@@ -3,25 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class RegistrationManager : MonoBehaviour
 {
-	private Player player;
-	DatabaseReference databaseReference;
 	public TMP_InputField usernameInputField;
 	public TMP_InputField passwordInputField;
+	private IDatabaseManager databaseManager;
+	private delegate void onPlayerRegistration(Player player);
 
 	private void Start()
 	{
-		databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
+		databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
 	}
 
 	public void RegisterPlayer()
 	{
-		player = new Player(usernameInputField.text, passwordInputField.text);
-		string json = JsonUtility.ToJson(player);
+		NewPlayer player = new NewPlayer(usernameInputField.text, "0", passwordInputField.text);
 
-		databaseReference.Child("Players").Child(SystemInfo.deviceUniqueIdentifier).SetRawJsonValueAsync(json);
-		Debug.Log(json);
+		StartCoroutine(databaseManager.RegisterPlayer(player, (newPlayer) =>
+		{
+			PlayerRegistered(newPlayer);
+		}));
+	}
+
+	public void PlayerRegistered(Player player)
+	{
+		Debug.Log($"{player.id} + {player.name}");
 	}
 }
