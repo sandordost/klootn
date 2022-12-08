@@ -16,30 +16,39 @@ public class FirestoreManager : IDatabaseManager
 
 	public IEnumerator RegisterPlayer(NewPlayer newPlayer, Action<Player> onCallback)
 	{
-		CollectionReference docRef = firestore.Collection("Players");
+		CollectionReference colRef = firestore.Collection("Players");
 
-		docRef.AddAsync(newPlayer).ContinueWithOnMainThread((task) =>
-		{
-		});
+		var addplayerTask = colRef.AddAsync(newPlayer);
 
-		yield return GetPlayers((callback) => { });
+		yield return new WaitUntil(() => addplayerTask.IsCompleted);
+		//TODO: Get id after or before insertion
+		DocumentReference docRef = addplayerTask.Result;
+
+		onCallback.Invoke(docRef.Id)
 	}
 
 	public IEnumerator GetPlayers(Action<List<Player>> onCallBack)
 	{
+		List<Player> playersResult = new();
+
 		CollectionReference docRef = firestore.Collection("Players");
 
-		QuerySnapshot documentSnapshot;
+		var collecting = docRef.GetSnapshotAsync();
 
-		var collecting = docRef.GetSnapshotAsync().ContinueWithOnMainThread((task) => {
-			documentSnapshot = task.Result;
+		yield return new WaitUntil(() => collecting.IsCompleted);
 
-			foreach(DocumentSnapshot snapshot in documentSnapshot.Documents)
-			{
-				NewPlayer player = snapshot.ConvertTo<NewPlayer>();
-				Debug.Log($"{player.id} - {player.name} - {player.password}");
-			}
-		});
-		yield return null;
+		QuerySnapshot snapshot = collecting.Result;
+
+		foreach(var item in snapshot.Documents)
+		{
+			Player newPlayer = item.ConvertTo<Player>();
+
+			playersResult.Add(newPlayer);
+		}
+
+		onCallBack.Invoke(playersResult);
 	}
+
+	public IEnumerator GetPlayer()
+
 }
