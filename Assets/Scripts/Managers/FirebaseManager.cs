@@ -68,4 +68,9 @@ public class FirebaseManager : IDatabaseManager
 			onCallback.Invoke(0);
 		}
 	}
+
+	public IEnumerator Login(NewPlayer newPlayer, Action<Player> callback)
+	{
+		throw new NotImplementedException();
+	}
 }

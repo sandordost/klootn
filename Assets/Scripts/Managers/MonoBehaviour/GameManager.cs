@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 	public SceneManager sceneManager;
 	public SettingsManager settingsManager;
 
-	void Start()
+	private void Awake()
     {
 		instance = this;
         DontDestroyOnLoad(gameObject);

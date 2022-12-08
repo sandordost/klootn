@@ -15,4 +15,9 @@ public class NewPlayer : Player
 	{
 		this.password = password;
 	}
+
+	public NewPlayer(string name, string password) : this(name, "", password)
+	{
+
+	}
 }

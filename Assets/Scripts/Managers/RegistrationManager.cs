@@ -1,16 +1,11 @@
-using Firebase.Database;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using System;
 
 public class RegistrationManager : MonoBehaviour
 {
 	public TMP_InputField usernameInputField;
 	public TMP_InputField passwordInputField;
 	private IDatabaseManager databaseManager;
-	private delegate void onPlayerRegistration(Player player);
 
 	private void Start()
 	{

@@ -5,5 +5,7 @@ using UnityEngine;
 
 public interface IDatabaseManager
 {
-    public IEnumerator RegisterPlayer(NewPlayer newPlayer, Action<Player> onCallback);
+    public IEnumerator RegisterPlayer(NewPlayer newPlayer, Action<Player> callback);
+
+    public IEnumerator Login(NewPlayer newPlayer, Action<Player> callback);
 }

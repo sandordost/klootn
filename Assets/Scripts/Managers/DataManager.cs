@@ -11,7 +11,7 @@ public class DataManager : MonoBehaviour
     public GameStateManager gameStateManager;
 	public DatabaseOption databaseOption;
 	
-	private void Start()
+	private void Awake()
 	{
 		SetDatabaseManager(databaseOption);
 	}
