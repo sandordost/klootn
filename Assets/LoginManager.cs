@@ -8,10 +8,12 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField usernameInputField;
     public TMP_InputField passwordInputField;
     private IDatabaseManager databaseManager;
+    private GameEvents gameEvents;
 
     private void Start()
     {
         databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
+        gameEvents = GameEvents.instance;
     }
 
     public void LogIn()
@@ -26,7 +28,10 @@ public class LoginManager : MonoBehaviour
     public void PlayerLoggedIn(Player player)
 	{
         if (player != null)
+        {
+            gameEvents.LoginPlayer(this, player);
             Debug.Log($"{player.name} - {player.id}");
+        }
         else Debug.Log($"Player has not been found or password is incorrect");
 	}
 }

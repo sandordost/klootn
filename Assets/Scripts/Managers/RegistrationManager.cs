@@ -6,24 +6,21 @@ public class RegistrationManager : MonoBehaviour
 	public TMP_InputField usernameInputField;
 	public TMP_InputField passwordInputField;
 	private IDatabaseManager databaseManager;
+	private GameEvents gameEvents;
 
 	private void Start()
 	{
 		databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
+		gameEvents = GameEvents.instance;
 	}
 
 	public void RegisterPlayer()
 	{
-		NewPlayer player = new NewPlayer(usernameInputField.text, "0", passwordInputField.text);
+		NewPlayer newPlayer = new NewPlayer(usernameInputField.text, "0", passwordInputField.text);
 
-		StartCoroutine(databaseManager.RegisterPlayer(player, (newPlayer) =>
+		StartCoroutine(databaseManager.RegisterPlayer(newPlayer, (player) =>
 		{
-			PlayerRegistered(newPlayer);
+			gameEvents.RegisterPlayer(this, player);
 		}));
-	}
-
-	public void PlayerRegistered(Player player)
-	{
-		Debug.Log($"{player.id} + {player.name}");
 	}
 }
