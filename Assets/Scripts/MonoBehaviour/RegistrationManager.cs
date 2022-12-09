@@ -10,6 +10,8 @@ public class RegistrationManager : MonoBehaviour
 	public TMP_Text passwordErrorMessage;
 
 	private IDatabaseManager databaseManager;
+	private PlayerManager playerManager;
+
 	private GameEventsManager gameEvents;
 	private InputValidator inputValidator = new InputValidator();
 
@@ -18,7 +20,10 @@ public class RegistrationManager : MonoBehaviour
 		usernameErrorMessage.gameObject.SetActive(false);
 		passwordErrorMessage.gameObject.SetActive(false);
 
-		databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
+		GameManager gameManager = GameManager.GetGameManager();
+
+		databaseManager = gameManager.dataManager.databaseManager;
+		playerManager = gameManager.dataManager.playerManager;
 
 		gameEvents = GameEventsManager.instance;
 	}
@@ -36,10 +41,19 @@ public class RegistrationManager : MonoBehaviour
 		if (nameResult.Equals(ValidationResult.Validated) &&
 			passwordResult.Equals(ValidationResult.Validated))
 		{
-			StartCoroutine(databaseManager.RegisterPlayer(newPlayer, (player) =>
+			StartCoroutine(inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (validationResult) =>
 			{
-				gameEvents.RegisterPlayer(this, player);
+				if (validationResult == ValidationResult.AlreadyExists)
+					ShowValidationError(validationResult, passwordResult);
+				else
+				{
+					StartCoroutine(databaseManager.RegisterPlayer(newPlayer, (player) =>
+					{
+						RegisterPlayer(player);
+					}));
+				}
 			}));
+
 		}
 		else
 		{
@@ -47,50 +61,26 @@ public class RegistrationManager : MonoBehaviour
 		}
 	}
 
+	private void RegisterPlayer(Player player)
+	{
+		playerManager.Client = player;
+		gameEvents.RegisterPlayer(this, player);
+	}
+
 	public void ShowValidationError(ValidationResult nameResult, ValidationResult passwordResult)
 	{
-		string usernameString = GetUsernameErrorMessage(nameResult);
-		if(usernameString != null)
+		string usernameString = inputValidator.GetUsernameErrorMessage(nameResult);
+		if (usernameString != null)
 		{
 			usernameErrorMessage.gameObject.SetActive(true);
 			usernameErrorMessage.text = usernameString;
 		}
 
-		string passwordString = GetPasswordErrorMessage(passwordResult);
-		if(passwordString != null)
+		string passwordString = inputValidator.GetPasswordErrorMessage(passwordResult);
+		if (passwordString != null)
 		{
 			passwordErrorMessage.gameObject.SetActive(true);
 			passwordErrorMessage.text = passwordString;
 		}
-	}
-
-	private string GetUsernameErrorMessage(ValidationResult validationResult)
-	{
-		return validationResult switch
-		{
-			ValidationResult.ShortStringLength =>
-				$"Username is shorter than {inputValidator.minPlayerNameSize} characters",
-			ValidationResult.LargeStringLength =>
-				$"Username is larger than {inputValidator.maxPlayerNameSize} characters",
-			ValidationResult.UnusableCharacters =>
-				$"Username contains unusable characters",
-			ValidationResult.Validated => null,
-			_ => null,
-		};
-	}
-
-	private string GetPasswordErrorMessage(ValidationResult validationResult)
-	{
-		return validationResult switch
-		{
-			ValidationResult.ShortStringLength =>
-				$"Password is shorter than {inputValidator.minPasswordSize} characters",
-			ValidationResult.LargeStringLength =>
-				$"Password is larger than {inputValidator.maxPasswordSize} characters",
-			ValidationResult.UnusableCharacters =>
-				$"Password contains unusable characters",
-			ValidationResult.Validated => null,
-			_ => null
-		};
 	}
 }
