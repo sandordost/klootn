@@ -11,12 +11,14 @@ public class MotdManager : MonoBehaviour
 	public RawImage motdImage;
 
 	private IDatabaseManager databaseManager;
-
-	
+	private IStorageManager storageManager;
 
 	private void Start()
 	{
-		databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
+		GameManager gameManager = GameManager.GetGameManager();
+
+		databaseManager = gameManager.dataManager.databaseManager;
+		storageManager = gameManager.dataManager.storageManager;
 
 		SetUIComponents();
 	}
@@ -28,14 +30,20 @@ public class MotdManager : MonoBehaviour
 			title.text = motd.Title;
 			message.text = motd.Message;
 
-			motdImage.texture = GetMotdImage(motd.ImageUrl);
+			StartCoroutine(GetMotdImage(motd, (texture) =>
+			{
+				motdImage.texture = texture;
+			}));
 		}));
 		
 	}
 
-	private Texture GetMotdImage(string imgUrl)
+	private IEnumerator GetMotdImage(Motd motd, Action<Texture> callback)
 	{
-		return null;
+		yield return storageManager.GetImage(motd, (texture) =>
+		{
+			callback.Invoke(texture);
+		});
 	}
 
 	private IEnumerator GetLatestMotd(Action<Motd> callback)

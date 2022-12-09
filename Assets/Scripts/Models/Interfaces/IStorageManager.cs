@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IStorageManager
 {
-	public IEnumerator GetMotdImage(Action<Texture> callback);
+	public IEnumerator GetImage(Motd motd, Action<Texture> callback);
 }
