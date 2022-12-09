@@ -7,8 +7,8 @@ public class GameEvents : MonoBehaviour
 {
     public static GameEvents instance;
 
-	public event EventHandler<LoginEventArgs> PlayerLoggedIn;
-	public event EventHandler<RegisterEventArgs> PlayerRegistered;
+	public event EventHandler<LoginEventArgs> OnPlayerLoggedIn;
+	public event EventHandler<RegisterEventArgs> OnPlayerRegistered;
 
 	private void Awake()
 	{
@@ -19,13 +19,15 @@ public class GameEvents : MonoBehaviour
 	{
 		RegisterEventArgs eventArgs = new RegisterEventArgs() { player = registeredPlayer };
 
-		PlayerRegistered.Invoke(sender, eventArgs);
+		if(OnPlayerRegistered != null)
+			OnPlayerRegistered.Invoke(sender, eventArgs);
 	}
 
 	public void LoginPlayer(object sender, Player loggedInPlayer)
 	{
 		LoginEventArgs eventArgs = new LoginEventArgs() { player = loggedInPlayer };
 
-		PlayerLoggedIn.Invoke(sender, eventArgs);
+		if(OnPlayerLoggedIn != null)
+			OnPlayerLoggedIn.Invoke(sender, eventArgs);
 	}
 }

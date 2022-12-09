@@ -1,22 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MenuManager : MonoBehaviour
 {
 	public GameObject mainMenuBackground;
 	public GameObject accountMenuBackground;
+
 	public GameObject mainMenu;
 	public GameObject accountMenu;
 
 	private GameObject[] menus;
 	private GameObject[] backgrounds;
+
 	private GameEvents gameEvents;
 
 	private void Start()
 	{
 		gameEvents = GameEvents.instance;
-		gameEvents.PlayerLoggedIn += OnPlayerLoggedIn;
+		gameEvents.OnPlayerLoggedIn += PlayerLoggedIn;
+		gameEvents.OnPlayerRegistered += PlayerRegistered;
 
 		menus = new GameObject[]{
 			mainMenu,
@@ -30,16 +31,11 @@ public class MenuManager : MonoBehaviour
 		};
 	}
 
-	private void OnPlayerLoggedIn(object sender, LoginEventArgs e)
-	{
-		NavigateTo(KlootnMenu.MainMenu);
-	}
-
 	public void NavigateTo(KlootnMenu klootnMenu)
 	{
 		GameObject objToNavigateTo = GetMenu(klootnMenu);
 
-		foreach(GameObject obj in menus)
+		foreach (GameObject obj in menus)
 		{
 			if (objToNavigateTo.Equals(obj))
 				obj.SetActive(true);
@@ -48,6 +44,16 @@ public class MenuManager : MonoBehaviour
 		}
 
 		SwapBackground(klootnMenu);
+	}
+
+	private void PlayerRegistered(object sender, RegisterEventArgs e)
+	{
+		NavigateTo(KlootnMenu.MainMenu);
+	}
+
+	private void PlayerLoggedIn(object sender, LoginEventArgs e)
+	{
+		NavigateTo(KlootnMenu.MainMenu);
 	}
 
 	private void SwapBackground(KlootnMenu klootnMenu)

@@ -64,7 +64,7 @@ public class RegistrationManager : MonoBehaviour
 		}
 	}
 
-	public string GetUsernameErrorMessage(ValidationResult validationResult)
+	private string GetUsernameErrorMessage(ValidationResult validationResult)
 	{
 		return validationResult switch
 		{
@@ -79,7 +79,7 @@ public class RegistrationManager : MonoBehaviour
 		};
 	}
 
-	public string GetPasswordErrorMessage(ValidationResult validationResult)
+	private string GetPasswordErrorMessage(ValidationResult validationResult)
 	{
 		return validationResult switch
 		{
