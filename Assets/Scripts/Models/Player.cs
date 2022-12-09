@@ -2,15 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Firebase.Firestore;
 
+[FirestoreData]
 public class Player
 {
-	public string name;
-	public string password;
+	[FirestoreDocumentId]
+	public string id { get; set; }
 
-	public Player(string name, string password)
+	[FirestoreProperty]
+	public string name { get; set; }
+
+	public Player()
+	{
+
+	}
+
+	public Player(string name, string id)
 	{
 		this.name = name;
-		this.password = password;
+		this.id = id;
 	}
 }
