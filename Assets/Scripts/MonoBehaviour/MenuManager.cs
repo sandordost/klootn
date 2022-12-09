@@ -11,11 +11,11 @@ public class MenuManager : MonoBehaviour
 	private GameObject[] menus;
 	private GameObject[] backgrounds;
 
-	private GameEvents gameEvents;
+	private GameEventsManager gameEvents;
 
 	private void Start()
 	{
-		gameEvents = GameEvents.instance;
+		gameEvents = GameEventsManager.instance;
 		gameEvents.OnPlayerLoggedIn += PlayerLoggedIn;
 		gameEvents.OnPlayerRegistered += PlayerRegistered;
 

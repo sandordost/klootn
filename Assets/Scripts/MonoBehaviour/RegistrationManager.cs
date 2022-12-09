@@ -10,7 +10,7 @@ public class RegistrationManager : MonoBehaviour
 	public TMP_Text passwordErrorMessage;
 
 	private IDatabaseManager databaseManager;
-	private GameEvents gameEvents;
+	private GameEventsManager gameEvents;
 	private InputValidator inputValidator = new InputValidator();
 
 	private void Start()
@@ -20,7 +20,7 @@ public class RegistrationManager : MonoBehaviour
 
 		databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
 
-		gameEvents = GameEvents.instance;
+		gameEvents = GameEventsManager.instance;
 	}
 
 	public void RegisterPlayer()

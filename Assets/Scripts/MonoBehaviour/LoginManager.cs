@@ -8,12 +8,12 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField usernameInputField;
     public TMP_InputField passwordInputField;
     private IDatabaseManager databaseManager;
-    private GameEvents gameEvents;
+    private GameEventsManager gameEvents;
 
     private void Start()
     {
         databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
-        gameEvents = GameEvents.instance;
+        gameEvents = GameEventsManager.instance;
     }
 
     public void LogIn()

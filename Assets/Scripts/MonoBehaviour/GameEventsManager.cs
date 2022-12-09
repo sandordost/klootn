@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameEvents : MonoBehaviour
+public class GameEventsManager : MonoBehaviour
 {
-    public static GameEvents instance;
+    public static GameEventsManager instance;
 
 	public event EventHandler<LoginEventArgs> OnPlayerLoggedIn;
 	public event EventHandler<RegisterEventArgs> OnPlayerRegistered;
