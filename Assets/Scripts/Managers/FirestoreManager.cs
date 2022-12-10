@@ -14,6 +14,24 @@ public class FirestoreManager : IDatabaseManager
 		firestore = FirebaseFirestore.DefaultInstance;
 	}
 
+	public IEnumerator GetLatestMotd(Action<Motd> callback)
+	{
+		CollectionReference collectionReference = firestore.Collection("Motds");
+
+		var task = collectionReference.OrderByDescending("Uploaddate").GetSnapshotAsync();
+
+		yield return new WaitUntil(() => task.IsCompleted);
+
+		QuerySnapshot result = task.Result;
+
+		Motd motd = null;
+
+		if(result.Count > 0)
+			motd = result[0].ConvertTo<Motd>();
+
+		callback.Invoke(motd);
+	}
+
 	public IEnumerator RegisterPlayer(NewPlayer newPlayer, Action<Player> callback)
 	{
 		CollectionReference colRef = firestore.Collection("Players");
@@ -34,7 +52,37 @@ public class FirestoreManager : IDatabaseManager
 		callback.Invoke(result);
 	}
 
-	public IEnumerator GetPlayers(Action<List<Player>> callBack)
+	public IEnumerator Login(NewPlayer newPlayer, Action<Player> callback)
+	{
+		CollectionReference playersRef = firestore.Collection("Players");
+
+		Query query = playersRef.WhereEqualTo("name", newPlayer.name);
+		query = query.WhereEqualTo("password", newPlayer.password);
+
+		var task = query.GetSnapshotAsync();
+
+		yield return new WaitUntil(() => task.IsCompleted);
+
+		var result = task.Result;
+
+		Player playerResult = null;
+
+		if (result.Count > 0)
+			playerResult = result[0].ConvertTo<Player>();
+
+		callback.Invoke(playerResult);
+	}
+
+	public IEnumerator PlayerExists(NewPlayer newPlayer, Action<bool> callback)
+	{
+		yield return GetPlayerByName(newPlayer.name, (player) =>
+		{
+			if (player == null) callback.Invoke(false);
+			else callback.Invoke(true);
+		});
+	}
+
+	private IEnumerator GetPlayers(Action<List<Player>> callBack)
 	{
 		List<Player> playersResult = new();
 
@@ -46,7 +94,7 @@ public class FirestoreManager : IDatabaseManager
 
 		QuerySnapshot snapshot = collecting.Result;
 
-		foreach(var item in snapshot.Documents)
+		foreach (var item in snapshot.Documents)
 		{
 			Player newPlayer = item.ConvertTo<Player>();
 
@@ -88,29 +136,11 @@ public class FirestoreManager : IDatabaseManager
 
 		QuerySnapshot result = task.Result;
 
-		Player player = result[0].ConvertTo<Player>();
+		Player player = null;
+
+		if(result.Count > 0)
+			player = result[0].ConvertTo<Player>();
 
 		callback.Invoke(player);
-	}
-
-	public IEnumerator Login(NewPlayer newPlayer, Action<Player> callback)
-	{
-		CollectionReference playersRef = firestore.Collection("Players");
-
-		Query query = playersRef.WhereEqualTo("name", newPlayer.name);
-		query = query.WhereEqualTo("password", newPlayer.password);
-
-		var task = query.GetSnapshotAsync();
-
-		yield return new WaitUntil(() => task.IsCompleted);
-
-		var result = task.Result;
-
-		Player playerResult = null;
-
-		if (result.Count > 0)
-			playerResult = result[0].ConvertTo<Player>();
-
-		callback.Invoke(playerResult);
 	}
 }
