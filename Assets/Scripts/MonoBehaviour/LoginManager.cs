@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.Diagnostics;
 
 public class LoginManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class LoginManager : MonoBehaviour
 
     public TMP_Text usernameErrorMessage;
     public TMP_Text passwordErrorMessage;
+    public TMP_Text overalErrorMessage;
 
     private IDatabaseManager databaseManager;
     private PlayerManager playerManager;
@@ -17,6 +19,12 @@ public class LoginManager : MonoBehaviour
     private GameEventsManager gameEvents;
 
     private InputValidator inputValidator = new InputValidator();
+
+    public int maxLoginAttempts = 10;
+    public int secondsCooldown = 60;
+
+    private int loginAttempts = 0;
+    private Stopwatch loginCooldownTimer = new Stopwatch();
 
     private void Start()
     {
@@ -29,48 +37,85 @@ public class LoginManager : MonoBehaviour
 
         usernameErrorMessage.gameObject.SetActive(false);
         passwordErrorMessage.gameObject.SetActive(false);
+        overalErrorMessage.gameObject.SetActive(false);
     }
 
     public void LogIn()
 	{
-        usernameErrorMessage.gameObject.SetActive(false);
-        passwordErrorMessage.gameObject.SetActive(false);
-
-        NewPlayer newPlayer = new NewPlayer(usernameInputField.text, passwordInputField.text);
-
-        ValidationResult nameResult = inputValidator.ValidatePlayerName(newPlayer.name);
-        ValidationResult passwordResult = inputValidator.ValidatePlayerPassword(newPlayer.password);
-
-        if (nameResult.Equals(ValidationResult.Validated) && 
-            passwordResult.Equals(ValidationResult.Validated))
+        if (HasLoginAttempts())
         {
-            StartCoroutine(inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (validationResult) =>
+            usernameErrorMessage.gameObject.SetActive(false);
+            passwordErrorMessage.gameObject.SetActive(false);
+            overalErrorMessage.gameObject.SetActive(false);
+
+            NewPlayer newPlayer = new NewPlayer(usernameInputField.text, passwordInputField.text);
+
+            ValidationResult nameResult = inputValidator.ValidatePlayerName(newPlayer.name);
+            ValidationResult passwordResult = inputValidator.ValidatePlayerPassword(newPlayer.password);
+
+            if (nameResult.Equals(ValidationResult.Validated) &&
+                passwordResult.Equals(ValidationResult.Validated))
             {
-                if (validationResult.Equals(ValidationResult.AlreadyExists))
+                StartCoroutine(inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (validationResult) =>
                 {
-                    StartCoroutine(databaseManager.Login(newPlayer, (player) =>
+                    if (validationResult.Equals(ValidationResult.AlreadyExists))
                     {
-                        if (player != null)
+                        StartCoroutine(databaseManager.Login(newPlayer, (player) =>
                         {
-                            PlayerLoggedIn(player);
-                        }
-						else
-						{
-                            ShowValidationError(nameResult, ValidationResult.PasswordIncorrect);
-						}
-                    }));
-                }
-				else
-				{
-                    ShowValidationError(ValidationResult.DoesNotExist, passwordResult);
-                }
-            }));
+                            if (player != null)
+                            {
+                                PlayerLoggedIn(player);
+                            }
+                            else
+                            {
+                                ShowValidationError(nameResult, ValidationResult.PasswordIncorrect);
+                            }
+                        }));
+                    }
+                    else
+                    {
+                        ShowValidationError(ValidationResult.DoesNotExist, passwordResult);
+                    }
+                }));
+            }
+            else
+            {
+                ShowValidationError(nameResult, passwordResult);
+            }
         }
 		else
 		{
-            ShowValidationError(nameResult, passwordResult);
+            ShowErrorMessage($"Too many login attempts. You must wait ({secondsCooldown - loginCooldownTimer.Elapsed.Seconds}) seconds");
 		}
 	}
+
+	private bool HasLoginAttempts()
+	{
+        if (loginAttempts < maxLoginAttempts)
+        {
+            loginAttempts++;
+            return true;
+        }
+
+        if (loginCooldownTimer.IsRunning)
+        {
+            if (loginCooldownTimer.Elapsed.Seconds < secondsCooldown) return false;
+
+            loginAttempts = 0;
+
+            loginCooldownTimer.Stop();
+            loginCooldownTimer.Reset();
+        }
+        else loginCooldownTimer.Start();
+
+        return false;
+    }
+
+    private void ShowErrorMessage(string message)
+    {
+        overalErrorMessage.text = message;
+        overalErrorMessage.gameObject.SetActive(true);
+    }
 
     private void PlayerLoggedIn(Player player)
 	{
