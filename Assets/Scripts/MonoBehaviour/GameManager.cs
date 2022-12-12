@@ -7,11 +7,15 @@ public class GameManager : MonoBehaviour
 	public SceneManager sceneManager;
 	public SettingsManager settingsManager;
 
+	public int standardFramerate;
+
 	private void Awake()
 	{
 		instance = this;
 		DontDestroyOnLoad(gameObject);
 		sceneManager.LoadScene(KlootnScene.MainMenu);
+
+		ChangeFramerate(standardFramerate);
 	}
 
 	/// <summary>
@@ -21,5 +25,10 @@ public class GameManager : MonoBehaviour
 	public static GameManager GetGameManager()
 	{
 		return instance;
+	}
+
+	private void ChangeFramerate(int framerate)
+	{
+		Application.targetFrameRate = framerate;
 	}
 }
