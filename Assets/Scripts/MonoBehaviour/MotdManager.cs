@@ -38,6 +38,12 @@ public class MotdManager : MonoBehaviour
 
 	}
 
+	/// <summary>
+	/// Gets the <see cref="Texture"/> from the <see cref="databaseManager"/> using the <see cref="Motd.ImageUrl"/> from <paramref name="motd"/>.
+	/// </summary>
+	/// <param name="motd"></param>
+	/// <param name="callback"></param>
+	/// <returns></returns>
 	private IEnumerator GetMotdImage(Motd motd, Action<Texture> callback)
 	{
 		yield return storageManager.GetImage(motd, (texture) =>
@@ -46,6 +52,11 @@ public class MotdManager : MonoBehaviour
 		});
 	}
 
+	/// <summary>
+	/// Gets the latest <see cref="Motd"/> from the <see cref="databaseManager"/>. 
+	/// </summary>
+	/// <param name="callback"></param>
+	/// <returns></returns>
 	private IEnumerator GetLatestMotd(Action<Motd> callback)
 	{
 		yield return databaseManager.GetLatestMotd((motd) =>

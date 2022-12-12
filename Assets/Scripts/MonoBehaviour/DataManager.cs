@@ -19,6 +19,10 @@ public class DataManager : MonoBehaviour
 		SetStorageOption(StorageOption.FirebaseStorage);
 	}
 
+	/// <summary>
+	/// Sets the <see cref="IStorageManager"/> using the given <paramref name="option"/>
+	/// </summary>
+	/// <param name="option"></param>
 	private void SetStorageOption(StorageOption option)
 	{
 		switch (option)
@@ -29,6 +33,10 @@ public class DataManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Sets the <see cref="IDatabaseManager"/> using the <paramref name="option"/>.
+	/// </summary>
+	/// <param name="option"></param>
 	private void SetDatabaseManager(DatabaseOption option)
 	{
 		switch (option)

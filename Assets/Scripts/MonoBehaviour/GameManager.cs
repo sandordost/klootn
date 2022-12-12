@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
 		sceneManager.LoadScene(KlootnScene.MainMenu);
 	}
 
+	/// <summary>
+	/// Returns the singleton instance of <see cref="GameManager"/>
+	/// </summary>
+	/// <returns></returns>
 	public static GameManager GetGameManager()
 	{
 		return instance;

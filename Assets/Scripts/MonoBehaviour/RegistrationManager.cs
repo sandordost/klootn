@@ -20,7 +20,7 @@ public class RegistrationManager : MonoBehaviour
 	public int maxRegisterAttempts = 10;
 	public int secondsCooldown = 60;
 
-	private int RegisterAttempts = 0;
+	private int registerAttempts = 0;
 	private Stopwatch registerCooldownTimer = new Stopwatch();
 
 	private void Start()
@@ -40,6 +40,9 @@ public class RegistrationManager : MonoBehaviour
 		gameEvents = GameEventsManager.instance;
 	}
 
+	/// <summary>
+	/// If the player has <see cref="registerAttempts"/>, this method will do <see cref="TryRegister"/>. Else <see cref="ShowErrorMessage(string)"/>
+	/// </summary>
 	public void RegisterPlayer()
 	{
 		if (HasRegisterAttempts())
@@ -52,6 +55,9 @@ public class RegistrationManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Attempt to register using "<see cref="usernameInputField"/>" and "<see cref="passwordInputField"/>" as input data
+	/// </summary>
 	private void TryRegister()
 	{
 		usernameErrorMessage.gameObject.SetActive(false);
@@ -74,11 +80,10 @@ public class RegistrationManager : MonoBehaviour
 				{
 					StartCoroutine(databaseManager.RegisterPlayer(newPlayer, (player) =>
 					{
-						RegisterPlayer(player);
+						PlayerRegistered(player);
 					}));
 				}
 			}));
-
 		}
 		else
 		{
@@ -86,17 +91,38 @@ public class RegistrationManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Uses <see cref="inputValidator"/> to set <see cref="usernameInputField"/> and <see cref="passwordInputField"/> to the correct error message
+	/// </summary>
+	/// <param name="nameResult"></param>
+	/// <param name="passwordResult"></param>
+	private void ShowValidationError(ValidationResult nameResult, ValidationResult passwordResult)
+	{
+		inputValidator.ShowValidationError(nameResult, passwordResult, usernameErrorMessage, passwordErrorMessage);
+	}
+
+	/// <summary>
+	/// Sets the <see cref="TMP_InputField.text"/> property to <paramref name="message"/> of (<see cref="TMP_InputField"/>) <see cref="overalErrorMessage"/>
+	/// </summary>
+	/// <param name="message"></param>
 	private void ShowErrorMessage(string message)
 	{
 		overalErrorMessage.text = message;
 		overalErrorMessage.gameObject.SetActive(true);
 	}
 
+	/// <summary>
+	/// Checks whether the player has <see cref="registerAttempts"/>. 
+	/// <para>
+	/// Uses <see cref="registerCooldownTimer"/> to add a cooldown of: <see cref="secondsCooldown"/> 
+	/// </para>
+	/// </summary>
+	/// <returns><b>True</b>: if <see cref="registerAttempts"/> are available. Else <b>False</b></returns>
 	private bool HasRegisterAttempts()
 	{
-		if (RegisterAttempts < maxRegisterAttempts)
+		if (registerAttempts < maxRegisterAttempts)
 		{
-			RegisterAttempts++;
+			registerAttempts++;
 			return true;
 		}
 
@@ -104,7 +130,7 @@ public class RegistrationManager : MonoBehaviour
 		{
 			if (registerCooldownTimer.Elapsed.Seconds < secondsCooldown) return false;
 
-			RegisterAttempts = 0;
+			registerAttempts = 0;
 
 			registerCooldownTimer.Stop();
 			registerCooldownTimer.Reset();
@@ -114,26 +140,13 @@ public class RegistrationManager : MonoBehaviour
 		return false;
 	}
 
-	private void RegisterPlayer(Player player)
+	/// <summary>
+	/// Sets <see cref="PlayerManager.Client"/> to the player and triggers the <see cref="GameEventsManager.OnPlayerLoggedIn"/>
+	/// </summary>
+	/// <param name="player"></param>
+	private void PlayerRegistered(Player player)
 	{
 		playerManager.Client = player;
 		gameEvents.RegisterPlayer(this, player);
-	}
-
-	private void ShowValidationError(ValidationResult nameResult, ValidationResult passwordResult)
-	{
-		string usernameString = inputValidator.GetUsernameErrorMessage(nameResult);
-		if (usernameString != null)
-		{
-			usernameErrorMessage.gameObject.SetActive(true);
-			usernameErrorMessage.text = usernameString;
-		}
-
-		string passwordString = inputValidator.GetPasswordErrorMessage(passwordResult);
-		if (passwordString != null)
-		{
-			passwordErrorMessage.gameObject.SetActive(true);
-			passwordErrorMessage.text = passwordString;
-		}
 	}
 }

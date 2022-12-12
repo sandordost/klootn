@@ -13,6 +13,11 @@ public class GameEventsManager : MonoBehaviour
 		instance = this;
 	}
 
+	/// <summary>
+	/// The event that gets triggered once the client registers a new account
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="registeredPlayer"></param>
 	public void RegisterPlayer(object sender, Player registeredPlayer)
 	{
 		RegisterEventArgs eventArgs = new RegisterEventArgs() { player = registeredPlayer };
@@ -21,6 +26,11 @@ public class GameEventsManager : MonoBehaviour
 			OnPlayerRegistered.Invoke(sender, eventArgs);
 	}
 
+	/// <summary>
+	/// The events that triggers once the client logs in
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="loggedInPlayer"></param>
 	public void LoginPlayer(object sender, Player loggedInPlayer)
 	{
 		LoginEventArgs eventArgs = new LoginEventArgs() { player = loggedInPlayer };

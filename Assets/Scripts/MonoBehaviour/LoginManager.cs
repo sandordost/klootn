@@ -41,6 +41,9 @@ public class LoginManager : MonoBehaviour
 		overalErrorMessage.gameObject.SetActive(false);
 	}
 
+	/// <summary>
+	/// If the player has <see cref="loginAttempts"/>, this method will do <see cref="TryLogin"/>. Else <see cref="ShowErrorMessage(string)"/>
+	/// </summary>
 	public void LogIn()
 	{
 		if (HasLoginAttempts())
@@ -53,6 +56,9 @@ public class LoginManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Attempt to login using "<see cref="usernameInputField"/>" and "<see cref="passwordInputField"/>" as input data
+	/// </summary>
 	private void TryLogin()
 	{
 		usernameErrorMessage.gameObject.SetActive(false);
@@ -95,6 +101,23 @@ public class LoginManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Uses <see cref="inputValidator"/> to set <see cref="usernameInputField"/> and <see cref="passwordInputField"/> to the correct error message
+	/// </summary>
+	/// <param name="nameResult"></param>
+	/// <param name="passwordResult"></param>
+	private void ShowValidationError(ValidationResult nameResult, ValidationResult passwordResult)
+	{
+		inputValidator.ShowValidationError(nameResult, passwordResult, usernameErrorMessage, passwordErrorMessage);
+	}
+
+	/// <summary>
+	/// Checks whether the player has <see cref="loginAttempts"/>. 
+	/// <para>
+	/// Uses <see cref="loginCooldownTimer"/> to add a cooldown of: <see cref="secondsCooldown"/> 
+	/// </para>
+	/// </summary>
+	/// <returns><b>True</b>: if <see cref="loginAttempts"/> are available. Else <b>False</b></returns>
 	private bool HasLoginAttempts()
 	{
 		if (loginAttempts < maxLoginAttempts)
@@ -117,35 +140,26 @@ public class LoginManager : MonoBehaviour
 		return false;
 	}
 
+	/// <summary>
+	/// Sets the <see cref="TMP_InputField.text"/> property to <paramref name="message"/> of (<see cref="TMP_InputField"/>) <see cref="overalErrorMessage"/>
+	/// </summary>
+	/// <param name="message"></param>
 	private void ShowErrorMessage(string message)
 	{
 		overalErrorMessage.text = message;
 		overalErrorMessage.gameObject.SetActive(true);
 	}
 
+	/// <summary>
+	/// Sets <see cref="PlayerManager.Client"/> to the player and triggers the <see cref="GameEventsManager.OnPlayerLoggedIn"/>
+	/// </summary>
+	/// <param name="player"></param>
 	private void PlayerLoggedIn(Player player)
 	{
 		if (player != null)
 		{
 			playerManager.Client = player;
 			gameEvents.LoginPlayer(this, player);
-		}
-	}
-
-	private void ShowValidationError(ValidationResult nameResult, ValidationResult passwordResult)
-	{
-		string usernameString = inputValidator.GetUsernameErrorMessage(nameResult);
-		if (usernameString != null)
-		{
-			usernameErrorMessage.gameObject.SetActive(true);
-			usernameErrorMessage.text = usernameString;
-		}
-
-		string passwordString = inputValidator.GetPasswordErrorMessage(passwordResult);
-		if (passwordString != null)
-		{
-			passwordErrorMessage.gameObject.SetActive(true);
-			passwordErrorMessage.text = passwordString;
 		}
 	}
 }

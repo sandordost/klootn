@@ -3,6 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+/// <summary>
+/// Implements <see cref="IDatabaseManager"/>. Manages the data from the <b>Google Firebase Database</b>
+/// </summary>
 public class FirebaseManager : IDatabaseManager
 {
 	DatabaseReference databaseReference;
