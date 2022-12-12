@@ -1,13 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using UnityEngine.EventSystems;
 
 namespace TranslucentUI
 {
 	[AddComponentMenu("TranslucentUI/TranslucentUI")]
 	//[RequireComponent(typeof(Canvas))]
-	public class TranslucentUI : MonoBehaviour 
+	public class TranslucentUI : MonoBehaviour
 	{
 		//[Range(0f, 1f)]
 		//public float Transparency = 0.5f;
@@ -15,7 +13,7 @@ namespace TranslucentUI
 		[SerializeField]
 		public Camera mainCamera;
 
-		public BlurOption     blurOption = BlurOption.BlurBehindUI;
+		public BlurOption blurOption = BlurOption.BlurBehindUI;
 
 		public BlurKernelSize kernalSize = BlurKernelSize.Medium;
 
@@ -48,36 +46,36 @@ namespace TranslucentUI
 		private TranslucentUICameraMobile translucentUICameraMobile = null;
 
 		// Use this for initialization
-		void Start () 
+		void Start()
 		{
-			
+
 		}
 
 		public void AddTranslucencyComponent()
 		{
-			if(shader == null)
-				shader = Shader.Find ("Custom/Translucency");
+			if (shader == null)
+				shader = Shader.Find("Custom/Translucency");
 
-			if(translucencyMat)
-				translucencyMat = new Material (shader);
+			if (translucencyMat)
+				translucencyMat = new Material(shader);
 
 
-			if(ApplyOnChildren)
+			if (ApplyOnChildren)
 			{
-				AddTranslucencyComponentOnChildren ();
+				AddTranslucencyComponentOnChildren();
 			}
 			else
 			{
-				uiImage = this.GetComponent<Image> ();
-				if(uiImage != null)
+				uiImage = this.GetComponent<Image>();
+				if (uiImage != null)
 				{
-					Translucency translucency = uiImage.gameObject.GetComponent<Translucency> ();
-					if (translucency == null) 
+					Translucency translucency = uiImage.gameObject.GetComponent<Translucency>();
+					if (translucency == null)
 					{
-						translucency = uiImage.gameObject.AddComponent<Translucency>();	
-						translucency.SetTranslucencyMaterial (translucencyMat);
-						translucency.SetGreyScale (GreyScale);
-						translucency.SetBrightness (Brightness);
+						translucency = uiImage.gameObject.AddComponent<Translucency>();
+						translucency.SetTranslucencyMaterial(translucencyMat);
+						translucency.SetGreyScale(GreyScale);
+						translucency.SetBrightness(Brightness);
 					}
 				}
 			}
@@ -87,24 +85,24 @@ namespace TranslucentUI
 
 		public void AddTranslucentUICamera()
 		{
-			if (mainCamera) 
+			if (mainCamera)
 			{
-				translucentUICamera = mainCamera.gameObject.GetComponent<TranslucentUICamera> ();
-				if (translucentUICamera == null) 
+				translucentUICamera = mainCamera.gameObject.GetComponent<TranslucentUICamera>();
+				if (translucentUICamera == null)
 				{
-					mainCamera.gameObject.AddComponent<TranslucentUICamera> ();
+					mainCamera.gameObject.AddComponent<TranslucentUICamera>();
 				}
 			}
 		}
 
 		public void RemoveTranslucentUICamera()
 		{
-			if (mainCamera) 
+			if (mainCamera)
 			{
-				TranslucentUICamera tuc = mainCamera.gameObject.GetComponent<TranslucentUICamera> ();
-				if (tuc != null) 
+				TranslucentUICamera tuc = mainCamera.gameObject.GetComponent<TranslucentUICamera>();
+				if (tuc != null)
 				{
-					DestroyImmediate (tuc);
+					DestroyImmediate(tuc);
 					translucentUICamera = null;
 				}
 			}
@@ -112,24 +110,24 @@ namespace TranslucentUI
 
 		public void AddTranslucentUICameraMobile()
 		{
-			if (mainCamera) 
+			if (mainCamera)
 			{
-				translucentUICameraMobile = mainCamera.gameObject.GetComponent<TranslucentUICameraMobile> ();
-				if (translucentUICameraMobile == null) 
+				translucentUICameraMobile = mainCamera.gameObject.GetComponent<TranslucentUICameraMobile>();
+				if (translucentUICameraMobile == null)
 				{
-					mainCamera.gameObject.AddComponent<TranslucentUICameraMobile> ();
+					mainCamera.gameObject.AddComponent<TranslucentUICameraMobile>();
 				}
 			}
 		}
 
 		public void RemoveTranslucentUICameraMobile()
 		{
-			if (mainCamera) 
+			if (mainCamera)
 			{
-				TranslucentUICameraMobile tuc = mainCamera.gameObject.GetComponent<TranslucentUICameraMobile> ();
-				if (tuc != null) 
+				TranslucentUICameraMobile tuc = mainCamera.gameObject.GetComponent<TranslucentUICameraMobile>();
+				if (tuc != null)
 				{
-					DestroyImmediate (tuc);
+					DestroyImmediate(tuc);
 					translucentUICameraMobile = null;
 				}
 			}
@@ -137,60 +135,60 @@ namespace TranslucentUI
 
 		public void AddTranslucencyComponentOnChildren()
 		{
-			uiImages = this.GetComponentsInChildren<Image> ();
-			for (int i = 0; i < uiImages.Length; i++) 
+			uiImages = this.GetComponentsInChildren<Image>();
+			for (int i = 0; i < uiImages.Length; i++)
 			{
-				Translucency translucency = uiImages [i].gameObject.GetComponent<Translucency> ();
-				if (translucency == null) 
+				Translucency translucency = uiImages[i].gameObject.GetComponent<Translucency>();
+				if (translucency == null)
 				{
-					translucency = uiImages [i].gameObject.AddComponent<Translucency>();	
-					translucency.SetTranslucencyMaterial (translucencyMat);
-					translucency.SetGreyScale (GreyScale);
-					translucency.SetBrightness (Brightness);
+					translucency = uiImages[i].gameObject.AddComponent<Translucency>();
+					translucency.SetTranslucencyMaterial(translucencyMat);
+					translucency.SetGreyScale(GreyScale);
+					translucency.SetBrightness(Brightness);
 				}
 			}
 		}
 
 		public void RemoveTranslucentUI()
 		{
-			foreach (Image image in GetComponentsInChildren<Image>()) 
+			foreach (Image image in GetComponentsInChildren<Image>())
 			{
-				Translucency translucency = image.GetComponent<Translucency> ();
-				if (translucency != null) 
+				Translucency translucency = image.GetComponent<Translucency>();
+				if (translucency != null)
 				{
-					DestroyImmediate (translucency);
+					DestroyImmediate(translucency);
 				}
 			}
-			RemoveTranslucentUICamera ();
+			RemoveTranslucentUICamera();
 			RemoveTranslucentUICameraMobile();
 
-			TranslucentUI tui = GetComponent<TranslucentUI> ();
-			if(tui != null)
+			TranslucentUI tui = GetComponent<TranslucentUI>();
+			if (tui != null)
 			{
-				DestroyImmediate (tui);
+				DestroyImmediate(tui);
 			}
 		}
 
-	
+
 		public void RemoveTranslucencyComponentFromChildren()
 		{
-			foreach (Image image in GetComponentsInChildren<Image>()) 
+			foreach (Image image in GetComponentsInChildren<Image>())
 			{
-				Translucency translucency = image.GetComponent<Translucency> ();
+				Translucency translucency = image.GetComponent<Translucency>();
 				TranslucentUI translucentUI = image.GetComponent<TranslucentUI>();
-				if (translucency != null && translucentUI == null) 
+				if (translucency != null && translucentUI == null)
 				{
-					DestroyImmediate (translucency);
+					DestroyImmediate(translucency);
 				}
 			}
-			uiImages = this.GetComponentsInChildren<Image> ();
+			uiImages = this.GetComponentsInChildren<Image>();
 		}
 
 		public void ApplyCameraProperties()
 		{
-			if(MobileDevice)
+			if (MobileDevice)
 			{
-				if(translucentUICameraMobile != null)
+				if (translucentUICameraMobile != null)
 				{
 					translucentUICameraMobile.blurOption = blurOption;
 					translucentUICameraMobile.DownSample = DownSample;
@@ -200,7 +198,7 @@ namespace TranslucentUI
 			}
 			else
 			{
-				if(translucentUICamera != null)
+				if (translucentUICamera != null)
 				{
 					translucentUICamera.blurOption = blurOption;
 					translucentUICamera.DownSample = DownSample;
@@ -213,40 +211,42 @@ namespace TranslucentUI
 		}
 
 		// Update is called once per frame
-		void Update () 
+		void Update()
 		{
-			if (ApplyOnChildren == true) 
+			if (ApplyOnChildren == true)
 			{
-				for (int i = 0; i < uiImages.Length; i++) 
+				for (int i = 0; i < uiImages.Length; i++)
 				{
-					Translucency translucency = uiImages [i].gameObject.GetComponent<Translucency>();
-					translucency.SetGreyScale (GreyScale);
-					translucency.SetBrightness (Brightness);
-				}	
+					Translucency translucency = uiImages[i].gameObject.GetComponent<Translucency>();
+					translucency.SetGreyScale(GreyScale);
+					translucency.SetBrightness(Brightness);
+				}
 			}
-			else 
+			else
 			{
-				if(uiImage != null)
+				if (uiImage != null)
 				{
 					Translucency translucency = uiImage.gameObject.GetComponent<Translucency>();
-					translucency.SetGreyScale (GreyScale);
-					translucency.SetBrightness (Brightness);	
+					translucency.SetGreyScale(GreyScale);
+					translucency.SetBrightness(Brightness);
 				}
 			}
 
 
-			if (blurOption == BlurOption.BlurBackground) 
+			if (blurOption == BlurOption.BlurBackground)
 			{
-				if(MobileDevice)
+				if (MobileDevice)
 				{
-					if (translucentUICameraMobile != null) {
+					if (translucentUICameraMobile != null)
+					{
 						translucentUICameraMobile.Brightness = Brightness;
 						translucentUICameraMobile.GreyScale = GreyScale;
 					}
 				}
 				else
 				{
-					if (translucentUICamera != null) {
+					if (translucentUICamera != null)
+					{
 						translucentUICamera.Brightness = Brightness;
 						translucentUICamera.GreyScale = GreyScale;
 					}

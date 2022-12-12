@@ -1,21 +1,18 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-    public IDatabaseManager databaseManager;
+	public IDatabaseManager databaseManager;
 	public IStorageManager storageManager;
 
-    public PlayerManager playerManager;
-    public LobbyManager lobbyManager;
-    public GameCommandsManager gameCommandsManager;
-    public GameStateManager gameStateManager;
+	public PlayerManager playerManager;
+	public LobbyManager lobbyManager;
+	public GameCommandsManager gameCommandsManager;
+	public GameStateManager gameStateManager;
 
 	public DatabaseOption databaseOption;
 	public StorageOption storageOption;
-	
+
 	private void Awake()
 	{
 		SetDatabaseManager(databaseOption);

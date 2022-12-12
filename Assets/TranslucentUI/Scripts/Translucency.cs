@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace TranslucentUI
@@ -28,56 +26,56 @@ namespace TranslucentUI
 		private int _BrightnessID;
 		void Start()
 		{
-			translucentUICamera = FindObjectOfType<TranslucentUICamera> ();
-			if (translucentUICamera != null) 
+			translucentUICamera = FindObjectOfType<TranslucentUICamera>();
+			if (translucentUICamera != null)
 			{
-				image = this.GetComponent<Image> ();
-				if (translucentUICamera.blurOption == BlurOption.BlurBehindUI) 
+				image = this.GetComponent<Image>();
+				if (translucentUICamera.blurOption == BlurOption.BlurBehindUI)
 				{
-					if (translucencyMat != null) 
+					if (translucencyMat != null)
 					{
-						image.material = translucencyMat;		
-					} 
-					else 
+						image.material = translucencyMat;
+					}
+					else
 					{
-						Shader translucentImage = Shader.Find ("Custom/Translucency");
-						Material translucentMat = new Material (translucentImage);
+						Shader translucentImage = Shader.Find("Custom/Translucency");
+						Material translucentMat = new Material(translucentImage);
 						image.material = translucentMat;
 					}
-					_BlurTexID = Shader.PropertyToID ("_BlurTex");
-					_GreyScaleID = Shader.PropertyToID ("_GreyScale");
-					_BrightnessID = Shader.PropertyToID ("_Brightness");
-				}	
-			} 
-			else 
+					_BlurTexID = Shader.PropertyToID("_BlurTex");
+					_GreyScaleID = Shader.PropertyToID("_GreyScale");
+					_BrightnessID = Shader.PropertyToID("_Brightness");
+				}
+			}
+			else
 			{
-				translucentUICameraMobile = FindObjectOfType<TranslucentUICameraMobile> ();
-				if (translucentUICameraMobile != null) 
+				translucentUICameraMobile = FindObjectOfType<TranslucentUICameraMobile>();
+				if (translucentUICameraMobile != null)
 				{
-					image = this.GetComponent<Image> ();
-					if (translucentUICameraMobile.blurOption == BlurOption.BlurBehindUI) 
+					image = this.GetComponent<Image>();
+					if (translucentUICameraMobile.blurOption == BlurOption.BlurBehindUI)
 					{
-						if (translucencyMat != null) 
+						if (translucencyMat != null)
 						{
-							image.material = translucencyMat;		
-						} 
-						else 
+							image.material = translucencyMat;
+						}
+						else
 						{
-							Shader translucentImage = Shader.Find ("Custom/Translucency");
-							Material translucentMat = new Material (translucentImage);
+							Shader translucentImage = Shader.Find("Custom/Translucency");
+							Material translucentMat = new Material(translucentImage);
 							image.material = translucentMat;
 						}
-						_BlurTexID = Shader.PropertyToID ("_BlurTex");
-						_GreyScaleID = Shader.PropertyToID ("_GreyScale");
-						_BrightnessID = Shader.PropertyToID ("_Brightness");
-					}	
-				} 
+						_BlurTexID = Shader.PropertyToID("_BlurTex");
+						_GreyScaleID = Shader.PropertyToID("_GreyScale");
+						_BrightnessID = Shader.PropertyToID("_Brightness");
+					}
+				}
 			}
-			if (image) 
+			if (image)
 			{
 				Color color = image.color;
 				Transparency = 1 - color.a;
-			}	
+			}
 
 		}
 
@@ -103,27 +101,27 @@ namespace TranslucentUI
 
 		void LateUpdate()
 		{
-			if (translucentUICamera && translucentUICamera.blurOption == BlurOption.BlurBehindUI) 
+			if (translucentUICamera && translucentUICamera.blurOption == BlurOption.BlurBehindUI)
 			{
-				if (translucentUICamera.BlurRT != null) 
+				if (translucentUICamera.BlurRT != null)
 				{
-					image.materialForRendering.SetTexture (_BlurTexID, translucentUICamera.BlurRT);
+					image.materialForRendering.SetTexture(_BlurTexID, translucentUICamera.BlurRT);
 					//image.material.SetTexture (_BlurTexID, translucentUICamera.BlurRT);
 					image.material.SetFloat(_GreyScaleID, GreyScale);
 					image.material.SetFloat(_BrightnessID, Brightness);
 				}
-			} 
-			else if (translucentUICameraMobile && translucentUICameraMobile.blurOption == BlurOption.BlurBehindUI) 
+			}
+			else if (translucentUICameraMobile && translucentUICameraMobile.blurOption == BlurOption.BlurBehindUI)
 			{
-				if (translucentUICameraMobile.BlurRT != null) 
+				if (translucentUICameraMobile.BlurRT != null)
 				{
-					image.materialForRendering.SetTexture (_BlurTexID, translucentUICameraMobile.BlurRT);
+					image.materialForRendering.SetTexture(_BlurTexID, translucentUICameraMobile.BlurRT);
 					//image.material.SetTexture (_BlurTexID, translucentUICameraMobile.BlurRT);
 					image.material.SetFloat(_GreyScaleID, GreyScale);
 					image.material.SetFloat(_BrightnessID, Brightness);
 				}
 			}
-			if (image) 
+			if (image)
 			{
 				Color color = image.color;
 				color.a = 1.0f - Transparency;

@@ -16,7 +16,7 @@ public class FirebaseManager : IDatabaseManager
 	{
 		int playerId = 0;
 
-		yield return GetHighestId("Players", (int id) => 
+		yield return GetHighestId("Players", (int id) =>
 		{
 			playerId = id + 1;
 		});
@@ -48,7 +48,7 @@ public class FirebaseManager : IDatabaseManager
 				IEnumerable<DataSnapshot> dataSnapshots = response.Result.Children;
 
 				int highestFound = 0;
-				foreach(DataSnapshot snapshot in dataSnapshots)
+				foreach (DataSnapshot snapshot in dataSnapshots)
 				{
 					int result = int.Parse(snapshot.Value.ToString());
 					if (result > highestFound)
@@ -57,7 +57,7 @@ public class FirebaseManager : IDatabaseManager
 
 				onCallback.Invoke(highestFound);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Debug.Log($"Problem has occured: {ex.Message}");
 				onCallback.Invoke(0);

@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Firebase.Firestore;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Firebase.Extensions;
-using Firebase.Firestore;
 using UnityEngine;
 
 public class FirestoreManager : IDatabaseManager
@@ -26,7 +25,7 @@ public class FirestoreManager : IDatabaseManager
 
 		Motd motd = null;
 
-		if(result.Count > 0)
+		if (result.Count > 0)
 			motd = result[0].ConvertTo<Motd>();
 
 		callback.Invoke(motd);
@@ -39,7 +38,7 @@ public class FirestoreManager : IDatabaseManager
 		var addplayerTask = colRef.AddAsync(newPlayer);
 
 		yield return new WaitUntil(() => addplayerTask.IsCompleted);
-		
+
 		DocumentReference docRef = addplayerTask.Result;
 
 		Player result = null;
@@ -138,7 +137,7 @@ public class FirestoreManager : IDatabaseManager
 
 		Player player = null;
 
-		if(result.Count > 0)
+		if (result.Count > 0)
 			player = result[0].ConvertTo<Player>();
 
 		callback.Invoke(player);

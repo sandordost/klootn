@@ -1,7 +1,6 @@
-using UnityEngine;
-using TMPro;
-using System;
 using System.Diagnostics;
+using TMPro;
+using UnityEngine;
 
 public class RegistrationManager : MonoBehaviour
 {
@@ -30,6 +29,9 @@ public class RegistrationManager : MonoBehaviour
 		passwordErrorMessage.gameObject.SetActive(false);
 		overalErrorMessage.gameObject.SetActive(false);
 
+		usernameInputField.characterLimit = inputValidator.maxPlayerNameSize;
+		passwordInputField.characterLimit = inputValidator.maxPasswordSize;
+
 		GameManager gameManager = GameManager.GetGameManager();
 
 		databaseManager = gameManager.dataManager.databaseManager;
@@ -42,40 +44,45 @@ public class RegistrationManager : MonoBehaviour
 	{
 		if (HasRegisterAttempts())
 		{
-			usernameErrorMessage.gameObject.SetActive(false);
-			passwordErrorMessage.gameObject.SetActive(false);
-			overalErrorMessage.gameObject.SetActive(false);
-
-			NewPlayer newPlayer = new NewPlayer(usernameInputField.text, "0", passwordInputField.text);
-
-			ValidationResult nameResult = inputValidator.ValidatePlayerName(newPlayer.name);
-			ValidationResult passwordResult = inputValidator.ValidatePlayerPassword(newPlayer.password);
-
-			if (nameResult.Equals(ValidationResult.Validated) &&
-				passwordResult.Equals(ValidationResult.Validated))
-			{
-				StartCoroutine(inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (validationResult) =>
-				{
-					if (validationResult == ValidationResult.AlreadyExists)
-						ShowValidationError(validationResult, passwordResult);
-					else
-					{
-						StartCoroutine(databaseManager.RegisterPlayer(newPlayer, (player) =>
-						{
-							RegisterPlayer(player);
-						}));
-					}
-				}));
-
-			}
-			else
-			{
-				ShowValidationError(nameResult, passwordResult);
-			}
+			TryRegister();
 		}
 		else
 		{
 			ShowErrorMessage($"Too many register attempts. You must wait ({secondsCooldown - registerCooldownTimer.Elapsed.Seconds}) seconds");
+		}
+	}
+
+	private void TryRegister()
+	{
+		usernameErrorMessage.gameObject.SetActive(false);
+		passwordErrorMessage.gameObject.SetActive(false);
+		overalErrorMessage.gameObject.SetActive(false);
+
+		NewPlayer newPlayer = new NewPlayer(usernameInputField.text, "0", passwordInputField.text);
+
+		ValidationResult nameResult = inputValidator.ValidatePlayerName(newPlayer.name);
+		ValidationResult passwordResult = inputValidator.ValidatePlayerPassword(newPlayer.password);
+
+		if (nameResult.Equals(ValidationResult.Validated) &&
+			passwordResult.Equals(ValidationResult.Validated))
+		{
+			StartCoroutine(inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (validationResult) =>
+			{
+				if (validationResult == ValidationResult.AlreadyExists)
+					ShowValidationError(validationResult, passwordResult);
+				else
+				{
+					StartCoroutine(databaseManager.RegisterPlayer(newPlayer, (player) =>
+					{
+						RegisterPlayer(player);
+					}));
+				}
+			}));
+
+		}
+		else
+		{
+			ShowValidationError(nameResult, passwordResult);
 		}
 	}
 
@@ -113,7 +120,7 @@ public class RegistrationManager : MonoBehaviour
 		gameEvents.RegisterPlayer(this, player);
 	}
 
-	public void ShowValidationError(ValidationResult nameResult, ValidationResult passwordResult)
+	private void ShowValidationError(ValidationResult nameResult, ValidationResult passwordResult)
 	{
 		string usernameString = inputValidator.GetUsernameErrorMessage(nameResult);
 		if (usernameString != null)

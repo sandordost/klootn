@@ -35,7 +35,7 @@ public class MotdManager : MonoBehaviour
 				motdImage.texture = texture;
 			}));
 		}));
-		
+
 	}
 
 	private IEnumerator GetMotdImage(Motd motd, Action<Texture> callback)
@@ -48,7 +48,7 @@ public class MotdManager : MonoBehaviour
 
 	private IEnumerator GetLatestMotd(Action<Motd> callback)
 	{
-		yield return databaseManager.GetLatestMotd((motd) => 
+		yield return databaseManager.GetLatestMotd((motd) =>
 		{
 			callback.Invoke(motd);
 		});

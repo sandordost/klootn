@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameEventsManager : MonoBehaviour
 {
-    public static GameEventsManager instance;
+	public static GameEventsManager instance;
 
 	public event EventHandler<LoginEventArgs> OnPlayerLoggedIn;
 	public event EventHandler<RegisterEventArgs> OnPlayerRegistered;
@@ -19,7 +17,7 @@ public class GameEventsManager : MonoBehaviour
 	{
 		RegisterEventArgs eventArgs = new RegisterEventArgs() { player = registeredPlayer };
 
-		if(OnPlayerRegistered != null)
+		if (OnPlayerRegistered != null)
 			OnPlayerRegistered.Invoke(sender, eventArgs);
 	}
 
@@ -27,7 +25,7 @@ public class GameEventsManager : MonoBehaviour
 	{
 		LoginEventArgs eventArgs = new LoginEventArgs() { player = loggedInPlayer };
 
-		if(OnPlayerLoggedIn != null)
+		if (OnPlayerLoggedIn != null)
 			OnPlayerLoggedIn.Invoke(sender, eventArgs);
 	}
 }

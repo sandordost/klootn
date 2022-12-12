@@ -5,9 +5,10 @@ using System.Collections;
 public class InputValidator
 {
 	public readonly int minPlayerNameSize = 3;
-	public readonly int maxPlayerNameSize = 20;
+	public readonly int maxPlayerNameSize = 18;
+
 	public readonly int minPasswordSize = 6;
-	public readonly int maxPasswordSize = 20;
+	public readonly int maxPasswordSize = 30;
 
 	private readonly char[] unpermittedNameCharacters =
 		{ ' ', '\\', '/', ';', ':', '\'', '\"', '|', ',', '_', };

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -10,11 +8,11 @@ public class GameManager : MonoBehaviour
 	public SettingsManager settingsManager;
 
 	private void Awake()
-    {
+	{
 		instance = this;
-        DontDestroyOnLoad(gameObject);
+		DontDestroyOnLoad(gameObject);
 		sceneManager.LoadScene(KlootnScene.MainMenu);
-    }
+	}
 
 	public static GameManager GetGameManager()
 	{

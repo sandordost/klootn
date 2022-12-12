@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Firebase.Storage;
+using System;
 using System.Collections;
 using UnityEngine;
-using Firebase.Storage;
 
 public class FirebaseStorageManager : IStorageManager
 {
@@ -20,7 +20,7 @@ public class FirebaseStorageManager : IStorageManager
 	{
 		StorageReference motdImageRef = firebaseStorage.GetReferenceFromUrl(motd.ImageUrl);
 
-		Texture2D texture = new Texture2D(1,1);
+		Texture2D texture = new Texture2D(1, 1);
 
 		var task = motdImageRef.GetBytesAsync(maxFileSize);
 

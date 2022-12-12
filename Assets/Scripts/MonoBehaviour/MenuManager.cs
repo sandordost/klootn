@@ -88,7 +88,7 @@ public class MenuManager : MonoBehaviour
 				return accountMenu;
 			case KlootnMenu.MainMenu:
 				return mainMenu;
-			default: 
+			default:
 				return accountMenu;
 		}
 	}

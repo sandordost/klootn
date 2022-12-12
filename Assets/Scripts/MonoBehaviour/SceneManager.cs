@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ public class SceneManager : MonoBehaviour
 
 	private void Start()
 	{
-		
+
 	}
 
 	private Dictionary<KlootnScene, string> klootnSceneNames = new Dictionary<KlootnScene, string>()
@@ -26,7 +25,7 @@ public class SceneManager : MonoBehaviour
 	public KlootnScene? GetCurrentScene()
 	{
 		UnityEngine.SceneManagement.Scene currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-		
+
 		string currentSceneName = currentScene.name;
 
 		return GetKlootnScene(currentSceneName);
@@ -34,7 +33,7 @@ public class SceneManager : MonoBehaviour
 
 	private KlootnScene? GetKlootnScene(string sceneName)
 	{
-		foreach(KeyValuePair<KlootnScene, string> pair in klootnSceneNames)
+		foreach (KeyValuePair<KlootnScene, string> pair in klootnSceneNames)
 		{
 			if (pair.Value == sceneName) return pair.Key;
 		}

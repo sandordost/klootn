@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace TranslucentUI
 {
 	[AddComponentMenu("TranslucentUI/TranslucentUICamera")]
 	//[RequireComponent(typeof(Camera))]
-	public class TranslucentUICamera : MonoBehaviour 
+	public class TranslucentUICamera : MonoBehaviour
 	{
 		//private Camera mainCamera = null;
 		private RenderTexture blurRT = null;
@@ -16,7 +14,7 @@ namespace TranslucentUI
 		private int screenHeight;
 		private int screenWidth;
 
-		public BlurOption     blurOption = BlurOption.BlurBehindUI;
+		public BlurOption blurOption = BlurOption.BlurBehindUI;
 
 		public BlurKernelSize kernalSize = BlurKernelSize.Medium;
 
@@ -40,37 +38,38 @@ namespace TranslucentUI
 
 		public RenderTexture BlurRT
 		{
-			get 
+			get
 			{
 				return blurRT;
 			}
 		}
 
-		void Start () 
+		void Start()
 		{
-			
+
 		}
 
-		void Awake ()
+		void Awake()
 		{
-			blurBackgroundMat = new Material (Shader.Find ("Custom/CameraBlur")) as Material;
+			blurBackgroundMat = new Material(Shader.Find("Custom/CameraBlur")) as Material;
 
-			__GreyScaleID = Shader.PropertyToID ("__GreyScale");
-			__BrightnessID = Shader.PropertyToID ("__Brightness");
+			__GreyScaleID = Shader.PropertyToID("__GreyScale");
+			__BrightnessID = Shader.PropertyToID("__Brightness");
 
 			blurRT = new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32);
 
 			screenHeight = Screen.height;
 			screenWidth = Screen.width;
 
-			blurRT.Create ();
+			blurRT.Create();
 			lastCameraUpdateTime = 0.0f;
 		}
 
-		void Update () 
+		void Update()
 		{
 			minCameraUpdateGap = 1.0f / UpdateFrameRate;
-			if (blurOption == BlurOption.BlurBackground) {
+			if (blurOption == BlurOption.BlurBackground)
+			{
 				blurBackgroundMat.SetFloat(__GreyScaleID, GreyScale);
 				blurBackgroundMat.SetFloat(__BrightnessID, Brightness);
 			}
@@ -91,9 +90,9 @@ namespace TranslucentUI
 
 				if (i == Iterations - 1)
 				{
-					if (blurOption == BlurOption.BlurBehindUI) 
+					if (blurOption == BlurOption.BlurBehindUI)
 					{
-						destination.DiscardContents ();
+						destination.DiscardContents();
 					}
 					Graphics.Blit(tempRT2, destination, blurBackgroundMat, kernal + 2);
 				}
@@ -107,9 +106,9 @@ namespace TranslucentUI
 			RenderTexture.ReleaseTemporary(tempRT2);
 		}
 
-		void OnRenderImage (RenderTexture source, RenderTexture destination)
+		void OnRenderImage(RenderTexture source, RenderTexture destination)
 		{
-			if (screenWidth != Screen.width && screenHeight != Screen.height) 
+			if (screenWidth != Screen.width && screenHeight != Screen.height)
 			{
 				screenWidth = Screen.width;
 				screenHeight = Screen.height;
@@ -119,27 +118,27 @@ namespace TranslucentUI
 				blurRT.width = Screen.width;
 			}
 
-			if (blurOption == BlurOption.BlurBackground) 
+			if (blurOption == BlurOption.BlurBackground)
 			{
-				if (Iterations == 0) 
+				if (Iterations == 0)
 				{
-					Graphics.Blit (source, destination);
+					Graphics.Blit(source, destination);
 					return;
 				}
 				int w = Screen.width >> DownSample;
 				int h = Screen.height >> DownSample;
 
-				RenderTexture tempRT = RenderTexture.GetTemporary (w, h, 0, source.format);
-				Graphics.Blit (source, tempRT);
-				BlurBackground (tempRT, destination);
-				RenderTexture.ReleaseTemporary (tempRT);
-			} 
-			else if (blurOption == BlurOption.BlurBehindUI) 
+				RenderTexture tempRT = RenderTexture.GetTemporary(w, h, 0, source.format);
+				Graphics.Blit(source, tempRT);
+				BlurBackground(tempRT, destination);
+				RenderTexture.ReleaseTemporary(tempRT);
+			}
+			else if (blurOption == BlurOption.BlurBehindUI)
 			{
-				if (Iterations == 0) 
+				if (Iterations == 0)
 				{
-					Graphics.Blit (source, blurRT);
-					Graphics.Blit (source, destination);
+					Graphics.Blit(source, blurRT);
+					Graphics.Blit(source, destination);
 					return;
 				}
 				float now = Time.unscaledTime;
@@ -147,16 +146,16 @@ namespace TranslucentUI
 				{
 					int w = Screen.width >> DownSample;
 					int h = Screen.height >> DownSample;
-					RenderTexture tempRT = RenderTexture.GetTemporary (w, h, 0, source.format);
-					Graphics.Blit (source, tempRT);
-					BlurBackground (tempRT, blurRT);
+					RenderTexture tempRT = RenderTexture.GetTemporary(w, h, 0, source.format);
+					Graphics.Blit(source, tempRT);
+					BlurBackground(tempRT, blurRT);
 					RenderTexture.ReleaseTemporary(tempRT);
 					lastCameraUpdateTime = Time.unscaledTime;
 				}
 
-				Graphics.Blit (source, destination);
+				Graphics.Blit(source, destination);
 			}
 		}
-			
+
 	}
 }
