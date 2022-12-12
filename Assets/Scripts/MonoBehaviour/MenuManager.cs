@@ -120,4 +120,14 @@ public class MenuManager : MonoBehaviour
 				return accountMenu;
 		}
 	}
+
+	/// <summary>
+	/// Set (<see cref="GameObject"/>) <paramref name="obj"/> to (<see cref="bool"/>) <paramref name="active"/>
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="active"></param>
+	public void ToggleMenu(GameObject obj)
+	{
+		obj.SetActive(!obj.activeSelf);
+	}
 }
