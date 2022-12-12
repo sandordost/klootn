@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,19 +24,15 @@ public class MotdManager : MonoBehaviour
 		SetUIComponents();
 	}
 
-	private void SetUIComponents()
+	private async void SetUIComponents()
 	{
-		StartCoroutine(GetLatestMotd((motd) =>
-		{
-			title.text = motd.Title;
-			message.text = motd.Message;
+		Motd motd = await GetLatestMotd();
 
-			StartCoroutine(GetMotdImage(motd, (texture) =>
-			{
-				motdImage.texture = texture;
-			}));
-		}));
+		title.text = motd.Title;
+		message.text = motd.Message;
 
+		Texture texture = await GetMotdImage(motd);
+		motdImage.texture = texture;
 	}
 
 	/// <summary>
@@ -44,12 +41,9 @@ public class MotdManager : MonoBehaviour
 	/// <param name="motd"></param>
 	/// <param name="callback"></param>
 	/// <returns></returns>
-	private IEnumerator GetMotdImage(Motd motd, Action<Texture> callback)
+	private async Task<Texture> GetMotdImage(Motd motd)
 	{
-		yield return storageManager.GetImage(motd, (texture) =>
-		{
-			callback.Invoke(texture);
-		});
+		return await storageManager.GetImage(motd);
 	}
 
 	/// <summary>
@@ -57,11 +51,8 @@ public class MotdManager : MonoBehaviour
 	/// </summary>
 	/// <param name="callback"></param>
 	/// <returns></returns>
-	private IEnumerator GetLatestMotd(Action<Motd> callback)
+	private async Task<Motd> GetLatestMotd()
 	{
-		yield return databaseManager.GetLatestMotd((motd) =>
-		{
-			callback.Invoke(motd);
-		});
+		return await databaseManager.GetLatestMotd();
 	}
 }

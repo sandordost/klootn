@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 
 public class InputValidator
@@ -45,7 +46,7 @@ public class InputValidator
 	}
 
 	/// <summary>
-	/// Asyncronously passes a <see cref="ValidationResult"/> through to <paramref name="callback"/> using <see cref="IDatabaseManager.PlayerExists(NewPlayer, Action{bool})"/>
+	/// Asyncronously returns a <see cref="ValidationResult"/> using <see cref="IDatabaseManager.PlayerExists(NewPlayer, Action{bool})"/>
 	/// </summary>
 	/// <param name="newPlayer"></param>
 	/// <param name="databaseManager"></param>
@@ -54,13 +55,11 @@ public class InputValidator
 	/// <para><see cref="ValidationResult.AlreadyExists"/> : <paramref name="newPlayer"/> already exists in database</para>
 	/// <para><see cref="ValidationResult.Validated"/> : <paramref name="newPlayer"/> does not exists in the database yet</para>
 	/// </returns>
-	public IEnumerator ValidatePlayerNameExists(NewPlayer newPlayer, IDatabaseManager databaseManager, Action<ValidationResult> callback)
+	public async Task<ValidationResult> ValidatePlayerNameExists(NewPlayer newPlayer, IDatabaseManager databaseManager)
 	{
-		yield return databaseManager.PlayerExists(newPlayer, (exists) =>
-		{
-			if (exists) callback.Invoke(ValidationResult.AlreadyExists);
-			else callback.Invoke(ValidationResult.Validated);
-		});
+		bool playerExists = await databaseManager.PlayerExists(newPlayer);
+
+		return playerExists ? ValidationResult.AlreadyExists : ValidationResult.Validated;
 	}
 
 	/// <summary>

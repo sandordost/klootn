@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -16,40 +17,31 @@ public class FirebaseManager : IDatabaseManager
 		databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
 	}
 
-	public IEnumerator RegisterPlayer(NewPlayer newPlayer, Action<Player> onCallback)
+	public async Task<Player> RegisterPlayer(NewPlayer newPlayer)
 	{
-		int playerId = 0;
+		int playerId = await GetHighestId("Players");
 
-		yield return GetHighestId("Players", (int id) =>
-		{
-			playerId = id + 1;
-		});
+		playerId++;
 
-		yield return PushObject(newPlayer, "Players", playerId.ToString());
+		await PushObject(newPlayer, "Players", playerId.ToString());
 
-		Player result = new Player(newPlayer.name, playerId.ToString());
-
-		onCallback.Invoke(result);
+		return new Player(newPlayer.name, playerId.ToString());
 	}
 
-	private IEnumerator PushObject(object obj, string table, string id)
+	private async Task PushObject(object obj, string table, string id)
 	{
-		var task = databaseReference.Child(table).Child(id).SetRawJsonValueAsync(JsonUtility.ToJson(obj));
-
-		yield return new WaitUntil(() => task.IsCompleted);
+		await databaseReference.Child(table).Child(id).SetRawJsonValueAsync(JsonUtility.ToJson(obj));
 	}
 
-	private IEnumerator GetHighestId(string table, Action<int> onCallback)
+	private async Task<int> GetHighestId(string table)
 	{
-		var response = databaseReference.Child(table).GetValueAsync();
-
-		yield return new WaitUntil(() => response.IsCompleted);
+		var response = await databaseReference.Child(table).GetValueAsync();
 
 		if (response != null)
 		{
 			try
 			{
-				IEnumerable<DataSnapshot> dataSnapshots = response.Result.Children;
+				var dataSnapshots = response.Children;
 
 				int highestFound = 0;
 				foreach (DataSnapshot snapshot in dataSnapshots)
@@ -59,23 +51,18 @@ public class FirebaseManager : IDatabaseManager
 						highestFound = result;
 				}
 
-				onCallback.Invoke(highestFound);
+				return highestFound;
 			}
 			catch (Exception ex)
 			{
 				Debug.Log($"Problem has occured: {ex.Message}");
-				onCallback.Invoke(0);
+				return 0;
 			}
 		}
 		else
 		{
-			onCallback.Invoke(0);
+			return 0;
 		}
-	}
-
-	public IEnumerator Login(NewPlayer newPlayer, Action<Player> callback)
-	{
-		throw new NotImplementedException();
 	}
 
 	public IEnumerator PlayerExists(NewPlayer newPlayer, Action<bool> callback)
@@ -83,7 +70,17 @@ public class FirebaseManager : IDatabaseManager
 		throw new NotImplementedException();
 	}
 
-	public IEnumerator GetLatestMotd(Action<Motd> callback)
+	public Task<Motd> GetLatestMotd()
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<Player> Login(NewPlayer newPlayer)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<bool> PlayerExists(NewPlayer newPlayer)
 	{
 		throw new NotImplementedException();
 	}

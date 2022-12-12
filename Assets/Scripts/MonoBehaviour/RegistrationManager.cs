@@ -58,7 +58,7 @@ public class RegistrationManager : MonoBehaviour
 	/// <summary>
 	/// Attempt to register using "<see cref="usernameInputField"/>" and "<see cref="passwordInputField"/>" as input data
 	/// </summary>
-	private void TryRegister()
+	private async void TryRegister()
 	{
 		usernameErrorMessage.gameObject.SetActive(false);
 		passwordErrorMessage.gameObject.SetActive(false);
@@ -72,18 +72,14 @@ public class RegistrationManager : MonoBehaviour
 		if (nameResult.Equals(ValidationResult.Validated) &&
 			passwordResult.Equals(ValidationResult.Validated))
 		{
-			StartCoroutine(inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (validationResult) =>
+			ValidationResult validationResult = await inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager);
+			if (validationResult == ValidationResult.AlreadyExists)
+				ShowValidationError(validationResult, passwordResult);
+			else
 			{
-				if (validationResult == ValidationResult.AlreadyExists)
-					ShowValidationError(validationResult, passwordResult);
-				else
-				{
-					StartCoroutine(databaseManager.RegisterPlayer(newPlayer, (player) =>
-					{
-						PlayerRegistered(player);
-					}));
-				}
-			}));
+				Player player = await databaseManager.RegisterPlayer(newPlayer);
+				PlayerRegistered(player);
+			}
 		}
 		else
 		{

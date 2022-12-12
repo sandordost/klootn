@@ -59,7 +59,7 @@ public class LoginManager : MonoBehaviour
 	/// <summary>
 	/// Attempt to login using "<see cref="usernameInputField"/>" and "<see cref="passwordInputField"/>" as input data
 	/// </summary>
-	private void TryLogin()
+	private async void TryLogin()
 	{
 		usernameErrorMessage.gameObject.SetActive(false);
 		passwordErrorMessage.gameObject.SetActive(false);
@@ -73,27 +73,23 @@ public class LoginManager : MonoBehaviour
 		if (nameResult.Equals(ValidationResult.Validated) &&
 			passwordResult.Equals(ValidationResult.Validated))
 		{
-			StartCoroutine(inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (validationResult) =>
+			ValidationResult validationResult = await inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager);
+			if (validationResult.Equals(ValidationResult.AlreadyExists))
 			{
-				if (validationResult.Equals(ValidationResult.AlreadyExists))
+				Player player = await databaseManager.Login(newPlayer);
+				if (player != null)
 				{
-					StartCoroutine(databaseManager.Login(newPlayer, (player) =>
-					{
-						if (player != null)
-						{
-							PlayerLoggedIn(player);
-						}
-						else
-						{
-							ShowValidationError(nameResult, ValidationResult.PasswordIncorrect);
-						}
-					}));
+					PlayerLoggedIn(player);
 				}
 				else
 				{
-					ShowValidationError(ValidationResult.DoesNotExist, passwordResult);
+					ShowValidationError(nameResult, ValidationResult.PasswordIncorrect);
 				}
-			}));
+			}
+			else
+			{
+				ShowValidationError(ValidationResult.DoesNotExist, passwordResult);
+			}
 		}
 		else
 		{

@@ -1,24 +1,25 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class SQLDatabaseManager : IDatabaseManager
 {
-	public IEnumerator GetLatestMotd(Action<Motd> callback)
+	public Task<Motd> GetLatestMotd()
 	{
 		throw new NotImplementedException();
 	}
 
-	public IEnumerator Login(NewPlayer newPlayer, Action<Player> callback)
+	public Task<Player> Login(NewPlayer newPlayer)
 	{
 		throw new NotImplementedException();
 	}
 
-	public IEnumerator PlayerExists(NewPlayer newPlayer, Action<bool> callback)
+	public Task<bool> PlayerExists(NewPlayer newPlayer)
 	{
 		throw new NotImplementedException();
 	}
 
-	public IEnumerator RegisterPlayer(NewPlayer newPlayer, Action<Player> onCallback)
+	public Task<Player> RegisterPlayer(NewPlayer newPlayer)
 	{
 		throw new NotImplementedException();
 	}

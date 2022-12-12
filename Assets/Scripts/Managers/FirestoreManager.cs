@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class FirestoreManager : IDatabaseManager
@@ -13,72 +14,59 @@ public class FirestoreManager : IDatabaseManager
 		firestore = FirebaseFirestore.DefaultInstance;
 	}
 
-	public IEnumerator GetLatestMotd(Action<Motd> callback)
+	public async Task<Motd> GetLatestMotd()
 	{
 		CollectionReference collectionReference = firestore.Collection("Motds");
 
-		var task = collectionReference.OrderByDescending("Uploaddate").GetSnapshotAsync();
+		var task = await collectionReference.OrderByDescending("Uploaddate").GetSnapshotAsync();
 
-		yield return new WaitUntil(() => task.IsCompleted);
-
-		QuerySnapshot result = task.Result;
+		QuerySnapshot result = task;
 
 		Motd motd = null;
 
 		if (result.Count > 0)
 			motd = result[0].ConvertTo<Motd>();
 
-		callback.Invoke(motd);
+		return motd;
 	}
 
-	public IEnumerator RegisterPlayer(NewPlayer newPlayer, Action<Player> callback)
+	public async Task<Player> RegisterPlayer(NewPlayer newPlayer)
 	{
 		CollectionReference colRef = firestore.Collection("Players");
 
-		var addplayerTask = colRef.AddAsync(newPlayer);
+		var addplayerTask = await colRef.AddAsync(newPlayer);
 
-		yield return new WaitUntil(() => addplayerTask.IsCompleted);
+		DocumentReference docRef = addplayerTask;
 
-		DocumentReference docRef = addplayerTask.Result;
+		Player result = await GetPlayerById(docRef.Id);
 
-		Player result = null;
-
-		yield return GetPlayerById(docRef.Id, (player) =>
-		{
-			result = player;
-		});
-
-		callback.Invoke(result);
+		return result;
 	}
 
-	public IEnumerator Login(NewPlayer newPlayer, Action<Player> callback)
+	public async Task<Player> Login(NewPlayer newPlayer)
 	{
 		CollectionReference playersRef = firestore.Collection("Players");
 
 		Query query = playersRef.WhereEqualTo("name", newPlayer.name);
 		query = query.WhereEqualTo("password", newPlayer.password);
 
-		var task = query.GetSnapshotAsync();
+		var task = await query.GetSnapshotAsync();
 
-		yield return new WaitUntil(() => task.IsCompleted);
-
-		var result = task.Result;
+		var result = task;
 
 		Player playerResult = null;
 
 		if (result.Count > 0)
 			playerResult = result[0].ConvertTo<Player>();
 
-		callback.Invoke(playerResult);
+		return playerResult;
 	}
 
-	public IEnumerator PlayerExists(NewPlayer newPlayer, Action<bool> callback)
+	public async Task<bool> PlayerExists(NewPlayer newPlayer)
 	{
-		yield return GetPlayerByName(newPlayer.name, (player) =>
-		{
-			if (player == null) callback.Invoke(false);
-			else callback.Invoke(true);
-		});
+		Player player = await GetPlayerByName(newPlayer.name);
+
+		return player != null;
 	}
 
 	private IEnumerator GetPlayers(Action<List<Player>> callBack)
@@ -103,43 +91,39 @@ public class FirestoreManager : IDatabaseManager
 		callBack.Invoke(playersResult);
 	}
 
-	private IEnumerator GetPlayerById(string id, Action<Player> callback)
+	private async Task<Player> GetPlayerById(string id)
 	{
 		CollectionReference playersRef = firestore.Collection("Players");
 
 		Query query = playersRef.WhereEqualTo(FieldPath.DocumentId, id);
 
-		var task = query.GetSnapshotAsync();
+		var task = await query.GetSnapshotAsync();
 
-		yield return new WaitUntil(() => task.IsCompleted);
-
-		QuerySnapshot result = task.Result;
+		QuerySnapshot result = task;
 
 		Player player = null;
 
 		if (result.Count > 0)
 			player = result[0].ConvertTo<Player>();
 
-		callback.Invoke(player);
+		return player;
 	}
 
-	private IEnumerator GetPlayerByName(string name, Action<Player> callback)
+	private async Task<Player> GetPlayerByName(string name)
 	{
 		CollectionReference playersRef = firestore.Collection("Players");
 
 		Query query = playersRef.WhereEqualTo("name", name);
 
-		var task = query.GetSnapshotAsync();
+		var task = await query.GetSnapshotAsync();
 
-		yield return new WaitUntil(() => task.IsCompleted);
-
-		QuerySnapshot result = task.Result;
+		QuerySnapshot result = task;
 
 		Player player = null;
 
 		if (result.Count > 0)
 			player = result[0].ConvertTo<Player>();
 
-		callback.Invoke(player);
+		return player;
 	}
 }
