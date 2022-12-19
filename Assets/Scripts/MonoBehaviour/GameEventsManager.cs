@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameEventsManager : MonoBehaviour
 {
-	public static GameEventsManager instance;
+	private static GameEventsManager instance;
 
 	public event EventHandler<LoginEventArgs> OnPlayerLoggedIn;
 	public event EventHandler<RegisterEventArgs> OnPlayerRegistered;
@@ -37,5 +38,13 @@ public class GameEventsManager : MonoBehaviour
 
 		if (OnPlayerLoggedIn != null)
 			OnPlayerLoggedIn.Invoke(sender, eventArgs);
+	}
+
+	/// <summary>
+	/// Gets the instance of singleton <see cref="GameEventsManager"/>
+	/// </summary>
+	public static GameEventsManager GetInstance()
+	{
+		return instance;
 	}
 }

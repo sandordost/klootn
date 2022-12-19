@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
@@ -45,8 +46,8 @@ public class DataManager : MonoBehaviour
 				databaseManager = new FirebaseManager();
 				break;
 			case DatabaseOption.SQLDatabase:
-				databaseManager = new SQLDatabaseManager();
-				break;
+				databaseManager = null;
+				throw new NotImplementedException();
 			case DatabaseOption.Firestore:
 				databaseManager = new FirestoreManager();
 				break;

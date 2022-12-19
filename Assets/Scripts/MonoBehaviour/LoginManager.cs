@@ -34,7 +34,7 @@ public class LoginManager : MonoBehaviour
 		databaseManager = gameManager.dataManager.databaseManager;
 		playerManager = gameManager.dataManager.playerManager;
 
-		gameEvents = GameEventsManager.instance;
+		gameEvents = GameEventsManager.GetInstance();
 
 		usernameErrorMessage.gameObject.SetActive(false);
 		passwordErrorMessage.gameObject.SetActive(false);

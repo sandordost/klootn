@@ -30,13 +30,49 @@ public class FirestoreManager : IDatabaseManager
 		return motd;
 	}
 
+	public async Task<List<Lobby>> GetLobbies()
+	{
+		CollectionReference colRef = firestore.Collection("Lobbies");
+
+		QuerySnapshot snapshot = await colRef.GetSnapshotAsync();
+
+		List<Lobby> result = new();
+
+		foreach(var item in snapshot.Documents)
+		{
+			result.Add(item.ConvertTo<Lobby>());
+		}
+
+		return result;
+	}
+
+	public async Task<Lobby> CreateLobby(Player host, string name, string description)
+	{
+		Lobby lobby = new()
+		{
+			Host = host,
+			Name = name,
+			Description = description
+		};
+
+		lobby.Players.Add(host);
+
+		CollectionReference colRef = firestore.Collection("Lobbies");
+
+		DocumentReference newDocument = await colRef.AddAsync(lobby);
+
+		lobby.Id = newDocument.Id;
+
+		return lobby;
+	}
+
 	public async Task<Player> RegisterPlayer(NewPlayer newPlayer)
 	{
 		CollectionReference colRef = firestore.Collection("Players");
 
-		var addplayerTask = await colRef.AddAsync(newPlayer);
+		DocumentReference addedPlayer = await colRef.AddAsync(newPlayer);
 
-		DocumentReference docRef = addplayerTask;
+		DocumentReference docRef = addedPlayer;
 
 		Player result = await GetPlayerById(docRef.Id);
 
@@ -69,26 +105,20 @@ public class FirestoreManager : IDatabaseManager
 		return player != null;
 	}
 
-	private IEnumerator GetPlayers(Action<List<Player>> callBack)
+	public async Task<List<Player>> GetPlayers()
 	{
-		List<Player> playersResult = new();
+		CollectionReference playersRef = firestore.Collection("Players");
 
-		CollectionReference docRef = firestore.Collection("Players");
+		QuerySnapshot snapshot = await playersRef.GetSnapshotAsync();
 
-		var collecting = docRef.GetSnapshotAsync();
-
-		yield return new WaitUntil(() => collecting.IsCompleted);
-
-		QuerySnapshot snapshot = collecting.Result;
+		List<Player> result = new();
 
 		foreach (var item in snapshot.Documents)
 		{
-			Player newPlayer = item.ConvertTo<Player>();
-
-			playersResult.Add(newPlayer);
+			result.Add(item.ConvertTo<Player>());
 		}
 
-		callBack.Invoke(playersResult);
+		return result;
 	}
 
 	private async Task<Player> GetPlayerById(string id)

@@ -84,4 +84,19 @@ public class FirebaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
+	public Task<List<Lobby>> GetLobbies()
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<List<Player>> GetPlayers()
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<Lobby> CreateLobby(Player host, string title, string description)
+	{
+		throw new NotImplementedException();
+	}
 }

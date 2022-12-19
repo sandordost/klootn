@@ -1,9 +1,16 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 public interface IDatabaseManager
 {
+	/// <summary>
+	/// Gets all existing <b>lobbies</b> in the database
+	/// </summary>
+	/// <returns><see cref="List{T}"/> of <see cref="Lobby"/> objects</returns>
+	public Task<List<Lobby>> GetLobbies();
+
 	/// <summary>
 	/// Tries to add the <paramref name="newPlayer"/> to the <b>Database</b>. 
 	/// </summary>
@@ -34,4 +41,17 @@ public interface IDatabaseManager
 	/// <param name="callback"></param>
 	/// <returns></returns>
 	public Task<Motd> GetLatestMotd();
+
+	/// <summary>
+	/// Gets all players from the database
+	/// </summary>
+	/// <returns>A new <see cref="List{T}"/> with the class <see cref="Player"/></returns>
+	public Task<List<Player>> GetPlayers();
+
+	/// <summary>
+	/// Adds a new lobby to the database
+	/// </summary>
+	/// <param name="host"></param>
+	/// <returns><see cref="Lobby"/> that was created in the database</returns>
+	public Task<Lobby> CreateLobby(Player host, string title, string description);
 }
