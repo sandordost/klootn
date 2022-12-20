@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,17 +8,32 @@ public class InLobbyManagerUI : MonoBehaviour
 {
 	public TMP_Text titleText;
 
+	public GameObject inLobbyPage;
+
 	public GameObject playerUIPrefabParent;
 
 	public GameObject playerUIPrefab;
 
 	public float inLobbyRefreshTime = 3;
 
-	public string CurrentLobbyId { get; set; }
-
 	private LobbyManager lobbyManager;
 
 	private float inLobbyRefreshTimeElapsed = 0;
+
+	private string currentLobbyId;
+
+	public string CurrentLobbyId 
+	{ 
+		get 
+		{ 
+			return currentLobbyId; 
+		} 
+		set 
+		{ 
+			currentLobbyId = value;
+			UpdateInLobbyUI();
+		} 
+	}
 
 	private void Start()
 	{
@@ -28,16 +44,16 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private void Update()
 	{
-		DoTimedUpdate();
+		TimedUpdate();
 	}
 
-	private void DoTimedUpdate()
+	private void TimedUpdate()
 	{
 		if (inLobbyRefreshTimeElapsed >= inLobbyRefreshTime)
 		{
-			if (playerUIPrefabParent.activeSelf)
+			if (inLobbyPage.activeSelf)
 			{
-				lobbyManager.RefreshLobbies();
+				DoTimedUpdate();
 			}
 			inLobbyRefreshTimeElapsed = 0;
 		}
@@ -47,8 +63,30 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
+	private void DoTimedUpdate()
+	{
+		lobbyManager.RefreshLobbies();
+	}
+
 	private void LobbyManager_LobbiesChanged(object sender, LobbiesChangedEventArgs e)
 	{
-		
+		foreach (Lobby lobby in e.ChangedLobbies.Keys)
+		{
+			if (lobby.Id == CurrentLobbyId)
+			{
+				UpdateInLobbyUI(lobby);
+			}
+		}
+	}
+
+	private async void UpdateInLobbyUI()
+	{
+		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
+		UpdateInLobbyUI(lobby);
+	}
+
+	private void UpdateInLobbyUI(Lobby lobby)
+	{
+		titleText.text = lobby.Name;
 	}
 }

@@ -14,7 +14,7 @@ public class Lobby
 	public List<Player> Players { get; set; }
 
 	[FirestoreProperty]
-	public Player Host { get; set; }
+	public string HostId { get; set; }
 
 	[FirestoreProperty]
 	public string Name { get; set; }

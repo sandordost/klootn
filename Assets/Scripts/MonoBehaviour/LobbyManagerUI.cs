@@ -14,14 +14,17 @@ public class LobbyManagerUI : MonoBehaviour
 	public UIPageSwitcher pageSwitcher;
 
 	private LobbyManager lobbyManager;
+	private InLobbyManagerUI inLobbyManagerUI;
 
 	public float lobbyRefreshTime = 5;
 	private float lobbyRefreshTimeElapsed = 0;
 
 	void Start()
 	{
+		UIManager uiManager = UIManager.GetInstance();
 		GameManager gameManager = GameManager.GetGameManager();
 		lobbyManager = gameManager.dataManager.lobbyManager;
+		inLobbyManagerUI = uiManager.inLobbyManagerUI;
 
 		lobbyManager.OnLobbiesChanged += LobbiesChanged;
 	}
@@ -37,7 +40,7 @@ public class LobbyManagerUI : MonoBehaviour
 		{
 			if (lobbyPage.activeSelf)
 			{
-				RefreshLobbies();
+				lobbyManager.RefreshLobbies();
 			}
 			lobbyRefreshTimeElapsed = 0;
 		}
@@ -49,15 +52,15 @@ public class LobbyManagerUI : MonoBehaviour
 
 	public async void CreateNewLobby()
 	{
-		//TODO: Create new lobby and swap page to inLobbyPage
 		Lobby lobby = await lobbyManager.CreateLobby();
 		OpenLobbyUI(lobby.Id);
 	}
 
 	public void OpenLobbyUI(string lobbyId)
 	{
-		//TODO: Load lobby info into inLobbyPage before showing
 		lobbyManager.RefreshLobbies();
+
+		inLobbyManagerUI.CurrentLobbyId = lobbyId;
 
 		pageSwitcher.SwitchPage(inLobbyPage);
 	}

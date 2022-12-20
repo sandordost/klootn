@@ -63,7 +63,7 @@ public class FirestoreManager : IDatabaseManager
 	{
 		Lobby lobby = new()
 		{
-			Host = host,
+			HostId = host.Id,
 			Name = name,
 			Description = description,
 			PlayerIds = new List<string>()
