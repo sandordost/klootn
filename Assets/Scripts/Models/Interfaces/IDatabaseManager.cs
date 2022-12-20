@@ -54,4 +54,6 @@ public interface IDatabaseManager
 	/// <param name="host"></param>
 	/// <returns><see cref="Lobby"/> that was created in the database</returns>
 	public Task<Lobby> CreateLobby(Player host, string title, string description);
+
+	public Task<Player> GetPlayerByName(string name);
 }

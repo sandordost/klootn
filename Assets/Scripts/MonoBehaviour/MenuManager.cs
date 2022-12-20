@@ -12,10 +12,14 @@ public class MenuManager : MonoBehaviour
 	private GameObject[] backgrounds;
 
 	private GameEventsManager gameEvents;
+	private PlayerManager playerManager;
 
 	private void Start()
 	{
 		gameEvents = GameEventsManager.GetInstance();
+
+		playerManager = GameManager.GetGameManager().dataManager.playerManager;
+
 		gameEvents.OnPlayerLoggedIn += PlayerLoggedIn;
 		gameEvents.OnPlayerRegistered += PlayerRegistered;
 
@@ -57,6 +61,7 @@ public class MenuManager : MonoBehaviour
 	/// <param name="e"></param>
 	private void PlayerRegistered(object sender, RegisterEventArgs e)
 	{
+		playerManager.Client = e.player;
 		NavigateTo(KlootnMenu.MainMenu);
 	}
 
@@ -67,6 +72,7 @@ public class MenuManager : MonoBehaviour
 	/// <param name="e"></param>
 	private void PlayerLoggedIn(object sender, LoginEventArgs e)
 	{
+		playerManager.Client = e.player;
 		NavigateTo(KlootnMenu.MainMenu);
 	}
 

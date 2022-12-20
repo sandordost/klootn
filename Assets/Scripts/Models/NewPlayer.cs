@@ -4,7 +4,7 @@
 public class NewPlayer : Player
 {
 	[FirestoreProperty]
-	public string password { get; set; }
+	public string Password { get; set; }
 
 	public NewPlayer()
 	{
@@ -13,7 +13,7 @@ public class NewPlayer : Player
 
 	public NewPlayer(string name, string id, string password) : base(name, id)
 	{
-		this.password = password;
+		this.Password = password;
 	}
 
 	public NewPlayer(string name, string password) : this(name, "", password)

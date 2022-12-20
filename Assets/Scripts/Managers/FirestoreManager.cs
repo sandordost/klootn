@@ -43,6 +43,19 @@ public class FirestoreManager : IDatabaseManager
 			result.Add(item.ConvertTo<Lobby>());
 		}
 
+		//Get all players
+		List<Player> players = await GetPlayers();
+
+		//Inject players in lobby list
+		foreach(Lobby lobby in result)
+		{
+			if (lobby.Players == null) 
+				lobby.Players = new List<Player>();
+
+			foreach (string playerId in lobby.PlayerIds)
+				lobby.Players.Add(players.Find((x) => x.Id.Equals(playerId)));
+		}
+
 		return result;
 	}
 
@@ -52,10 +65,11 @@ public class FirestoreManager : IDatabaseManager
 		{
 			Host = host,
 			Name = name,
-			Description = description
+			Description = description,
+			PlayerIds = new List<string>()
 		};
 
-		lobby.Players.Add(host);
+		lobby.PlayerIds.Add(host.Id);
 
 		CollectionReference colRef = firestore.Collection("Lobbies");
 
@@ -83,8 +97,8 @@ public class FirestoreManager : IDatabaseManager
 	{
 		CollectionReference playersRef = firestore.Collection("Players");
 
-		Query query = playersRef.WhereEqualTo("name", newPlayer.name);
-		query = query.WhereEqualTo("password", newPlayer.password);
+		Query query = playersRef.WhereEqualTo("Name", newPlayer.Name);
+		query = query.WhereEqualTo("Password", newPlayer.Password);
 
 		var task = await query.GetSnapshotAsync();
 
@@ -100,7 +114,7 @@ public class FirestoreManager : IDatabaseManager
 
 	public async Task<bool> PlayerExists(NewPlayer newPlayer)
 	{
-		Player player = await GetPlayerByName(newPlayer.name);
+		Player player = await GetPlayerByName(newPlayer.Name);
 
 		return player != null;
 	}
@@ -139,11 +153,11 @@ public class FirestoreManager : IDatabaseManager
 		return player;
 	}
 
-	private async Task<Player> GetPlayerByName(string name)
+	public async Task<Player> GetPlayerByName(string name)
 	{
 		CollectionReference playersRef = firestore.Collection("Players");
 
-		Query query = playersRef.WhereEqualTo("name", name);
+		Query query = playersRef.WhereEqualTo("Name", name);
 
 		var task = await query.GetSnapshotAsync();
 

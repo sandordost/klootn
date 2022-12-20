@@ -4,19 +4,19 @@ using Firebase.Firestore;
 public class Player
 {
 	[FirestoreDocumentId]
-	public string id { get; set; }
+	public string Id { get; set; }
 
 	[FirestoreProperty]
-	public string name { get; set; }
+	public string Name { get; set; }
+
+	public Player(string name, string id)
+	{
+		Name = name;
+		Id = id;
+	}
 
 	public Player()
 	{
 
-	}
-
-	public Player(string name, string id)
-	{
-		this.name = name;
-		this.id = id;
 	}
 }

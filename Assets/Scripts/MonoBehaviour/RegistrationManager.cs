@@ -66,8 +66,8 @@ public class RegistrationManager : MonoBehaviour
 
 		NewPlayer newPlayer = new NewPlayer(usernameInputField.text, "0", passwordInputField.text);
 
-		ValidationResult nameResult = inputValidator.ValidatePlayerName(newPlayer.name);
-		ValidationResult passwordResult = inputValidator.ValidatePlayerPassword(newPlayer.password);
+		ValidationResult nameResult = inputValidator.ValidatePlayerName(newPlayer.Name);
+		ValidationResult passwordResult = inputValidator.ValidatePlayerPassword(newPlayer.Password);
 
 		if (nameResult.Equals(ValidationResult.Validated) &&
 			passwordResult.Equals(ValidationResult.Validated))

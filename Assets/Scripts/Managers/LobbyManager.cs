@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class LobbyManager : MonoBehaviour, IDataRecievable
 {
-	IDatabaseManager databaseManager;
-	PlayerManager playerManager;
-
-	public List<Lobby> lobbies { get; set; }
 	public int maxPlayers = 8;
 	public event EventHandler<List<Lobby>> OnLobbiesFetched;
+
+	private IDatabaseManager databaseManager;
+	private PlayerManager playerManager;
+	private List<Lobby> Lobbies { get; set; }
+	
 
 	private void Start()
 	{
@@ -22,15 +23,24 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	public async Task RetrieveData()
 	{
-		lobbies = await databaseManager.GetLobbies();
-		if (OnLobbiesFetched != null && lobbies.Count > 0)
-			OnLobbiesFetched.Invoke(this, lobbies);
+		List<Lobby> lobbies = await databaseManager.GetLobbies();
+
+		Lobbies = lobbies;
+
+		if (OnLobbiesFetched != null && Lobbies.Count > 0)
+			OnLobbiesFetched.Invoke(this, Lobbies);
+
 	}
 
 	public async Task<Lobby> CreateLobby()
 	{
 		return await databaseManager.CreateLobby(playerManager.Client, 
-			$"{playerManager.Client.name}'s lobby", 
-			$"Join {playerManager.Client.name}'s lobby to feel accomplished");
+			$"{playerManager.Client.Name}'s lobby", 
+			$"Join {playerManager.Client.Name}'s lobby to feel accomplished");
+	}
+
+	public async void RefreshLobbies()
+	{
+		await RetrieveData();
 	}
 }

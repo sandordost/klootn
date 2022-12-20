@@ -1,4 +1,5 @@
 ﻿using Firebase.Firestore;
+using System;
 
 [FirestoreData]
 public class Motd
@@ -14,4 +15,7 @@ public class Motd
 
 	[FirestoreProperty]
 	public string ImageUrl { get; set; }
+
+	[FirestoreProperty]
+	public DateTime Uploaddate { get; set; }
 }

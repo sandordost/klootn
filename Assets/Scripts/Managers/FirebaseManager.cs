@@ -25,7 +25,7 @@ public class FirebaseManager : IDatabaseManager
 
 		await PushObject(newPlayer, "Players", playerId.ToString());
 
-		return new Player(newPlayer.name, playerId.ToString());
+		return new Player(newPlayer.Name, playerId.ToString());
 	}
 
 	private async Task PushObject(object obj, string table, string id)
@@ -96,6 +96,11 @@ public class FirebaseManager : IDatabaseManager
 	}
 
 	public Task<Lobby> CreateLobby(Player host, string title, string description)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<Player> GetPlayerByName(string name)
 	{
 		throw new NotImplementedException();
 	}
