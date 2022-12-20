@@ -10,6 +10,7 @@ public class MotdManager : MonoBehaviour
 	public TMP_Text title;
 	public TMP_Text message;
 	public RawImage motdImage;
+	public RawImage altImage;
 
 	private IDatabaseManager databaseManager;
 	private IStorageManager storageManager;
@@ -33,6 +34,9 @@ public class MotdManager : MonoBehaviour
 
 		Texture texture = await GetMotdImage(motd);
 		motdImage.texture = texture;
+
+		motdImage.color = Color.white;
+		altImage.gameObject.SetActive(false);
 	}
 
 	/// <summary>
