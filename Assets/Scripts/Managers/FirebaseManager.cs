@@ -104,4 +104,9 @@ public class FirebaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
+	public Task<Lobby> GetLobby(string id)
+	{
+		throw new NotImplementedException();
+	}
 }

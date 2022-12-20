@@ -55,5 +55,17 @@ public interface IDatabaseManager
 	/// <returns><see cref="Lobby"/> that was created in the database</returns>
 	public Task<Lobby> CreateLobby(Player host, string title, string description);
 
+	/// <summary>
+	/// Gets player by name from the database
+	/// </summary>
+	/// <param name="name"></param>
+	/// <returns>New <see cref="Player"/>, is <b>null</b> when not found</returns>
 	public Task<Player> GetPlayerByName(string name);
+
+	/// <summary>
+	/// Gets a Lobby by LobbyId from the database
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns>New <see cref="Lobby"/>, returns <b>null</b> when not found</returns>
+	public Task<Lobby> GetLobby(string id);
 }

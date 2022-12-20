@@ -170,4 +170,22 @@ public class FirestoreManager : IDatabaseManager
 
 		return player;
 	}
+
+	public async Task<Lobby> GetLobby(string id)
+	{
+		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
+
+		Query query = lobbiesRef.WhereEqualTo(FieldPath.DocumentId, id);
+
+		var task = await query.GetSnapshotAsync();
+
+		QuerySnapshot result = task;
+
+		Lobby lobby = null;
+
+		if (result.Count > 0)
+			lobby = result[0].ConvertTo<Lobby>();
+
+		return lobby;
+	}
 }

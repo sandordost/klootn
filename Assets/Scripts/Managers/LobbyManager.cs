@@ -6,12 +6,12 @@ using UnityEngine;
 public class LobbyManager : MonoBehaviour, IDataRecievable
 {
 	public int maxPlayers = 8;
-	public event EventHandler<List<Lobby>> OnLobbiesFetched;
+	public event EventHandler<LobbiesChangedEventArgs> OnLobbiesChanged;
 
 	private IDatabaseManager databaseManager;
 	private PlayerManager playerManager;
 	private List<Lobby> Lobbies { get; set; }
-	
+
 
 	private void Start()
 	{
@@ -23,20 +23,66 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	public async Task RetrieveData()
 	{
-		List<Lobby> lobbies = await databaseManager.GetLobbies();
+		List<Lobby> newLobbies = await databaseManager.GetLobbies();
 
-		Lobbies = lobbies;
+		Dictionary<Lobby, LobbyChangeState> changedLobbies = new();
 
-		if (OnLobbiesFetched != null && Lobbies.Count > 0)
-			OnLobbiesFetched.Invoke(this, Lobbies);
+		if (Lobbies != null)
+		{
+			//Check if any old lobby is not in newlobbies (removed)
+			foreach (Lobby lobby in Lobbies)
+				if (newLobbies.Find((x) => x.Id.Equals(lobby.Id)) == null)
+					changedLobbies.Add(lobby, LobbyChangeState.Deleted);
+
+			foreach (Lobby newLobby in newLobbies)
+			{
+				//Check if newlobby already exists
+				Lobby existingLobby = Lobbies.Find((x) => x.Id.Equals(newLobby.Id));
+				
+				if (existingLobby != null)
+				{
+					//newlobby exists
+					if (!existingLobby.CompareLobby(newLobby))
+					{
+						//newlobby has changed
+						changedLobbies.Add(newLobby, LobbyChangeState.Changed);
+					}
+				}
+				else
+				{
+					//newlobby doesnt exist and is new
+					changedLobbies.Add(newLobby, LobbyChangeState.New);
+				}
+			}
+		}
+		else
+		{
+			changedLobbies = new Dictionary<Lobby, LobbyChangeState>();
+			foreach(Lobby lobby in newLobbies)
+			{
+				changedLobbies.Add(lobby, LobbyChangeState.New);
+			}
+		}
+
+		Lobbies = newLobbies;
+
+		if (OnLobbiesChanged != null && changedLobbies.Count > 0)
+			OnLobbiesChanged.Invoke(this, new LobbiesChangedEventArgs() { ChangedLobbies = changedLobbies} );
 
 	}
 
 	public async Task<Lobby> CreateLobby()
 	{
-		return await databaseManager.CreateLobby(playerManager.Client, 
-			$"{playerManager.Client.Name}'s lobby", 
+		return await databaseManager.CreateLobby(playerManager.Client,
+			$"{playerManager.Client.Name}'s lobby",
 			$"Join {playerManager.Client.Name}'s lobby to feel accomplished");
+	}
+
+	public async Task<Lobby> GetLobby(string id)
+	{
+		Lobby lobby = await databaseManager.GetLobby(id);
+
+		return lobby;
 	}
 
 	public async void RefreshLobbies()

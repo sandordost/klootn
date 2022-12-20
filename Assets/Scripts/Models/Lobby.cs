@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Firebase.Firestore;
 
 [FirestoreData]
@@ -20,4 +21,18 @@ public class Lobby
 
 	[FirestoreProperty]
 	public string Description { get; set; }
+}
+
+public static class LobbyExtensions
+{
+	public static bool CompareLobby(this Lobby currentLobby, Lobby comparedLobby)
+	{
+		if (currentLobby.Id.Equals(comparedLobby.Id) &&
+			currentLobby.Name.Equals(comparedLobby.Name) &&
+			currentLobby.PlayerIds.SequenceEqual(comparedLobby.PlayerIds))
+		{
+			return true;
+		}
+		return false;
+	}
 }

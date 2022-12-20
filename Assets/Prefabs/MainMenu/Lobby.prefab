@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 7406276945054298259}
   - component: {fileID: 7406276945054298258}
   - component: {fileID: 7406276945054298256}
-  - component: {fileID: -3371399644811517383}
+  - component: {fileID: 4066771201010945371}
   m_Layer: 5
   m_Name: Lobby
   m_TagString: Untagged
@@ -273,7 +273,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &-3371399644811517383
+--- !u!114 &4066771201010945371
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -282,7 +282,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7406276945054298260}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68265e58e41020e478a9c0a46dba2fdf, type: 3}
+  m_Script: {fileID: 11500000, guid: 0970a1ebb2d5cf1419c38e9f597c0a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7406276945213689698

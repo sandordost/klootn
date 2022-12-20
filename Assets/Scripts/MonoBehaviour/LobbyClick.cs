@@ -14,6 +14,8 @@ public class LobbyClick : MonoBehaviour
 
 	private LobbyManagerUI lobbyManagerUI;
 
+	private InLobbyManagerUI inLobbyManagerUI;
+
 	private void Start()
 	{
 		uiManager = UIManager.GetInstance();
