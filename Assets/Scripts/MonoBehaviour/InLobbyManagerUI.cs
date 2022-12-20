@@ -81,8 +81,14 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private async void UpdateInLobbyUI()
 	{
+		ClearInLobbyUI();
 		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
 		UpdateInLobbyUI(lobby);
+	}
+
+	private void ClearInLobbyUI()
+	{
+		titleText.text = "";
 	}
 
 	private void UpdateInLobbyUI(Lobby lobby)

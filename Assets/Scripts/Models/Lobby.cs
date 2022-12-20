@@ -8,10 +8,9 @@ public class Lobby
 	[FirestoreDocumentId]
 	public string Id { get; set; }
 
+	/// Dictionary of ids : string and players : Players
 	[FirestoreProperty]
-	public List<string> PlayerIds { get; set; }
-
-	public List<Player> Players { get; set; }
+	public Dictionary<string, Player> Players { get; set; }
 
 	[FirestoreProperty]
 	public string HostId { get; set; }
@@ -29,7 +28,8 @@ public static class LobbyExtensions
 	{
 		if (currentLobby.Id.Equals(comparedLobby.Id) &&
 			currentLobby.Name.Equals(comparedLobby.Name) &&
-			currentLobby.PlayerIds.SequenceEqual(comparedLobby.PlayerIds))
+			currentLobby.Description.Equals(comparedLobby.Description) &&
+			currentLobby.Players.Keys.SequenceEqual(comparedLobby.Players.Keys))
 		{
 			return true;
 		}

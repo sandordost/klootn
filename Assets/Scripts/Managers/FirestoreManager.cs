@@ -43,19 +43,6 @@ public class FirestoreManager : IDatabaseManager
 			result.Add(item.ConvertTo<Lobby>());
 		}
 
-		//Get all players
-		List<Player> players = await GetPlayers();
-
-		//Inject players in lobby list
-		foreach(Lobby lobby in result)
-		{
-			if (lobby.Players == null) 
-				lobby.Players = new List<Player>();
-
-			foreach (string playerId in lobby.PlayerIds)
-				lobby.Players.Add(players.Find((x) => x.Id.Equals(playerId)));
-		}
-
 		return result;
 	}
 
@@ -66,10 +53,10 @@ public class FirestoreManager : IDatabaseManager
 			HostId = host.Id,
 			Name = name,
 			Description = description,
-			PlayerIds = new List<string>()
+			Players = new Dictionary<string, Player>()
 		};
 
-		lobby.PlayerIds.Add(host.Id);
+		lobby.Players.Add(host.Id, host);
 
 		CollectionReference colRef = firestore.Collection("Lobbies");
 
