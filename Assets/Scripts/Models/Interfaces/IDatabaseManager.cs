@@ -1,3 +1,4 @@
+using Firebase.Firestore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ public interface IDatabaseManager
 	/// Gets all players from the database
 	/// </summary>
 	/// <returns>A new <see cref="List{T}"/> with the class <see cref="Player"/></returns>
-	public Task<List<Player>> GetPlayers();
+	public Task<List<Player>> GetAllPlayers();
 
 	/// <summary>
 	/// Adds a new lobby to the database
@@ -87,16 +88,46 @@ public interface IDatabaseManager
 	/// Adds or updates last seen state for a player in a lobby.
 	/// </summary>
 	/// <param name="playerId"></param>
-	/// <param name="dateTime"></param>
+	/// <param name="timestamp"></param>
 	/// <param name="lobbyId"></param>
 	/// <returns></returns>
-	public Task UpdateLobbyLastSeen(string playerId, string lobbyId, DateTime dateTime);
+	public Task UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp);
 
 	/// <summary>
 	/// Updates the last seen field for a player
 	/// </summary>
 	/// <param name="playerId"></param>
-	/// <param name="dateTime"></param>
+	/// <param name="timestamp"></param>
 	/// <returns></returns>
-	public Task UpdateLastSeen(string playerId, DateTime dateTime);
+	public Task UpdateLastSeen(string playerId, Timestamp timestamp);
+
+	/// <summary>
+	/// Removes players when they have been inactive for <paramref name="secondsTimeout"/> time
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <returns></returns>
+	public Task RemoveInactivePlayersFromLobby(string lobbyId, int secondsTimeout);
+
+	/// <summary>
+	/// Removes a player from a lobby
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <param name="playerId"></param>
+	/// <returns></returns>
+	public Task RemovePlayerFromLobby(string lobbyId, string playerId);
+
+	/// <summary>
+	/// Gets all current players Ids from the lobby
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <returns></returns>
+	public Task<List<string>> GetLobbyPlayers(string lobbyId);
+
+	/// <summary>
+	/// Removes entry of a player in the LastSeen list
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <param name="playerId"></param>
+	/// <returns></returns>
+	public Task RemoveLobbyLastSeen(string lobbyId, string playerId);
 }

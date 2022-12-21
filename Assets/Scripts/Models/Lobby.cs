@@ -14,7 +14,7 @@ public class Lobby
 	public List<string> Players { get; set; }
 
 	[FirestoreProperty]
-	public Dictionary<string, DateTime> PlayersLastSeen { get; set; }
+	public Dictionary<string, Timestamp> PlayersLastSeen { get; set; }
 
 	[FirestoreProperty]
 	public string HostId { get; set; }

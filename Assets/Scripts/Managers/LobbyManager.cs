@@ -1,3 +1,4 @@
+using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using UnityEngine;
 public class LobbyManager : MonoBehaviour, IDataRecievable
 {
 	public int maxPlayers = 8;
+	public int timeoutSeconds = 30;
 	public event EventHandler<LobbiesChangedEventArgs> OnLobbiesChanged;
 
 	private IDatabaseManager databaseManager;
@@ -90,9 +92,15 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		await databaseManager.AddPlayerToLobby(lobbyId, playerManager.Client.Id);
 	}
 
-	public async void UpdateLobbyLastSeen(string playerId, string lobbyId, DateTime dateTime)
+	public async void UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
 	{
-		await databaseManager.UpdateLobbyLastSeen(playerId, lobbyId, dateTime);
+		await databaseManager.UpdateLobbyLastSeen(playerId, lobbyId, timestamp);
+		await databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
+	}
+
+	public async void FindAndRemoveInactivePlayers(string lobbyId)
+	{
+		await databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
 	}
 
 	public async void RefreshLobbies()

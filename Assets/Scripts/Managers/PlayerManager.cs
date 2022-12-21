@@ -1,3 +1,4 @@
+using Firebase.Firestore;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 
 	private async void UpdateLastSeen()
 	{
-		Client.LastSeen = DateTime.Now;
+		Client.LastSeen = Timestamp.GetCurrentTimestamp();
 		await databaseManager.UpdateLastSeen(Client.Id, Client.LastSeen);
 	}
 

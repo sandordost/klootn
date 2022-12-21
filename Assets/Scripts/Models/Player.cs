@@ -14,7 +14,7 @@ public class Player
 	public string Password { get; set; }
 
 	[FirestoreProperty]
-	public DateTime LastSeen { get; set; }
+	public Timestamp LastSeen { get; set; }
 
 	public Player(string name, string id)
 	{

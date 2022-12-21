@@ -1,4 +1,5 @@
 ﻿using Firebase.Database;
+using Firebase.Firestore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -90,7 +91,7 @@ public class FirebaseManager : IDatabaseManager
 		throw new NotImplementedException();
 	}
 
-	public Task<List<Player>> GetPlayers()
+	public Task<List<Player>> GetAllPlayers()
 	{
 		throw new NotImplementedException();
 	}
@@ -115,17 +116,37 @@ public class FirebaseManager : IDatabaseManager
 		throw new NotImplementedException();
 	}
 
-	public Task UpdateLobbyLastSeen(string playerId, string lobbyId, DateTime dateTime)
+	public Task UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
 	{
 		throw new NotImplementedException();
 	}
 
-	public Task UpdateLastSeen(string playerId, DateTime dateTime)
+	public Task UpdateLastSeen(string playerId, Timestamp timestamp)
 	{
 		throw new NotImplementedException();
 	}
 
 	public Task<Player> GetPlayerById(string id)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task RemoveInactivePlayersFromLobby(string lobbyId, int secondsTimeout)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task RemovePlayerFromLobby(string lobbyId, string playerId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<List<string>> GetLobbyPlayers(string lobbyId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task RemoveLobbyLastSeen(string lobbyId, string playerId)
 	{
 		throw new NotImplementedException();
 	}

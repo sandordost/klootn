@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Timers;
 using TMPro;
 using UnityEngine;
 
@@ -31,22 +32,18 @@ public class LobbyManagerUI : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		DoTimedUpdate();
-	}
-
-	private void DoTimedUpdate()
-	{
-		if (lobbyRefreshTimeElapsed >= lobbyRefreshTime)
+		if (lobbyPage.activeInHierarchy)
 		{
-			if (lobbyPage.activeSelf)
+			if (lobbyRefreshTimeElapsed > lobbyRefreshTime)
 			{
+				Debug.Log("Updating Lobbies from LobbyUI");
 				lobbyManager.RefreshLobbies();
+				lobbyRefreshTimeElapsed = 0;
 			}
-			lobbyRefreshTimeElapsed = 0;
-		}
-		else
-		{
-			lobbyRefreshTimeElapsed += Time.deltaTime;
+			else
+			{
+				lobbyRefreshTimeElapsed += Time.deltaTime;
+			}
 		}
 	}
 

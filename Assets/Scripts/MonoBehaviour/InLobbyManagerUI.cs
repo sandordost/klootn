@@ -1,7 +1,9 @@
+using Firebase.Firestore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Timers;
 using TMPro;
 using UnityEngine;
 
@@ -15,12 +17,11 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	public GameObject playerUIPrefab;
 
-	public float inLobbyRefreshTime = 3;
-
 	private LobbyManager lobbyManager;
 
 	private PlayerManager playerManager;
 
+	public float inLobbyRefreshTime = 3;
 	private float inLobbyRefreshTimeElapsed = 0;
 
 	private string currentLobbyId;
@@ -45,40 +46,29 @@ public class InLobbyManagerUI : MonoBehaviour
 		lobbyManager = gameManager.dataManager.lobbyManager;
 
 		playerManager = gameManager.dataManager.playerManager;
-
-		lobbyManager.OnLobbiesChanged += LobbyManager_LobbiesChanged;
 	}
 
-	private void Update()
+	private void FixedUpdate()
 	{
-		TimedUpdate();
-	}
-
-	private void TimedUpdate()
-	{
-		if (inLobbyRefreshTimeElapsed >= inLobbyRefreshTime)
+		if (inLobbyPage.activeInHierarchy)
 		{
-			if (inLobbyPage.activeSelf)
+			if (inLobbyRefreshTimeElapsed > inLobbyRefreshTime)
 			{
-				DoTimedUpdate();
+				RefreshAndUpdate();
 			}
-			inLobbyRefreshTimeElapsed = 0;
-		}
-		else
-		{
-			inLobbyRefreshTimeElapsed += Time.deltaTime;
+			else
+			{
+				inLobbyRefreshTimeElapsed += Time.deltaTime;
+			}
 		}
 	}
 
-	private void DoTimedUpdate()
+	private void RefreshAndUpdate()
 	{
+		Debug.Log("Updating Lobbies from inLobbyUI");
 		lobbyManager.RefreshLobbies();
-		UpdateLobbyLastSeen();
-	}
-
-	private void UpdateLobbyLastSeen()
-	{
-		lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, currentLobbyId, DateTime.Now);
+		lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, currentLobbyId, Timestamp.GetCurrentTimestamp());
+		inLobbyRefreshTimeElapsed = 0;
 	}
 
 	private void LobbyManager_LobbiesChanged(object sender, LobbiesChangedEventArgs e)

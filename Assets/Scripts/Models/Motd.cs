@@ -17,5 +17,5 @@ public class Motd
 	public string ImageUrl { get; set; }
 
 	[FirestoreProperty]
-	public DateTime Uploaddate { get; set; }
+	public Timestamp Uploaddate { get; set; }
 }
