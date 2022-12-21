@@ -90,7 +90,11 @@ public class LobbyManagerUI : MonoBehaviour
 	{
 		foreach (Transform transform in lobbyPrefabParent.transform)
 		{
-			Destroy(transform.gameObject);
+			if (transform.GetComponent<LobbyClick>().LobbyId.Equals(lobby.Id))
+			{
+				Destroy(transform.gameObject);
+				return;
+			}
 		}
 	}
 

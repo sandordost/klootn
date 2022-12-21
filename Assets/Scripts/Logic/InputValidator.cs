@@ -55,7 +55,7 @@ public class InputValidator
 	/// <para><see cref="ValidationResult.AlreadyExists"/> : <paramref name="newPlayer"/> already exists in database</para>
 	/// <para><see cref="ValidationResult.Validated"/> : <paramref name="newPlayer"/> does not exists in the database yet</para>
 	/// </returns>
-	public async Task<ValidationResult> ValidatePlayerNameExists(NewPlayer newPlayer, IDatabaseManager databaseManager)
+	public async Task<ValidationResult> ValidatePlayerNameExists(Player newPlayer, IDatabaseManager databaseManager)
 	{
 		bool playerExists = await databaseManager.PlayerExists(newPlayer);
 

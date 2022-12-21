@@ -17,7 +17,7 @@ public interface IDatabaseManager
 	/// <param name="newPlayer"></param>
 	/// <param name="callback"></param>
 	/// <returns>If registration succeeds : (new)<see cref="Player"/>. If it doesn't : null</returns>
-	public Task<Player> RegisterPlayer(NewPlayer newPlayer);
+	public Task<Player> RegisterPlayer(Player newPlayer);
 
 	/// <summary>
 	/// Checks whether <paramref name="newPlayer"/> exists in the <b>Database</b>. 
@@ -25,7 +25,7 @@ public interface IDatabaseManager
 	/// <param name="newPlayer"></param>
 	/// <param name="callback"></param>
 	/// <returns>If <paramref name="newPlayer"/> exists : (new)<see cref="Player"/>. If it doesn't exist : null</returns>
-	public Task<Player> Login(NewPlayer newPlayer);
+	public Task<Player> Login(Player newPlayer);
 
 	/// <summary>
 	/// Checks whether <paramref name="newPlayer"/> exists. 
@@ -33,7 +33,7 @@ public interface IDatabaseManager
 	/// <param name="newPlayer"></param>
 	/// <param name="callback"></param>
 	/// <returns>The answer in <see cref="Boolean"/> format</returns>
-	public Task<bool> PlayerExists(NewPlayer newPlayer);
+	public Task<bool> PlayerExists(Player newPlayer);
 
 	/// <summary>
 	/// Gets the latest <see cref="Motd"/> and returns it.
@@ -63,11 +63,40 @@ public interface IDatabaseManager
 	public Task<Player> GetPlayerByName(string name);
 
 	/// <summary>
+	/// Gets a player with id: <paramref name="id"/> from the database
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns></returns>
+	public Task<Player> GetPlayerById(string id);
+
+	/// <summary>
 	/// Gets a Lobby by LobbyId from the database
 	/// </summary>
 	/// <param name="id"></param>
 	/// <returns>New <see cref="Lobby"/>, returns <b>null</b> when not found</returns>
 	public Task<Lobby> GetLobby(string id);
 
+	/// <summary>
+	/// Adds a player to the lobby in the database
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <param name="playerId"></param>
 	public Task AddPlayerToLobby(string lobbyId, string playerId);
+
+	/// <summary>
+	/// Adds or updates last seen state for a player in a lobby.
+	/// </summary>
+	/// <param name="playerId"></param>
+	/// <param name="dateTime"></param>
+	/// <param name="lobbyId"></param>
+	/// <returns></returns>
+	public Task UpdateLobbyLastSeen(string playerId, string lobbyId, DateTime dateTime);
+
+	/// <summary>
+	/// Updates the last seen field for a player
+	/// </summary>
+	/// <param name="playerId"></param>
+	/// <param name="dateTime"></param>
+	/// <returns></returns>
+	public Task UpdateLastSeen(string playerId, DateTime dateTime);
 }

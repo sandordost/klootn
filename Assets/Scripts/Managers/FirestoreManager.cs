@@ -53,10 +53,10 @@ public class FirestoreManager : IDatabaseManager
 			HostId = host.Id,
 			Name = name,
 			Description = description,
-			Players = new Dictionary<string, Player>()
+			Players = new()
 		};
 
-		lobby.Players.Add(host.Id, host);
+		lobby.Players.Add(host.Id);
 
 		CollectionReference colRef = firestore.Collection("Lobbies");
 
@@ -67,7 +67,7 @@ public class FirestoreManager : IDatabaseManager
 		return lobby;
 	}
 
-	public async Task<Player> RegisterPlayer(NewPlayer newPlayer)
+	public async Task<Player> RegisterPlayer(Player newPlayer)
 	{
 		CollectionReference colRef = firestore.Collection("Players");
 
@@ -80,7 +80,7 @@ public class FirestoreManager : IDatabaseManager
 		return result;
 	}
 
-	public async Task<Player> Login(NewPlayer newPlayer)
+	public async Task<Player> Login(Player newPlayer)
 	{
 		CollectionReference playersRef = firestore.Collection("Players");
 
@@ -99,7 +99,7 @@ public class FirestoreManager : IDatabaseManager
 		return playerResult;
 	}
 
-	public async Task<bool> PlayerExists(NewPlayer newPlayer)
+	public async Task<bool> PlayerExists(Player newPlayer)
 	{
 		Player player = await GetPlayerByName(newPlayer.Name);
 
@@ -122,7 +122,7 @@ public class FirestoreManager : IDatabaseManager
 		return result;
 	}
 
-	private async Task<Player> GetPlayerById(string id)
+	public async Task<Player> GetPlayerById(string id)
 	{
 		CollectionReference playersRef = firestore.Collection("Players");
 
@@ -187,9 +187,9 @@ public class FirestoreManager : IDatabaseManager
 
 		Lobby lobby = getLobbyTask.Result;
 
-		if (!lobby.Players.ContainsKey(player.Id))
+		if (!lobby.Players.Contains(player.Id))
 		{
-			lobby.Players.Add(player.Id, player);
+			lobby.Players.Add(player.Id);
 
 			await UpdateLobby(lobbyId, lobby);
 		}
@@ -200,5 +200,47 @@ public class FirestoreManager : IDatabaseManager
 		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
 
 		await lobbiesRef.Document(lobbyId).SetAsync(lobby);
+	}
+
+	public async Task UpdateLobbyLastSeen(string playerId, string lobbyId, DateTime dateTime)
+	{
+		if (playerId is not null && lobbyId is not null)
+		{
+			CollectionReference lobbiesRef = firestore.Collection("Lobbies");
+
+			DocumentReference lobbyRef = lobbiesRef.Document(lobbyId);
+
+			Dictionary<string, DateTime> lastSeenDict = await GetLobbyLastSeen(lobbyId);
+
+			if (lastSeenDict is null) lastSeenDict = new();
+
+			lastSeenDict[playerId] = dateTime;
+
+			await lobbyRef.UpdateAsync("PlayersLastSeen", lastSeenDict);
+		}
+	}
+
+	private async Task<Dictionary<string, DateTime>> GetLobbyLastSeen(string lobbyId)
+	{
+		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
+
+		DocumentReference lobby = lobbiesRef.Document(lobbyId);
+
+		DocumentSnapshot snapshot = await lobby.GetSnapshotAsync();
+
+		Lobby lobby1 = snapshot.ConvertTo<Lobby>();
+
+		return lobby1.PlayersLastSeen;
+	}
+
+	public async Task UpdateLastSeen(string playerId, DateTime dateTime)
+	{
+		CollectionReference playersRef = firestore.Collection("Players");
+
+		Player player = await GetPlayerById(playerId);
+
+		player.LastSeen = dateTime;
+
+		await playersRef.Document(playerId).SetAsync(player);
 	}
 }

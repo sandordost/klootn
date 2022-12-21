@@ -17,7 +17,7 @@ public class FirebaseManager : IDatabaseManager
 		databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
 	}
 
-	public async Task<Player> RegisterPlayer(NewPlayer newPlayer)
+	public async Task<Player> RegisterPlayer(Player newPlayer)
 	{
 		int playerId = await GetHighestId("Players");
 
@@ -65,7 +65,7 @@ public class FirebaseManager : IDatabaseManager
 		}
 	}
 
-	public IEnumerator PlayerExists(NewPlayer newPlayer, Action<bool> callback)
+	public IEnumerator PlayerExists(Player newPlayer, Action<bool> callback)
 	{
 		throw new NotImplementedException();
 	}
@@ -75,12 +75,12 @@ public class FirebaseManager : IDatabaseManager
 		throw new NotImplementedException();
 	}
 
-	public Task<Player> Login(NewPlayer newPlayer)
+	public Task<Player> Login(Player newPlayer)
 	{
 		throw new NotImplementedException();
 	}
 
-	public Task<bool> PlayerExists(NewPlayer newPlayer)
+	public Task<bool> PlayerExists(Player newPlayer)
 	{
 		throw new NotImplementedException();
 	}
@@ -111,6 +111,21 @@ public class FirebaseManager : IDatabaseManager
 	}
 
 	Task IDatabaseManager.AddPlayerToLobby(string lobbyId, string playerId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task UpdateLobbyLastSeen(string playerId, string lobbyId, DateTime dateTime)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task UpdateLastSeen(string playerId, DateTime dateTime)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<Player> GetPlayerById(string id)
 	{
 		throw new NotImplementedException();
 	}

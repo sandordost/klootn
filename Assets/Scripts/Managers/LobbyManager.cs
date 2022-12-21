@@ -90,6 +90,11 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		await databaseManager.AddPlayerToLobby(lobbyId, playerManager.Client.Id);
 	}
 
+	public async void UpdateLobbyLastSeen(string playerId, string lobbyId, DateTime dateTime)
+	{
+		await databaseManager.UpdateLobbyLastSeen(playerId, lobbyId, dateTime);
+	}
+
 	public async void RefreshLobbies()
 	{
 		await RetrieveData();

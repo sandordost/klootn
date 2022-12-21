@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -18,6 +19,8 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private LobbyManager lobbyManager;
 
+	private PlayerManager playerManager;
+
 	private float inLobbyRefreshTimeElapsed = 0;
 
 	private string currentLobbyId;
@@ -31,13 +34,17 @@ public class InLobbyManagerUI : MonoBehaviour
 		set 
 		{ 
 			currentLobbyId = value;
-			UpdateInLobbyUI();
+			UpdateInLobbyUI(value);
 		} 
 	}
 
 	private void Start()
 	{
-		lobbyManager = GameManager.GetGameManager().dataManager.lobbyManager;
+		GameManager gameManager = GameManager.GetGameManager();
+
+		lobbyManager = gameManager.dataManager.lobbyManager;
+
+		playerManager = gameManager.dataManager.playerManager;
 
 		lobbyManager.OnLobbiesChanged += LobbyManager_LobbiesChanged;
 	}
@@ -66,6 +73,12 @@ public class InLobbyManagerUI : MonoBehaviour
 	private void DoTimedUpdate()
 	{
 		lobbyManager.RefreshLobbies();
+		UpdateLobbyLastSeen();
+	}
+
+	private void UpdateLobbyLastSeen()
+	{
+		lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, currentLobbyId, DateTime.Now);
 	}
 
 	private void LobbyManager_LobbiesChanged(object sender, LobbiesChangedEventArgs e)
@@ -79,32 +92,31 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private async void UpdateInLobbyUI()
+	private async void UpdateInLobbyUI(string lobbyId)
 	{
-		ClearInLobbyUI();
-		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
+		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
+
 		UpdateInLobbyUI(lobby);
 	}
 
-	private void ClearInLobbyUI()
+	private async void UpdateInLobbyUI(Lobby lobby)
 	{
 		titleText.text = "";
-	}
 
-	private void UpdateInLobbyUI(Lobby lobby)
-	{
-		foreach(Transform t in playerUIPrefabParent.transform)
+		foreach (Transform t in playerUIPrefabParent.transform)
 		{
 			Destroy(t.gameObject);
 		}
 
 		titleText.text = lobby.Name;
 
-		foreach(var player in lobby.Players)
+		foreach(var playerId in lobby.Players)
 		{
 			GameObject newPlayerUI = Instantiate(playerUIPrefab, playerUIPrefabParent.transform);
 
-			newPlayerUI.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Value.Name;
+			Player player = await playerManager.GetPlayer(playerId);
+
+			newPlayerUI.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
 		}
 	}
 }

@@ -64,7 +64,7 @@ public class RegistrationManager : MonoBehaviour
 		passwordErrorMessage.gameObject.SetActive(false);
 		overalErrorMessage.gameObject.SetActive(false);
 
-		NewPlayer newPlayer = new NewPlayer(usernameInputField.text, "0", passwordInputField.text);
+		Player newPlayer = new Player(usernameInputField.text, new KlootnPassword(passwordInputField.text));
 
 		ValidationResult nameResult = inputValidator.ValidatePlayerName(newPlayer.Name);
 		ValidationResult passwordResult = inputValidator.ValidatePlayerPassword(newPlayer.Password);
