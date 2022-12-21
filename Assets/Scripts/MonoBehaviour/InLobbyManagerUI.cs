@@ -93,6 +93,18 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private void UpdateInLobbyUI(Lobby lobby)
 	{
+		foreach(Transform t in playerUIPrefabParent.transform)
+		{
+			Destroy(t.gameObject);
+		}
+
 		titleText.text = lobby.Name;
+
+		foreach(var player in lobby.Players)
+		{
+			GameObject newPlayerUI = Instantiate(playerUIPrefab, playerUIPrefabParent.transform);
+
+			newPlayerUI.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Value.Name;
+		}
 	}
 }

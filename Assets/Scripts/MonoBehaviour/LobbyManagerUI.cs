@@ -62,6 +62,8 @@ public class LobbyManagerUI : MonoBehaviour
 
 		inLobbyManagerUI.CurrentLobbyId = lobbyId;
 
+		lobbyManager.JoinLobby(lobbyId);
+
 		pageSwitcher.SwitchPage(inLobbyPage);
 	}
 

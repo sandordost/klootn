@@ -68,4 +68,6 @@ public interface IDatabaseManager
 	/// <param name="id"></param>
 	/// <returns>New <see cref="Lobby"/>, returns <b>null</b> when not found</returns>
 	public Task<Lobby> GetLobby(string id);
+
+	public Task AddPlayerToLobby(string lobbyId, string playerId);
 }

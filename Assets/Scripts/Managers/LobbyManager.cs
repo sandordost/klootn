@@ -85,6 +85,11 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		return lobby;
 	}
 
+	public async void JoinLobby(string lobbyId)
+	{
+		await databaseManager.AddPlayerToLobby(lobbyId, playerManager.Client.Id);
+	}
+
 	public async void RefreshLobbies()
 	{
 		await RetrieveData();

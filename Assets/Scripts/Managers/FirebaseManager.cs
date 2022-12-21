@@ -109,4 +109,9 @@ public class FirebaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
+	Task IDatabaseManager.AddPlayerToLobby(string lobbyId, string playerId)
+	{
+		throw new NotImplementedException();
+	}
 }

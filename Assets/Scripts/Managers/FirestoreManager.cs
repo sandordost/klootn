@@ -175,4 +175,30 @@ public class FirestoreManager : IDatabaseManager
 
 		return lobby;
 	}
+
+	public async Task AddPlayerToLobby(string lobbyId, string playerId)
+	{
+		Task<Player> getPlayerTask = GetPlayerById(playerId);
+		Task<Lobby> getLobbyTask = GetLobby(lobbyId);
+
+		await Task.WhenAll(new Task[] { getPlayerTask, getLobbyTask });
+
+		Player player = getPlayerTask.Result;
+
+		Lobby lobby = getLobbyTask.Result;
+
+		if (!lobby.Players.ContainsKey(player.Id))
+		{
+			lobby.Players.Add(player.Id, player);
+
+			await UpdateLobby(lobbyId, lobby);
+		}
+	}
+
+	private async Task UpdateLobby(string lobbyId, Lobby lobby)
+	{
+		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
+
+		await lobbiesRef.Document(lobbyId).SetAsync(lobby);
+	}
 }
