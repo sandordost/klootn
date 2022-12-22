@@ -18,7 +18,7 @@ public class LobbyManagerUI : MonoBehaviour
 	private InLobbyManagerUI inLobbyManagerUI;
 
 	public float lobbyRefreshTime = 5;
-	private float lobbyRefreshTimeElapsed = 0;
+	private float lobbyRefreshTimeElapsed;
 
 	void Start()
 	{
@@ -27,6 +27,7 @@ public class LobbyManagerUI : MonoBehaviour
 		lobbyManager = gameManager.dataManager.lobbyManager;
 		inLobbyManagerUI = uiManager.inLobbyManagerUI;
 
+		lobbyRefreshTimeElapsed = lobbyRefreshTime;
 		lobbyManager.OnLobbiesChanged += LobbiesChanged;
 	}
 

@@ -73,6 +73,8 @@ public class InLobbyManagerUI : MonoBehaviour
 		lobbyManager = gameManager.dataManager.lobbyManager;
 
 		playerManager = gameManager.dataManager.playerManager;
+
+		inLobbyRefreshTimeElapsed = inLobbyRefreshTime;
 	}
 
 	private void FixedUpdate()
