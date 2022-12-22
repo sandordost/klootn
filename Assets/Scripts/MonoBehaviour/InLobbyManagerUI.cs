@@ -35,8 +35,35 @@ public class InLobbyManagerUI : MonoBehaviour
 		set 
 		{ 
 			currentLobbyId = value;
-			UpdateInLobbyUI(value);
+			CurrentPlayers.Clear();
+			ClearPlayerListUI();
+			UpdateInLobbyUI();
 		} 
+	}
+
+	private void ClearPlayerListUI()
+	{
+		foreach(Transform t in playerUIPrefabParent.transform)
+		{
+			Destroy(t.gameObject);
+		}
+	}
+
+	private List<Player> currentPlayers;
+	private List<Player> CurrentPlayers
+	{
+		get
+		{
+			if (currentPlayers is null)
+			{
+				currentPlayers = new();
+			}
+			return currentPlayers;
+		}
+		set
+		{
+			currentPlayers = value;
+		}
 	}
 
 	private void Start()
@@ -68,45 +95,88 @@ public class InLobbyManagerUI : MonoBehaviour
 		Debug.Log("Updating Lobbies from inLobbyUI");
 		lobbyManager.RefreshLobbies();
 		lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, currentLobbyId, Timestamp.GetCurrentTimestamp());
+		UpdatePlayerListUI();
 		inLobbyRefreshTimeElapsed = 0;
 	}
 
 	private void LobbyManager_LobbiesChanged(object sender, LobbiesChangedEventArgs e)
 	{
-		foreach (Lobby lobby in e.ChangedLobbies.Keys)
-		{
-			if (lobby.Id == CurrentLobbyId)
-			{
-				UpdateInLobbyUI(lobby);
-			}
-		}
+		UpdateInLobbyUI();
 	}
 
-	private async void UpdateInLobbyUI(string lobbyId)
+	private async void UpdateInLobbyUI()
 	{
-		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
-
-		UpdateInLobbyUI(lobby);
-	}
-
-	private async void UpdateInLobbyUI(Lobby lobby)
-	{
+		//Change inlobbyUI
 		titleText.text = "";
 
-		foreach (Transform t in playerUIPrefabParent.transform)
-		{
-			Destroy(t.gameObject);
-		}
+		Lobby lobby = await lobbyManager.GetLobby(currentLobbyId);
 
 		titleText.text = lobby.Name;
+	}
 
-		foreach(var playerId in lobby.Players)
+	private async void UpdatePlayerListUI()
+	{
+		//Change Player area
+		List<Player> lobbyPlayers = await lobbyManager.GetLobbyPlayers(CurrentLobbyId);
+
+		Dictionary<string, LobbyChangeState> lobbyPlayerChanges = lobbyManager.GetLobbyPlayersChanges(CurrentPlayers, lobbyPlayers);
+
+		foreach (var playerChange in lobbyPlayerChanges)
 		{
-			GameObject newPlayerUI = Instantiate(playerUIPrefab, playerUIPrefabParent.transform);
-
-			Player player = await playerManager.GetPlayer(playerId);
-
-			newPlayerUI.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
+			switch (playerChange.Value)
+			{
+				case LobbyChangeState.New:
+					AddPlayerToLobby(playerChange.Key);
+					break;
+				case LobbyChangeState.Changed:
+					UpdatePlayerInLobby(playerChange.Key);
+					break;
+				case LobbyChangeState.Deleted:
+					RemovePlayerFromLobby(playerChange.Key);
+					break;
+			}
 		}
+
+		CurrentPlayers = lobbyPlayers;
+	}
+
+	private void RemovePlayerFromLobby(string playerId)
+	{
+		Transform parent = playerUIPrefabParent.transform;
+
+		GameObject objectToRemove = null;
+
+		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
+			if (playerUI.PlayerId.Equals(playerId)) objectToRemove = playerUI.gameObject;
+
+		if (objectToRemove is not null)
+			Destroy(objectToRemove);
+	}
+
+	public async void AddPlayerToLobby(string playerId)
+	{
+		Player player = await playerManager.GetPlayer(playerId);
+
+		GameObject newPlayerUI = Instantiate(playerUIPrefab, playerUIPrefabParent.transform);
+
+		newPlayerUI.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
+
+		newPlayerUI.GetComponent<Player_UI>().PlayerId = playerId;
+	}
+
+	public async void UpdatePlayerInLobby(string playerId)
+	{
+		Player player = await playerManager.GetPlayer(playerId);
+
+		Transform parent = playerUIPrefabParent.transform;
+
+		GameObject objectToUpdate = null;
+
+		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
+			if (playerUI.PlayerId.Equals(playerId)) objectToUpdate = playerUI.gameObject;
+
+		objectToUpdate.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
+
+
 	}
 }

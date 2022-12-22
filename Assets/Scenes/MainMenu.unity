@@ -17360,7 +17360,7 @@ MonoBehaviour:
   lobbyPrefab: {fileID: 7406276945054298260, guid: 7eba541938e281b478d0c703a26417b5,
     type: 3}
   pageSwitcher: {fileID: 2065954076}
-  lobbyRefreshTime: 5
+  lobbyRefreshTime: 3
 --- !u!114 &2065954083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17378,7 +17378,7 @@ MonoBehaviour:
   playerUIPrefabParent: {fileID: 676798889}
   playerUIPrefab: {fileID: 7004216728073926346, guid: 1340ee7f9ebaf1646960556e54e29423,
     type: 3}
-  inLobbyRefreshTime: 3
+  inLobbyRefreshTime: 2
 --- !u!114 &2065954084
 MonoBehaviour:
   m_ObjectHideFlags: 0

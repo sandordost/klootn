@@ -50,6 +50,13 @@ public interface IDatabaseManager
 	public Task<List<Player>> GetAllPlayers();
 
 	/// <summary>
+	/// Gets all players from the database found with <paramref name="playerIds"/>
+	/// </summary>
+	/// <param name="playerIds"></param>
+	/// <returns>A new <see cref="List{T}"/> with the class <see cref="Player"/></returns>
+	public Task<List<Player>> GetAllPlayers(string[] playerIds);
+
+	/// <summary>
 	/// Adds a new lobby to the database
 	/// </summary>
 	/// <param name="host"></param>
@@ -121,7 +128,7 @@ public interface IDatabaseManager
 	/// </summary>
 	/// <param name="lobbyId"></param>
 	/// <returns></returns>
-	public Task<List<string>> GetLobbyPlayers(string lobbyId);
+	public Task<List<Player>> GetLobbyPlayers(string lobbyId);
 
 	/// <summary>
 	/// Removes entry of a player in the LastSeen list

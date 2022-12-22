@@ -27,14 +27,14 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	{
 		List<Lobby> newLobbies = await databaseManager.GetLobbies();
 
-		Dictionary<Lobby, LobbyChangeState> changedLobbies = new();
+		Dictionary<string, LobbyChangeState> changedLobbies = new();
 
 		if (Lobbies != null)
 		{
 			//Check if any old lobby is not in newlobbies (removed)
 			foreach (Lobby lobby in Lobbies)
 				if (newLobbies.Find((x) => x.Id.Equals(lobby.Id)) == null)
-					changedLobbies.Add(lobby, LobbyChangeState.Deleted);
+					changedLobbies.Add(lobby.Id, LobbyChangeState.Deleted);
 
 			foreach (Lobby newLobby in newLobbies)
 			{
@@ -47,22 +47,23 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 					if (!existingLobby.CompareLobby(newLobby))
 					{
 						//newlobby has changed
-						changedLobbies.Add(newLobby, LobbyChangeState.Changed);
+						changedLobbies.Add(newLobby.Id, LobbyChangeState.Changed);
 					}
 				}
 				else
 				{
 					//newlobby doesnt exist and is new
-					changedLobbies.Add(newLobby, LobbyChangeState.New);
+					changedLobbies.Add(newLobby.Id, LobbyChangeState.New);
 				}
 			}
 		}
 		else
 		{
-			changedLobbies = new Dictionary<Lobby, LobbyChangeState>();
+			changedLobbies = new Dictionary<string, LobbyChangeState>();
+
 			foreach(Lobby lobby in newLobbies)
 			{
-				changedLobbies.Add(lobby, LobbyChangeState.New);
+				changedLobbies.Add(lobby.Id, LobbyChangeState.New);
 			}
 		}
 
@@ -85,6 +86,49 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		Lobby lobby = await databaseManager.GetLobby(id);
 
 		return lobby;
+	}
+
+	public async Task<List<Player>> GetLobbyPlayers(string lobbyId)
+	{
+		return await databaseManager.GetLobbyPlayers(lobbyId);
+	}
+
+	public Dictionary<string, LobbyChangeState> GetLobbyPlayersChanges(List<Player> oldPlayerList, List<Player> newPlayerList)
+	{
+		Dictionary<string, LobbyChangeState> result = new();
+		//Check for removals
+		foreach(Player oldPlayer in oldPlayerList)
+		{
+			Player foundOldPlayer = newPlayerList.Find((newplayer) => newplayer.Id.Equals(oldPlayer.Id));
+			if(foundOldPlayer is null)
+			{
+				//Old player not found in the newplayer list
+				result.Add(oldPlayer.Id, LobbyChangeState.Deleted);
+			}
+		}
+
+		//Check for adds or updates
+		foreach (Player newPlayer in newPlayerList)
+		{
+			//Find new player in old player list
+			Player foundNewPlayer = oldPlayerList.Find((oldplayer) => oldplayer.Id.Equals(newPlayer.Id));
+			if (foundNewPlayer is null)
+			{
+				//New player is not found in the oldplayer list
+				result.Add(newPlayer.Id, LobbyChangeState.New);
+			}
+			else
+			{
+				//Player exists - check for changes in player
+				if (!foundNewPlayer.ComparePlayer(newPlayer)) 
+				{
+					//Player changed
+					result.Add(newPlayer.Id, LobbyChangeState.Changed);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	public async void JoinLobby(string lobbyId)

@@ -83,8 +83,10 @@ public class LobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private void RemoveLobbyFromUI(Lobby lobby)
+	private async void RemoveLobbyFromUI(string lobbyId)
 	{
+		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
+
 		foreach (Transform transform in lobbyPrefabParent.transform)
 		{
 			if (transform.GetComponent<LobbyClick>().LobbyId.Equals(lobby.Id))
@@ -95,26 +97,21 @@ public class LobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private void UpdateLobbyUI(Lobby lobby)
+	private async void UpdateLobbyUI(string lobbyId)
 	{
-		GameObject existingLobby = FindLobby(lobby.Id);
+		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
+
+		GameObject existingLobby = FindLobbyCardUI(lobby.Id);
 
 		existingLobby.transform.Find("LobbyTitle").GetComponent<TMP_Text>().text = lobby.Name;
 		existingLobby.transform.Find("LobbyDescription").GetComponent<TMP_Text>().text = lobby.Description;
 		existingLobby.transform.Find("LobbyPlayers").GetComponent<TMP_Text>().text = $"{lobby.Players.Count}/{lobbyManager.maxPlayers}";
 	}
 
-	private GameObject FindLobby(string id)
+	private async void AddLobbyToUI(string lobbyId)
 	{
-		foreach(LobbyClick click in lobbyPrefabParent.GetComponentsInChildren<LobbyClick>())
-		{
-			if (click.LobbyId.Equals(id)) return click.gameObject;
-		}
-		return null;
-	}
+		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
 
-	private void AddLobbyToUI(Lobby lobby)
-	{
 		GameObject newLobby = Instantiate(lobbyPrefab, lobbyPrefabParent.transform);
 
 		newLobby.GetComponent<LobbyClick>().LobbyId = lobby.Id;
@@ -122,6 +119,16 @@ public class LobbyManagerUI : MonoBehaviour
 		newLobby.transform.Find("LobbyTitle").GetComponent<TMP_Text>().text = lobby.Name;
 		newLobby.transform.Find("LobbyDescription").GetComponent<TMP_Text>().text = lobby.Description;
 		newLobby.transform.Find("LobbyPlayers").GetComponent<TMP_Text>().text = $"{lobby.Players.Count}/{lobbyManager.maxPlayers}";
+	}
+
+
+	private GameObject FindLobbyCardUI(string id)
+	{
+		foreach (LobbyClick click in lobbyPrefabParent.GetComponentsInChildren<LobbyClick>())
+		{
+			if (click.LobbyId.Equals(id)) return click.gameObject;
+		}
+		return null;
 	}
 
 }

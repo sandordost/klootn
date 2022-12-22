@@ -141,12 +141,17 @@ public class FirebaseManager : IDatabaseManager
 		throw new NotImplementedException();
 	}
 
-	public Task<List<string>> GetLobbyPlayers(string lobbyId)
+	public Task<List<Player>> GetLobbyPlayers(string lobbyId)
 	{
 		throw new NotImplementedException();
 	}
 
 	public Task RemoveLobbyLastSeen(string lobbyId, string playerId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<List<Player>> GetAllPlayers(string[] playerIds)
 	{
 		throw new NotImplementedException();
 	}

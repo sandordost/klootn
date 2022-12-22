@@ -33,3 +33,15 @@ public class Player
 
 	}
 }
+
+public static class PlayerExtension
+{
+	public static bool ComparePlayer(this Player player, Player playerToCompare)
+	{
+		if (player.Id.Equals(playerToCompare.Id)
+			&& player.Name.Equals(playerToCompare.Name))
+			return true;
+
+		return false;
+	}
+}

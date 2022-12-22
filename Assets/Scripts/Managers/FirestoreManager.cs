@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -111,6 +112,27 @@ public class FirestoreManager : IDatabaseManager
 		CollectionReference playersRef = firestore.Collection("Players");
 
 		QuerySnapshot snapshot = await playersRef.GetSnapshotAsync();
+
+		List<Player> result = new();
+
+		foreach (var item in snapshot.Documents)
+		{
+			result.Add(item.ConvertTo<Player>());
+		}
+
+		return result;
+	}
+
+	public async Task<List<Player>> GetAllPlayers(string[] playerIds)
+	{
+		if (playerIds is null || playerIds.Length.Equals(0)) 
+			return new();
+
+		CollectionReference playersRef = firestore.Collection("Players");
+
+		Query query = playersRef.WhereIn(FieldPath.DocumentId, playerIds);
+
+		QuerySnapshot snapshot = await query.GetSnapshotAsync();
 
 		List<Player> result = new();
 
@@ -242,16 +264,18 @@ public class FirestoreManager : IDatabaseManager
 
 	public async Task RemovePlayerFromLobby(string lobbyId, string playerId)
 	{
-		List<string> players = await GetLobbyPlayers(lobbyId);
+		List<Player> players = await GetLobbyPlayers(lobbyId);
 
-		players.Remove(playerId);
+		List<string> playerIds = players.Select((player) => player.Id).ToList();
 
-		await UpdateLobbyPlayerList(lobbyId, players);
+		playerIds.Remove(playerId);
+
+		await UpdateLobbyPlayerList(lobbyId, playerIds);
 
 		await RemoveLobbyLastSeen(lobbyId, playerId);
 	}
 
-	public async Task<List<string>> GetLobbyPlayers(string lobbyId)
+	public async Task<List<Player>> GetLobbyPlayers(string lobbyId)
 	{
 		CollectionReference lobbyRef = firestore.Collection("Lobbies");
 
@@ -259,7 +283,11 @@ public class FirestoreManager : IDatabaseManager
 
 		Lobby lobby = snapshot.ConvertTo<Lobby>();
 
-		return lobby.Players;
+		List<string> playerIds = lobby.Players;
+
+		List<Player> players = await GetAllPlayers(playerIds.ToArray());
+
+		return players;
 	}
 
 	public async Task UpdateLastSeen(string playerId, Timestamp timestamp)
