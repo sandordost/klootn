@@ -26,7 +26,7 @@ public class LoginManager : MonoBehaviour
 
 	private void Start()
 	{
-		GameManager gameManager = GameManager.GetGameManager();
+		GameManager gameManager = GameManager.GetInstance();
 
 		usernameInputField.characterLimit = inputValidator.maxPlayerNameSize;
 		passwordInputField.characterLimit = inputValidator.maxPasswordSize;

@@ -6,19 +6,18 @@ using System.Threading.Tasks;
 using System.Timers;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InLobbyManagerUI : MonoBehaviour
 {
 	public TMP_Text titleText;
-
 	public GameObject inLobbyPage;
-
 	public GameObject playerUIPrefabParent;
-
 	public GameObject playerUIPrefab;
+	public GameObject MapGameObj;
 
+	private MapManager mapManager;
 	private LobbyManager lobbyManager;
-
 	private PlayerManager playerManager;
 
 	public float inLobbyRefreshTime = 3;
@@ -68,13 +67,21 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private void Start()
 	{
-		GameManager gameManager = GameManager.GetGameManager();
-
+		GameManager gameManager = GameManager.GetInstance();
 		lobbyManager = gameManager.dataManager.lobbyManager;
-
 		playerManager = gameManager.dataManager.playerManager;
+		mapManager = gameManager.dataManager.mapManager;
 
 		inLobbyRefreshTimeElapsed = inLobbyRefreshTime;
+
+		lobbyManager.OnLobbiesChanged += LobbiesChanged;
+	}
+
+	private void LobbiesChanged(object sender, LobbiesChangedEventArgs e)
+	{
+		if (currentLobbyId is not null && 
+			e.ChangedLobbies.ContainsKey(currentLobbyId))
+			UpdateInLobbyUI();
 	}
 
 	private void FixedUpdate()
@@ -101,17 +108,19 @@ public class InLobbyManagerUI : MonoBehaviour
 		inLobbyRefreshTimeElapsed = 0;
 	}
 
-	private void LobbyManager_LobbiesChanged(object sender, LobbiesChangedEventArgs e)
-	{
-		UpdateInLobbyUI();
-	}
-
 	private async void UpdateInLobbyUI()
 	{
-		//Change inlobbyUI
 		titleText.text = "";
 
 		Lobby lobby = await lobbyManager.GetLobby(currentLobbyId);
+
+		KlootnMap map = await mapManager.GetCurrentKlootnMap(currentLobbyId);
+
+		MapGameObj.transform.Find("Image").GetComponent<Image>().sprite = map.image;
+
+		MapGameObj.transform.Find("MapInfo").Find("MapName").GetComponent<TMP_Text>().text = map.title;
+
+		MapGameObj.transform.Find("MapInfo").Find("MapDescription").GetComponent<TMP_Text>().text = map.description;
 
 		titleText.text = lobby.Name;
 	}

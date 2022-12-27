@@ -61,7 +61,7 @@ public interface IDatabaseManager
 	/// </summary>
 	/// <param name="host"></param>
 	/// <returns><see cref="Lobby"/> that was created in the database</returns>
-	public Task<Lobby> CreateLobby(Player host, string title, string description);
+	public Task<Lobby> CreateLobby(Player host, string name, string description, string mapId);
 
 	/// <summary>
 	/// Gets player by name from the database
@@ -137,4 +137,19 @@ public interface IDatabaseManager
 	/// <param name="playerId"></param>
 	/// <returns></returns>
 	public Task RemoveLobbyLastSeen(string lobbyId, string playerId);
+
+	/// <summary>
+	/// Updates the lobby mapId, within a database
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <param name="mapId"></param>
+	/// <returns></returns>
+	public Task UpdateLobbyMap(string lobbyId, string mapId);
+
+	/// <summary>
+	/// Gets the mapId from a lobby that is found using <paramref name="lobbyId"/>
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <returns></returns>
+	public Task<string> GetLobbyMap(string lobbyId);
 }

@@ -17,7 +17,7 @@ public class MotdManager : MonoBehaviour
 
 	private void Start()
 	{
-		GameManager gameManager = GameManager.GetGameManager();
+		GameManager gameManager = GameManager.GetInstance();
 
 		databaseManager = gameManager.dataManager.databaseManager;
 		storageManager = gameManager.dataManager.storageManager;

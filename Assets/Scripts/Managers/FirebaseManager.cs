@@ -155,4 +155,19 @@ public class FirebaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
+	public Task UpdateLobbyMap(string lobbyId, string mapId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<string> GetLobbyMap(string lobbyId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<Lobby> CreateLobby(Player host, string name, string description, string mapId)
+	{
+		throw new NotImplementedException();
+	}
 }

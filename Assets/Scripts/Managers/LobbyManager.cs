@@ -12,13 +12,15 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	private IDatabaseManager databaseManager;
 	private PlayerManager playerManager;
+	private MapManager mapManager;
 	private List<Lobby> Lobbies { get; set; }
 
 
 	private void Start()
 	{
-		GameManager gameManager = GameManager.GetGameManager();
+		GameManager gameManager = GameManager.GetInstance();
 
+		mapManager = gameManager.dataManager.mapManager;
 		databaseManager = gameManager.dataManager.databaseManager;
 		playerManager = gameManager.dataManager.playerManager;
 	}
@@ -78,7 +80,8 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	{
 		return await databaseManager.CreateLobby(playerManager.Client,
 			$"{playerManager.Client.Name}'s lobby",
-			$"Join {playerManager.Client.Name}'s lobby to feel accomplished");
+			$"Join {playerManager.Client.Name}'s lobby to feel accomplished",
+			mapManager.DefaultMap);
 	}
 
 	public async Task<Lobby> GetLobby(string id)

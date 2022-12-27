@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 	/// Returns the singleton instance of <see cref="GameManager"/>
 	/// </summary>
 	/// <returns></returns>
-	public static GameManager GetGameManager()
+	public static GameManager GetInstance()
 	{
 		return instance;
 	}

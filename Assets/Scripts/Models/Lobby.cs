@@ -9,10 +9,10 @@ public class Lobby
 	[FirestoreDocumentId]
 	public string Id { get; set; }
 
-	/// Dictionary of ids : string and players : Players
 	[FirestoreProperty]
 	public List<string> Players { get; set; }
 
+	/// Dictionary of ids : string and playerTimestamps : Timestamp
 	[FirestoreProperty]
 	public Dictionary<string, Timestamp> PlayersLastSeen { get; set; }
 
@@ -21,6 +21,9 @@ public class Lobby
 
 	[FirestoreProperty]
 	public string Name { get; set; }
+
+	[FirestoreProperty]
+	public string MapId { get; set; }
 
 	[FirestoreProperty]
 	public string Description { get; set; }
@@ -33,7 +36,8 @@ public static class LobbyExtensions
 		if (currentLobby.Id.Equals(comparedLobby.Id) &&
 			currentLobby.Name.Equals(comparedLobby.Name) &&
 			currentLobby.Description.Equals(comparedLobby.Description) &&
-			currentLobby.Players.SequenceEqual(comparedLobby.Players))
+			currentLobby.Players.SequenceEqual(comparedLobby.Players) &&
+			currentLobby.MapId.Equals(comparedLobby.MapId))
 		{
 			return true;
 		}

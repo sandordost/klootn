@@ -10,6 +10,7 @@ public class DataManager : MonoBehaviour
 	public LobbyManager lobbyManager;
 	public GameCommandsManager gameCommandsManager;
 	public GameStateManager gameStateManager;
+	public MapManager mapManager;
 
 	public DatabaseOption databaseOption;
 	public StorageOption storageOption;

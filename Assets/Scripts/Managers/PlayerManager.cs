@@ -30,7 +30,7 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 
 	private void Start()
 	{
-		databaseManager = GameManager.GetGameManager().dataManager.databaseManager;
+		databaseManager = GameManager.GetInstance().dataManager.databaseManager;
 
 		SetTestClient();
 		UpdateLastSeenTimer = new Timer(UpdateClientLastSeenInterval * 1000);
@@ -61,6 +61,6 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 
 	private async void SetTestClient()
 	{
-		Client = await GameManager.GetGameManager().dataManager.databaseManager.GetPlayerByName("sandordost");
+		Client = await GameManager.GetInstance().dataManager.databaseManager.GetPlayerByName("sandor");
 	}
 }

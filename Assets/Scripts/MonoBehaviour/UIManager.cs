@@ -10,6 +10,10 @@ public class UIManager : MonoBehaviour
 
 	public InLobbyManagerUI inLobbyManagerUI;
 
+	public MapSelectionManager mapSelectionManager;
+
+	public UIPageSwitcher uiPageSwitcher;
+
 	private void Awake()
 	{
 		instance = this;

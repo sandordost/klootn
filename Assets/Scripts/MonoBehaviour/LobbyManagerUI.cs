@@ -14,6 +14,7 @@ public class LobbyManagerUI : MonoBehaviour
 	public GameObject lobbyPrefab;
 	public UIPageSwitcher pageSwitcher;
 
+	private MapManager mapManager;
 	private LobbyManager lobbyManager;
 	private InLobbyManagerUI inLobbyManagerUI;
 
@@ -23,9 +24,10 @@ public class LobbyManagerUI : MonoBehaviour
 	void Start()
 	{
 		UIManager uiManager = UIManager.GetInstance();
-		GameManager gameManager = GameManager.GetGameManager();
+		GameManager gameManager = GameManager.GetInstance();
 		lobbyManager = gameManager.dataManager.lobbyManager;
 		inLobbyManagerUI = uiManager.inLobbyManagerUI;
+		mapManager = gameManager.dataManager.mapManager;
 
 		lobbyRefreshTimeElapsed = lobbyRefreshTime;
 		lobbyManager.OnLobbiesChanged += LobbiesChanged;
@@ -98,29 +100,33 @@ public class LobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private async void UpdateLobbyUI(string lobbyId)
+	private void UpdateLobbyUI(string lobbyId)
 	{
-		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
+		GameObject existingLobby = FindLobbyCardUI(lobbyId);
 
-		GameObject existingLobby = FindLobbyCardUI(lobby.Id);
-
-		existingLobby.transform.Find("LobbyTitle").GetComponent<TMP_Text>().text = lobby.Name;
-		existingLobby.transform.Find("LobbyDescription").GetComponent<TMP_Text>().text = lobby.Description;
-		existingLobby.transform.Find("LobbyPlayers").GetComponent<TMP_Text>().text = $"{lobby.Players.Count}/{lobbyManager.maxPlayers}";
+		UpdateLobbyUIObject(existingLobby, lobbyId);
 	}
 
-	private async void AddLobbyToUI(string lobbyId)
-	{
-		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
-
+	private void AddLobbyToUI(string lobbyId)
+	{ 
 		GameObject newLobby = Instantiate(lobbyPrefab, lobbyPrefabParent.transform);
 
-		newLobby.GetComponent<LobbyClick>().LobbyId = lobby.Id;
+		newLobby.GetComponent<LobbyClick>().LobbyId = lobbyId;
 
-		newLobby.transform.Find("LobbyTitle").GetComponent<TMP_Text>().text = lobby.Name;
-		newLobby.transform.Find("LobbyDescription").GetComponent<TMP_Text>().text = lobby.Description;
-		newLobby.transform.Find("LobbyPlayers").GetComponent<TMP_Text>().text = $"{lobby.Players.Count}/{lobbyManager.maxPlayers}";
+		UpdateLobbyUIObject(newLobby, lobbyId);
 	}
+
+	private async void UpdateLobbyUIObject(GameObject lobbyObject, string lobbyId)
+	{
+		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
+
+		KlootnMap lobbyMap = mapManager.GetMap(lobby.MapId);
+
+		lobbyObject.transform.Find("LobbyTitle").GetComponent<TMP_Text>().text = lobby.Name;
+		lobbyObject.transform.Find("LobbyDescription").GetComponent<TMP_Text>().text = lobby.Description;
+		lobbyObject.transform.Find("LobbyPlayers").GetComponent<TMP_Text>().text = $"{lobby.Players.Count}/{lobbyMap.maxPlayers}";
+	}
+
 
 
 	private GameObject FindLobbyCardUI(string id)

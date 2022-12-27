@@ -22,4 +22,19 @@ public class UIPageSwitcher : MonoBehaviour
 			}
 		}
 	}
+
+	public void SwitchPage(string pageName)
+	{
+		SwitchPage(GetPage(pageName));
+	}
+
+	private GameObject GetPage(string pageName)
+	{
+		foreach(GameObject obj in pages)
+		{
+			if (obj.name.Equals(pageName))
+				return obj;
+		}
+		return null;
+	}
 }

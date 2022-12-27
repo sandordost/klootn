@@ -18,7 +18,7 @@ public class MenuManager : MonoBehaviour
 	{
 		gameEvents = GameEventsManager.GetInstance();
 
-		playerManager = GameManager.GetGameManager().dataManager.playerManager;
+		playerManager = GameManager.GetInstance().dataManager.playerManager;
 
 		gameEvents.OnPlayerLoggedIn += PlayerLoggedIn;
 		gameEvents.OnPlayerRegistered += PlayerRegistered;

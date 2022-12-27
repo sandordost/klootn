@@ -32,7 +32,7 @@ public class RegistrationManager : MonoBehaviour
 		usernameInputField.characterLimit = inputValidator.maxPlayerNameSize;
 		passwordInputField.characterLimit = inputValidator.maxPasswordSize;
 
-		GameManager gameManager = GameManager.GetGameManager();
+		GameManager gameManager = GameManager.GetInstance();
 
 		databaseManager = gameManager.dataManager.databaseManager;
 		playerManager = gameManager.dataManager.playerManager;

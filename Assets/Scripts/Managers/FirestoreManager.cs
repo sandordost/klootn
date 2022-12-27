@@ -47,11 +47,12 @@ public class FirestoreManager : IDatabaseManager
 		return result;
 	}
 
-	public async Task<Lobby> CreateLobby(Player host, string name, string description)
+	public async Task<Lobby> CreateLobby(Player host, string name, string description, string mapId)
 	{
 		Lobby lobby = new()
 		{
 			HostId = host.Id,
+			MapId = mapId,
 			Name = name,
 			Description = description,
 			Players = new()
@@ -180,11 +181,11 @@ public class FirestoreManager : IDatabaseManager
 		return player;
 	}
 
-	public async Task<Lobby> GetLobby(string id)
+	public async Task<Lobby> GetLobby(string lobbyId)
 	{
 		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
 
-		Query query = lobbiesRef.WhereEqualTo(FieldPath.DocumentId, id);
+		Query query = lobbiesRef.WhereEqualTo(FieldPath.DocumentId, lobbyId);
 
 		var task = await query.GetSnapshotAsync();
 
@@ -327,5 +328,25 @@ public class FirestoreManager : IDatabaseManager
 		playersLastSeen.Remove(playerId);
 
 		await lobbyRef.UpdateAsync("PlayersLastSeen", playersLastSeen);
+	}
+
+	public async Task UpdateLobbyMap(string lobbyId, string mapId)
+	{
+		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
+
+		DocumentReference lobbyRef = lobbiesRef.Document(lobbyId);
+
+		await lobbyRef.UpdateAsync("MapId", mapId);
+	}
+
+	public async Task<string> GetLobbyMap(string lobbyId)
+	{
+		DocumentReference lobbyRef = firestore.Collection("Lobbies").Document(lobbyId);
+
+		DocumentSnapshot snapshot = await lobbyRef.GetSnapshotAsync();
+
+		Lobby lobby = snapshot.ConvertTo<Lobby>();
+
+		return lobby.MapId;
 	}
 }
