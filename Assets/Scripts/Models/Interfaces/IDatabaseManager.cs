@@ -167,4 +167,17 @@ public interface IDatabaseManager
 	/// <param name="playerId"></param>
 	/// <returns></returns>
 	public Task SetHost(string lobbyId, string playerId);
+
+	/// <summary>
+	/// Gets all lobbies and removes any lobby that does not have any players
+	/// </summary>
+	/// <returns></returns>
+	public Task RemoveEmptyLobbies();
+
+	/// <summary>
+	/// Removes a lobby from lobbies in the database
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <returns></returns>
+	public Task RemoveLobby(string lobbyId);
 }

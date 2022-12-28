@@ -18,8 +18,11 @@ public class LobbyManagerUI : MonoBehaviour
 	private LobbyManager lobbyManager;
 	private InLobbyManagerUI inLobbyManagerUI;
 
-	public float lobbyRefreshTime = 5;
+	public float lobbyRefreshTime = 2;
 	private float lobbyRefreshTimeElapsed;
+
+	public float emptyAndIdleRemoveTime = 5;
+	private float emptyAndIdleRemoveTimeElapsed = 5;
 
 	void Start()
 	{
@@ -47,7 +50,24 @@ public class LobbyManagerUI : MonoBehaviour
 			{
 				lobbyRefreshTimeElapsed += Time.deltaTime;
 			}
+
+			if(emptyAndIdleRemoveTimeElapsed > emptyAndIdleRemoveTime)
+			{				
+				RemoveIdleAndEmptyLobbies();
+				emptyAndIdleRemoveTimeElapsed = 0;
+			}
+			else
+			{
+				emptyAndIdleRemoveTimeElapsed += Time.deltaTime;
+			}
 		}
+	}
+
+	private async void RemoveIdleAndEmptyLobbies()
+	{
+		Debug.Log("Removing idle players and empty lobbies");
+		await lobbyManager.FindAndRemoveInactivePlayers();
+		lobbyManager.RemoveEmptyLobbies();
 	}
 
 	public async void CreateNewLobby()
@@ -88,11 +108,9 @@ public class LobbyManagerUI : MonoBehaviour
 
 	private async void RemoveLobbyFromUI(string lobbyId)
 	{
-		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
-
 		foreach (Transform transform in lobbyPrefabParent.transform)
 		{
-			if (transform.GetComponent<LobbyClick>().LobbyId.Equals(lobby.Id))
+			if (transform.GetComponent<LobbyClick>().LobbyId.Equals(lobbyId))
 			{
 				Destroy(transform.gameObject);
 				return;

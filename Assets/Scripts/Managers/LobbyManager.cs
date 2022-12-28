@@ -76,6 +76,11 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	}
 
+	public async void RemoveEmptyLobbies()
+	{
+		await databaseManager.RemoveEmptyLobbies();
+	}
+
 	public async Task<Lobby> CreateLobby()
 	{
 		return await databaseManager.CreateLobby(playerManager.Client,
@@ -111,22 +116,25 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		}
 
 		//Check for adds or updates
-		foreach (Player newPlayer in newPlayerList)
+		if (newPlayerList is not null)
 		{
-			//Find new player in old player list
-			Player foundNewPlayer = oldPlayerList.Find((oldplayer) => oldplayer.Id.Equals(newPlayer.Id));
-			if (foundNewPlayer is null)
+			foreach (Player newPlayer in newPlayerList)
 			{
-				//New player is not found in the oldplayer list
-				result.Add(newPlayer.Id, LobbyChangeState.New);
-			}
-			else
-			{
-				//Player exists - check for changes in player
-				if (!foundNewPlayer.ComparePlayer(newPlayer)) 
+				//Find new player in old player list
+				Player foundNewPlayer = oldPlayerList.Find((oldplayer) => oldplayer.Id.Equals(newPlayer.Id));
+				if (foundNewPlayer is null)
 				{
-					//Player changed
-					result.Add(newPlayer.Id, LobbyChangeState.Changed);
+					//New player is not found in the oldplayer list
+					result.Add(newPlayer.Id, LobbyChangeState.New);
+				}
+				else
+				{
+					//Player exists - check for changes in player
+					if (!foundNewPlayer.ComparePlayer(newPlayer))
+					{
+						//Player changed
+						result.Add(newPlayer.Id, LobbyChangeState.Changed);
+					}
 				}
 			}
 		}
@@ -150,9 +158,19 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		await databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
 	}
 
-	public async void FindAndRemoveInactivePlayers(string lobbyId)
+	public async Task FindAndRemoveInactivePlayers(string lobbyId)
 	{
 		await databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
+	}
+
+	public async Task FindAndRemoveInactivePlayers()
+	{
+		List<Lobby> lobbies = await databaseManager.GetLobbies();
+
+		foreach (Lobby lobby in lobbies)
+		{
+			await FindAndRemoveInactivePlayers(lobby.Id);
+		}
 	}
 
 	public async void RefreshLobbies()

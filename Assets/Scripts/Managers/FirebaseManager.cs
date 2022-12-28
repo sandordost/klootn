@@ -180,4 +180,14 @@ public class FirebaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
+	public Task RemoveEmptyLobbies()
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task RemoveLobby(string lobbyId)
+	{
+		throw new NotImplementedException();
+	}
 }

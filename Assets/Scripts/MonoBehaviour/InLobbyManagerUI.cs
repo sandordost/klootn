@@ -20,6 +20,7 @@ public class InLobbyManagerUI : MonoBehaviour
 	private MapManager mapManager;
 	private LobbyManager lobbyManager;
 	private PlayerManager playerManager;
+	private UIPageSwitcher uiPageSwitcher;
 
 	public float inLobbyRefreshTime = 3;
 	private float inLobbyRefreshTimeElapsed = 0;
@@ -74,6 +75,7 @@ public class InLobbyManagerUI : MonoBehaviour
 		lobbyManager = gameManager.dataManager.lobbyManager;
 		playerManager = gameManager.dataManager.playerManager;
 		mapManager = gameManager.dataManager.mapManager;
+		uiPageSwitcher = UIManager.GetInstance().uiPageSwitcher;
 
 		inLobbyRefreshTimeElapsed = inLobbyRefreshTime;
 
@@ -84,7 +86,9 @@ public class InLobbyManagerUI : MonoBehaviour
 	{
 		if (CurrentLobbyId is not null && e.ChangedLobbies.ContainsKey(CurrentLobbyId))
 		{
-			UpdateInLobbyUI();
+			if (e.ChangedLobbies[CurrentLobbyId].Equals(LobbyChangeState.Deleted))
+				uiPageSwitcher.SwitchPage("LobbyPage");
+			else UpdateInLobbyUI();
 		}
 	}
 
@@ -115,6 +119,8 @@ public class InLobbyManagerUI : MonoBehaviour
 	private async void UpdateInLobbyUI()
 	{
 		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
+
+		if (lobby is null) return;
 
 		ClientIsHost = await lobbyManager.ClientIsHost(lobby.Id);
 
@@ -222,7 +228,7 @@ public class InLobbyManagerUI : MonoBehaviour
 
 		bool playerIsHost = player.Id.Equals(currentHost);
 
-		playerObj.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
+		playerObj.transform.Find("NameAndIcon").Find("PlayerNameHolder").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
 
 		playerObj.transform.Find("NameAndIcon").Find("HostIcon").gameObject.SetActive(playerIsHost);
 
@@ -230,6 +236,10 @@ public class InLobbyManagerUI : MonoBehaviour
 			playerObj.transform.Find("KickAndPromote").gameObject.SetActive(false);
 		else
 			playerObj.transform.Find("KickAndPromote").gameObject.SetActive(ClientIsHost);
+
+		await Task.Delay(20);
+
+		LayoutRebuilder.ForceRebuildLayoutImmediate(playerObj.transform.Find("NameAndIcon").GetComponent<RectTransform>());
 	}
 
 	public void PromotePlayer(string playerId)

@@ -39,7 +39,7 @@ public class FirestoreManager : IDatabaseManager
 
 		List<Lobby> result = new();
 
-		foreach(var item in snapshot.Documents)
+		foreach (var item in snapshot.Documents)
 		{
 			result.Add(item.ConvertTo<Lobby>());
 		}
@@ -126,7 +126,7 @@ public class FirestoreManager : IDatabaseManager
 
 	public async Task<List<Player>> GetAllPlayers(string[] playerIds)
 	{
-		if (playerIds is null || playerIds.Length.Equals(0)) 
+		if (playerIds is null || playerIds.Length.Equals(0))
 			return new();
 
 		CollectionReference playersRef = firestore.Collection("Players");
@@ -227,19 +227,24 @@ public class FirestoreManager : IDatabaseManager
 
 	public async Task UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
 	{
-		if (playerId is not null && lobbyId is not null)
+		if (playerId is null || lobbyId is null) return;
+
+		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
+
+		DocumentReference lobbyRef = lobbiesRef.Document(lobbyId);
+
+		Dictionary<string, Timestamp> lastSeenDict = await GetLobbyLastSeen(lobbyId);
+
+		if (lastSeenDict is null) lastSeenDict = new();
+
+		lastSeenDict[playerId] = timestamp;
+		try
 		{
-			CollectionReference lobbiesRef = firestore.Collection("Lobbies");
-
-			DocumentReference lobbyRef = lobbiesRef.Document(lobbyId);
-
-			Dictionary<string, Timestamp> lastSeenDict = await GetLobbyLastSeen(lobbyId);
-
-			if (lastSeenDict is null) lastSeenDict = new();
-
-			lastSeenDict[playerId] = timestamp;
-
 			await lobbyRef.UpdateAsync("PlayersLastSeen", lastSeenDict);
+		}
+		catch(Exception e)
+		{
+			Debug.Log($"Couldn't update lobby- player-lastseen: {e.Message}");
 		}
 	}
 
@@ -260,7 +265,7 @@ public class FirestoreManager : IDatabaseManager
 
 		Lobby lobby1 = snapshot.ConvertTo<Lobby>();
 
-		return lobby1.PlayersLastSeen;
+		return lobby1?.PlayersLastSeen;
 	}
 
 	public async Task RemovePlayerFromLobby(string lobbyId, string playerId)
@@ -284,6 +289,8 @@ public class FirestoreManager : IDatabaseManager
 
 		Lobby lobby = snapshot.ConvertTo<Lobby>();
 
+		if (lobby is null) return null;
+
 		List<string> playerIds = lobby.Players;
 
 		List<Player> players = await GetAllPlayers(playerIds.ToArray());
@@ -306,10 +313,12 @@ public class FirestoreManager : IDatabaseManager
 	{
 		Dictionary<string, Timestamp> playersLastSeen = await GetLobbyLastSeen(lobbyId);
 
-		foreach(var player in playersLastSeen)
+		if (playersLastSeen is null) return;
+
+		foreach (var player in playersLastSeen)
 		{
 			double secondsSinceLastSeen = (Timestamp.GetCurrentTimestamp().ToDateTime() - player.Value.ToDateTime()).TotalSeconds;
-			if(secondsSinceLastSeen > secondsTimeout)
+			if (secondsSinceLastSeen > secondsTimeout)
 			{
 				Debug.Log($"Removed player {player.Key} from lobby {lobbyId}");
 				await RemovePlayerFromLobby(lobbyId, player.Key);
@@ -366,5 +375,29 @@ public class FirestoreManager : IDatabaseManager
 		DocumentReference lobbyRef = firestore.Collection("Lobbies").Document(lobbyId);
 
 		await lobbyRef.UpdateAsync("HostId", playerId);
+	}
+
+	public async Task RemoveEmptyLobbies()
+	{
+		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
+
+		QuerySnapshot snapshot = await lobbiesRef.GetSnapshotAsync();
+
+		foreach (DocumentSnapshot docSnapshot in snapshot.Documents)
+		{
+			Lobby lobby = docSnapshot.ConvertTo<Lobby>();
+
+			if (lobby.Players.Count <= 0)
+			{
+				await RemoveLobby(lobby.Id);
+			}
+		}
+	}
+
+	public async Task RemoveLobby(string lobbyId)
+	{
+		DocumentReference lobbyRef = firestore.Collection("Lobbies").Document(lobbyId);
+
+		await lobbyRef.DeleteAsync();
 	}
 }
