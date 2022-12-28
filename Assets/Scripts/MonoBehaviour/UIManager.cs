@@ -14,6 +14,8 @@ public class UIManager : MonoBehaviour
 
 	public UIPageSwitcher uiPageSwitcher;
 
+	public AlertManager alertManager;
+
 	private void Awake()
 	{
 		instance = this;

@@ -17,6 +17,7 @@ public class LobbyManagerUI : MonoBehaviour
 	private MapManager mapManager;
 	private LobbyManager lobbyManager;
 	private InLobbyManagerUI inLobbyManagerUI;
+	private AlertManager alertManager;
 
 	public float lobbyRefreshTime = 2;
 	private float lobbyRefreshTimeElapsed;
@@ -31,6 +32,7 @@ public class LobbyManagerUI : MonoBehaviour
 		lobbyManager = gameManager.dataManager.lobbyManager;
 		inLobbyManagerUI = uiManager.inLobbyManagerUI;
 		mapManager = gameManager.dataManager.mapManager;
+		alertManager = uiManager.alertManager;
 
 		lobbyRefreshTimeElapsed = lobbyRefreshTime;
 		lobbyManager.OnLobbiesChanged += LobbiesChanged;
@@ -72,8 +74,10 @@ public class LobbyManagerUI : MonoBehaviour
 
 	public async void CreateNewLobby()
 	{
+		alertManager.ShowLoadingAlert("Creating new lobby ...");
 		Lobby lobby = await lobbyManager.CreateLobby();
 		OpenLobbyUI(lobby.Id);
+		alertManager.CloseLoadingAlert();
 	}
 
 	public void OpenLobbyUI(string lobbyId)
@@ -106,7 +110,7 @@ public class LobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private async void RemoveLobbyFromUI(string lobbyId)
+	private void RemoveLobbyFromUI(string lobbyId)
 	{
 		foreach (Transform transform in lobbyPrefabParent.transform)
 		{

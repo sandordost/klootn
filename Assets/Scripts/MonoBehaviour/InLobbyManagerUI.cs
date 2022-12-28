@@ -21,6 +21,7 @@ public class InLobbyManagerUI : MonoBehaviour
 	private LobbyManager lobbyManager;
 	private PlayerManager playerManager;
 	private UIPageSwitcher uiPageSwitcher;
+	private AlertManager alertManager;
 
 	public float inLobbyRefreshTime = 3;
 	private float inLobbyRefreshTimeElapsed = 0;
@@ -75,7 +76,10 @@ public class InLobbyManagerUI : MonoBehaviour
 		lobbyManager = gameManager.dataManager.lobbyManager;
 		playerManager = gameManager.dataManager.playerManager;
 		mapManager = gameManager.dataManager.mapManager;
-		uiPageSwitcher = UIManager.GetInstance().uiPageSwitcher;
+
+		UIManager uiManager = UIManager.GetInstance();
+		uiPageSwitcher = uiManager.uiPageSwitcher;
+		alertManager = uiManager.alertManager;
 
 		inLobbyRefreshTimeElapsed = inLobbyRefreshTime;
 
@@ -118,9 +122,16 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private async void UpdateInLobbyUI()
 	{
+		alertManager.ShowLoadingAlert("Loading lobby ...");
+
 		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
 
-		if (lobby is null) return;
+		if (lobby is null) 
+		{
+			alertManager.CloseLoadingAlert();
+			uiPageSwitcher.SwitchPage("LobbyPage");
+			return;
+		}
 
 		ClientIsHost = await lobbyManager.ClientIsHost(lobby.Id);
 
@@ -135,6 +146,8 @@ public class InLobbyManagerUI : MonoBehaviour
 		titleText.text = lobby.Name;
 
 		UpdateHostControls(ClientIsHost);
+
+		alertManager.CloseLoadingAlert();
 	}
 
 	private async void UpdateHostControls(bool clientIsHost)
