@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -27,14 +28,16 @@ public class AlertManager : MonoBehaviour
 		ToggleAlertScreen(true);
 	}
 
-	public void CloseLoadingAlert()
+	public async void CloseLoadingAlert()
 	{
+		await Task.Delay(100);
 		loadingView.SetActive(false);
 		ToggleAlertScreen(messageView.activeSelf || loadingView.activeSelf);
 	}
 
-	public void CloseMessageView()
+	public async void CloseMessageView()
 	{
+		await Task.Delay(100);
 		messageView.SetActive(false);
 		ToggleAlertScreen(messageView.activeSelf || loadingView.activeSelf);
 	}
