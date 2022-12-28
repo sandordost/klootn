@@ -139,6 +139,11 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		await databaseManager.AddPlayerToLobby(lobbyId, playerManager.Client.Id);
 	}
 
+	public async void KickPlayer(string lobbyId, string playerId)
+	{
+		await databaseManager.RemovePlayerFromLobby(lobbyId, playerId);
+	}
+
 	public async void UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
 	{
 		await databaseManager.UpdateLobbyLastSeen(playerId, lobbyId, timestamp);
@@ -153,5 +158,24 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	public async void RefreshLobbies()
 	{
 		await RetrieveData();
+	}
+
+	public async Task<string> GetHost(string lobbyId)
+	{
+		string hostId = await databaseManager.GetLobbyHost(lobbyId);
+
+		return hostId;
+	}
+
+	public async Task<bool> ClientIsHost(string lobbyId)
+	{
+		string hostId = await GetHost(lobbyId);
+
+		return hostId.Equals(playerManager.Client.Id);
+	}
+
+	public async void SetHost(string lobbyId, string playerId)
+	{
+		await databaseManager.SetHost(lobbyId, playerId);
 	}
 }

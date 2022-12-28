@@ -349,4 +349,22 @@ public class FirestoreManager : IDatabaseManager
 
 		return lobby.MapId;
 	}
+
+	public async Task<string> GetLobbyHost(string lobbyId)
+	{
+		DocumentReference lobbyRef = firestore.Collection("Lobbies").Document(lobbyId);
+
+		DocumentSnapshot snapshot = await lobbyRef.GetSnapshotAsync();
+
+		Lobby lobby = snapshot.ConvertTo<Lobby>();
+
+		return lobby.HostId;
+	}
+
+	public async Task SetHost(string lobbyId, string playerId)
+	{
+		DocumentReference lobbyRef = firestore.Collection("Lobbies").Document(lobbyId);
+
+		await lobbyRef.UpdateAsync("HostId", playerId);
+	}
 }

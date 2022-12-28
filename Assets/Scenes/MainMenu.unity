@@ -13949,7 +13949,8 @@ MonoBehaviour:
   playerUIPrefabParent: {fileID: 676798889}
   playerUIPrefab: {fileID: 7004216728073926346, guid: 1340ee7f9ebaf1646960556e54e29423,
     type: 3}
-  MapGameObj: {fileID: 1914017836}
+  mapGameObj: {fileID: 1914017836}
+  mapChangeButton: {fileID: 343243072}
   inLobbyRefreshTime: 0.6
 --- !u!114 &2065954084
 MonoBehaviour:

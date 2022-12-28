@@ -37,7 +37,8 @@ public static class LobbyExtensions
 			currentLobby.Name.Equals(comparedLobby.Name) &&
 			currentLobby.Description.Equals(comparedLobby.Description) &&
 			currentLobby.Players.SequenceEqual(comparedLobby.Players) &&
-			currentLobby.MapId.Equals(comparedLobby.MapId))
+			currentLobby.MapId.Equals(comparedLobby.MapId) &&
+			currentLobby.HostId.Equals(comparedLobby.HostId))
 		{
 			return true;
 		}

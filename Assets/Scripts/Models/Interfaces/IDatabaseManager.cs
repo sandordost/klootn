@@ -152,4 +152,19 @@ public interface IDatabaseManager
 	/// <param name="lobbyId"></param>
 	/// <returns></returns>
 	public Task<string> GetLobbyMap(string lobbyId);
+
+	/// <summary>
+	/// Gets the playerId that is host of the lobby found with <paramref name="lobbyId"/>
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <returns></returns>
+	public Task<string> GetLobbyHost(string lobbyId);
+
+	/// <summary>
+	/// Sets the host to <paramref name="playerId"/> of the lobby found with <paramref name="lobbyId"/> 
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <param name="playerId"></param>
+	/// <returns></returns>
+	public Task SetHost(string lobbyId, string playerId);
 }

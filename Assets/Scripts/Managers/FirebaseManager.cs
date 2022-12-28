@@ -170,4 +170,14 @@ public class FirebaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
+	public Task<string> GetLobbyHost(string lobbyId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task SetHost(string lobbyId, string playerId)
+	{
+		throw new NotImplementedException();
+	}
 }

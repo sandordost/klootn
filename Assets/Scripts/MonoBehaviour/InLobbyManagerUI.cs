@@ -14,7 +14,8 @@ public class InLobbyManagerUI : MonoBehaviour
 	public GameObject inLobbyPage;
 	public GameObject playerUIPrefabParent;
 	public GameObject playerUIPrefab;
-	public GameObject MapGameObj;
+	public GameObject mapGameObj;
+	public GameObject mapChangeButton;
 
 	private MapManager mapManager;
 	private LobbyManager lobbyManager;
@@ -25,24 +26,26 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private string currentLobbyId;
 
-	public string CurrentLobbyId 
-	{ 
-		get 
-		{ 
-			return currentLobbyId; 
-		} 
-		set 
-		{ 
+	public bool ClientIsHost { get; set; }
+
+	public string CurrentLobbyId
+	{
+		get
+		{
+			return currentLobbyId;
+		}
+		set
+		{
 			currentLobbyId = value;
 			CurrentPlayers.Clear();
 			ClearPlayerListUI();
 			UpdateInLobbyUI();
-		} 
+		}
 	}
 
 	private void ClearPlayerListUI()
 	{
-		foreach(Transform t in playerUIPrefabParent.transform)
+		foreach (Transform t in playerUIPrefabParent.transform)
 		{
 			Destroy(t.gameObject);
 		}
@@ -79,9 +82,10 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private void LobbiesChanged(object sender, LobbiesChangedEventArgs e)
 	{
-		if (currentLobbyId is not null && 
-			e.ChangedLobbies.ContainsKey(currentLobbyId))
+		if (CurrentLobbyId is not null && e.ChangedLobbies.ContainsKey(CurrentLobbyId))
+		{
 			UpdateInLobbyUI();
+		}
 	}
 
 	private void FixedUpdate()
@@ -103,26 +107,46 @@ public class InLobbyManagerUI : MonoBehaviour
 	{
 		Debug.Log("Updating Lobbies from inLobbyUI");
 		lobbyManager.RefreshLobbies();
-		lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, currentLobbyId, Timestamp.GetCurrentTimestamp());
+		lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, CurrentLobbyId, Timestamp.GetCurrentTimestamp());
 		UpdatePlayerListUI();
 		inLobbyRefreshTimeElapsed = 0;
 	}
 
 	private async void UpdateInLobbyUI()
 	{
-		titleText.text = "";
+		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
 
-		Lobby lobby = await lobbyManager.GetLobby(currentLobbyId);
+		ClientIsHost = await lobbyManager.ClientIsHost(lobby.Id);
 
-		KlootnMap map = await mapManager.GetCurrentKlootnMap(currentLobbyId);
+		KlootnMap map = await mapManager.GetCurrentKlootnMap(CurrentLobbyId);
 
-		MapGameObj.transform.Find("Image").GetComponent<Image>().sprite = map.image;
+		mapGameObj.transform.Find("Image").GetComponent<Image>().sprite = map.image;
 
-		MapGameObj.transform.Find("MapInfo").Find("MapName").GetComponent<TMP_Text>().text = map.title;
+		mapGameObj.transform.Find("MapInfo").Find("MapName").GetComponent<TMP_Text>().text = map.title;
 
-		MapGameObj.transform.Find("MapInfo").Find("MapDescription").GetComponent<TMP_Text>().text = map.description;
+		mapGameObj.transform.Find("MapInfo").Find("MapDescription").GetComponent<TMP_Text>().text = map.description;
 
 		titleText.text = lobby.Name;
+
+		UpdateHostControls(ClientIsHost);
+	}
+
+	private async void UpdateHostControls(bool clientIsHost)
+	{
+		Transform parent = playerUIPrefabParent.transform;
+
+		mapChangeButton.SetActive(clientIsHost);
+
+		string currentHost = await lobbyManager.GetHost(CurrentLobbyId);
+
+		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
+		{
+			GameObject playerCard = playerUI.gameObject;
+
+			playerCard.transform.Find("NameAndIcon").Find("HostIcon").gameObject.SetActive(currentHost.Equals(playerUI.PlayerId));
+
+			playerCard.transform.Find("KickAndPromote").gameObject.SetActive(clientIsHost && playerUI.PlayerId != playerManager.Client.Id);
+		}
 	}
 
 	private async void UpdatePlayerListUI()
@@ -137,13 +161,13 @@ public class InLobbyManagerUI : MonoBehaviour
 			switch (playerChange.Value)
 			{
 				case LobbyChangeState.New:
-					AddPlayerToLobby(playerChange.Key);
+					AddPlayerToLobbyUI(playerChange.Key);
 					break;
 				case LobbyChangeState.Changed:
-					UpdatePlayerInLobby(playerChange.Key);
+					UpdatePlayerInLobbyUI(playerChange.Key);
 					break;
 				case LobbyChangeState.Deleted:
-					RemovePlayerFromLobby(playerChange.Key);
+					RemovePlayerFromLobbyUI(playerChange.Key);
 					break;
 			}
 		}
@@ -151,7 +175,12 @@ public class InLobbyManagerUI : MonoBehaviour
 		CurrentPlayers = lobbyPlayers;
 	}
 
-	private void RemovePlayerFromLobby(string playerId)
+	public void KickPlayer(string playerId)
+	{
+		lobbyManager.KickPlayer(CurrentLobbyId, playerId);
+	}
+
+	private void RemovePlayerFromLobbyUI(string playerId)
 	{
 		Transform parent = playerUIPrefabParent.transform;
 
@@ -164,21 +193,17 @@ public class InLobbyManagerUI : MonoBehaviour
 			Destroy(objectToRemove);
 	}
 
-	public async void AddPlayerToLobby(string playerId)
+	public void AddPlayerToLobbyUI(string playerId)
 	{
-		Player player = await playerManager.GetPlayer(playerId);
-
 		GameObject newPlayerUI = Instantiate(playerUIPrefab, playerUIPrefabParent.transform);
 
-		newPlayerUI.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
-
 		newPlayerUI.GetComponent<Player_UI>().PlayerId = playerId;
+
+		SetPlayerObject(newPlayerUI, playerId);
 	}
 
-	public async void UpdatePlayerInLobby(string playerId)
+	public void UpdatePlayerInLobbyUI(string playerId)
 	{
-		Player player = await playerManager.GetPlayer(playerId);
-
 		Transform parent = playerUIPrefabParent.transform;
 
 		GameObject objectToUpdate = null;
@@ -186,8 +211,29 @@ public class InLobbyManagerUI : MonoBehaviour
 		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
 			if (playerUI.PlayerId.Equals(playerId)) objectToUpdate = playerUI.gameObject;
 
-		objectToUpdate.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
+		SetPlayerObject(objectToUpdate, playerId);
+	}
 
+	private async void SetPlayerObject(GameObject playerObj, string playerId)
+	{
+		Player player = await playerManager.GetPlayer(playerId);
 
+		string currentHost = await lobbyManager.GetHost(CurrentLobbyId);
+
+		bool playerIsHost = player.Id.Equals(currentHost);
+
+		playerObj.transform.Find("NameAndIcon").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
+
+		playerObj.transform.Find("NameAndIcon").Find("HostIcon").gameObject.SetActive(playerIsHost);
+
+		if (player.Id.Equals(playerManager.Client.Id))
+			playerObj.transform.Find("KickAndPromote").gameObject.SetActive(false);
+		else
+			playerObj.transform.Find("KickAndPromote").gameObject.SetActive(ClientIsHost);
+	}
+
+	public void PromotePlayer(string playerId)
+	{
+		lobbyManager.SetHost(currentLobbyId, playerId);
 	}
 }
