@@ -77,7 +77,6 @@ public class LobbyManagerUI : MonoBehaviour
 		alertManager.ShowLoadingAlert("Creating new lobby ...");
 		Lobby lobby = await lobbyManager.CreateLobby();
 		OpenLobbyUI(lobby.Id);
-		alertManager.CloseLoadingAlert();
 	}
 
 	public void OpenLobbyUI(string lobbyId)
