@@ -1,6 +1,7 @@
 using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -42,7 +43,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 			{
 				//Check if newlobby already exists
 				Lobby existingLobby = Lobbies.Find((x) => x.Id.Equals(newLobby.Id));
-				
+
 				if (existingLobby != null)
 				{
 					//newlobby exists
@@ -63,7 +64,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		{
 			changedLobbies = new Dictionary<string, LobbyChangeState>();
 
-			foreach(Lobby lobby in newLobbies)
+			foreach (Lobby lobby in newLobbies)
 			{
 				changedLobbies.Add(lobby.Id, LobbyChangeState.New);
 			}
@@ -72,7 +73,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		Lobbies = newLobbies;
 
 		if (OnLobbiesChanged != null && changedLobbies.Count > 0)
-			OnLobbiesChanged.Invoke(this, new LobbiesChangedEventArgs() { ChangedLobbies = changedLobbies} );
+			OnLobbiesChanged.Invoke(this, new LobbiesChangedEventArgs() { ChangedLobbies = changedLobbies });
 
 	}
 
@@ -87,6 +88,21 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 			$"{playerManager.Client.Name}'s lobby",
 			$"Join {playerManager.Client.Name}'s lobby to feel accomplished",
 			mapManager.DefaultMap);
+	}
+
+	public async Task<LobbyStatusMessage> CheckIfJoinable(string playerId, string lobbyId)
+	{
+		Lobby lobby = await databaseManager.GetLobby(lobbyId);
+
+		int maxPlayers = mapManager.GetMap(lobby.MapId).maxPlayers;
+		
+		//TODO: Check if lobbystatus is open and not closed or started
+
+		if (lobby.Players.Find((x) => x == playerId) is not null)
+			return LobbyStatusMessage.Open;
+		else if (lobby.Players.Count <= maxPlayers)
+			return LobbyStatusMessage.Open;
+		return LobbyStatusMessage.Full;
 	}
 
 	public async Task<Lobby> GetLobby(string id)
@@ -105,10 +121,10 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	{
 		Dictionary<string, LobbyChangeState> result = new();
 		//Check for removals
-		foreach(Player oldPlayer in oldPlayerList)
+		foreach (Player oldPlayer in oldPlayerList)
 		{
 			Player foundOldPlayer = newPlayerList.Find((newplayer) => newplayer.Id.Equals(oldPlayer.Id));
-			if(foundOldPlayer is null)
+			if (foundOldPlayer is null)
 			{
 				//Old player not found in the newplayer list
 				result.Add(oldPlayer.Id, LobbyChangeState.Deleted);

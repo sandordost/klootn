@@ -18,6 +18,7 @@ public class LobbyManagerUI : MonoBehaviour
 	private LobbyManager lobbyManager;
 	private InLobbyManagerUI inLobbyManagerUI;
 	private AlertManager alertManager;
+	private PlayerManager playerManager;
 
 	public float lobbyRefreshTime = 2;
 	private float lobbyRefreshTimeElapsed;
@@ -33,6 +34,7 @@ public class LobbyManagerUI : MonoBehaviour
 		inLobbyManagerUI = uiManager.inLobbyManagerUI;
 		mapManager = gameManager.dataManager.mapManager;
 		alertManager = uiManager.alertManager;
+		playerManager = gameManager.dataManager.playerManager;
 
 		lobbyRefreshTimeElapsed = lobbyRefreshTime;
 		lobbyManager.OnLobbiesChanged += LobbiesChanged;
@@ -44,9 +46,7 @@ public class LobbyManagerUI : MonoBehaviour
 		{
 			if (lobbyRefreshTimeElapsed > lobbyRefreshTime)
 			{
-				Debug.Log("Updating Lobbies from LobbyUI");
-				lobbyManager.RefreshLobbies();
-				lobbyRefreshTimeElapsed = 0;
+				RefreshLobbies();
 			}
 			else
 			{
@@ -79,15 +79,34 @@ public class LobbyManagerUI : MonoBehaviour
 		OpenLobbyUI(lobby.Id);
 	}
 
-	public void OpenLobbyUI(string lobbyId)
+	public async void OpenLobbyUI(string lobbyId)
 	{
 		lobbyManager.RefreshLobbies();
+
+		LobbyStatusMessage statusMessage = await lobbyManager.CheckIfJoinable(playerManager.Client.Id, lobbyId);
+		if (statusMessage.Equals(LobbyStatusMessage.Full))
+		{
+			alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join is full", "That sucks!");
+			return;
+		}
+		else if (statusMessage.Equals(LobbyStatusMessage.Started))
+		{
+			alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join has already started", "Oh man!");
+			return;
+		}
 
 		inLobbyManagerUI.CurrentLobbyId = lobbyId;
 
 		lobbyManager.JoinLobby(lobbyId);
 
 		pageSwitcher.SwitchPage(inLobbyPage);
+	}
+
+	public void RefreshLobbies()
+	{
+		Debug.Log("Updating Lobbies from LobbyUI");
+		lobbyManager.RefreshLobbies();
+		lobbyRefreshTimeElapsed = 0;
 	}
 
 	private void LobbiesChanged(object sender, LobbiesChangedEventArgs lobbiesChangedArgs)

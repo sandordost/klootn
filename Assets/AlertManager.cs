@@ -27,7 +27,6 @@ public class AlertManager : MonoBehaviour
 
 	private async void RebuildLayout()
 	{
-		Debug.Log("waiting 20 ms...");
 		await Task.Delay(20);
 
 		LayoutRebuilder.ForceRebuildLayoutImmediate(alertScreen.transform.Find("AlertScreen").GetComponent<RectTransform>());
