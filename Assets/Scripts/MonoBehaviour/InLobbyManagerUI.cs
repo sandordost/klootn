@@ -201,6 +201,13 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private void RemovePlayerFromLobbyUI(string playerId)
 	{
+		if (playerManager.Client.Id.Equals(playerId))
+		{
+			uiPageSwitcher.SwitchPage("LobbyPage");
+			alertManager.ShowMessageAlert("Removed from the lobby", "You have been removed from the lobby by the host", "Don't care");
+			return;
+		}
+
 		Transform parent = playerUIPrefabParent.transform;
 
 		GameObject objectToRemove = null;

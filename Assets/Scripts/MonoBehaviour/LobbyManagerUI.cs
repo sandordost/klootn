@@ -85,15 +85,17 @@ public class LobbyManagerUI : MonoBehaviour
 
 		LobbyStatusMessage statusMessage = await lobbyManager.CheckIfJoinable(playerManager.Client.Id, lobbyId);
 
-		if (statusMessage.Equals(LobbyStatusMessage.Full))
+		switch (statusMessage)
 		{
-			alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join is full", "That sucks!");
-			return;
-		}
-		else if (statusMessage.Equals(LobbyStatusMessage.Started))
-		{
-			alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join has already started", "Oh man!");
-			return;
+			case LobbyStatusMessage.Full:
+				alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join is full", "That sucks!");
+				return;
+			case LobbyStatusMessage.Started:
+				alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join has already started", "Oh man!");
+				return;
+			case LobbyStatusMessage.Deleted:
+				alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join does not exist anymore", "Yikes");
+				return;
 		}
 
 		inLobbyManagerUI.CurrentLobbyId = lobbyId;

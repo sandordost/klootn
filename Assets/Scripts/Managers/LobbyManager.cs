@@ -94,6 +94,8 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	{
 		Lobby lobby = await databaseManager.GetLobby(lobbyId);
 
+		if (lobby is null) return LobbyStatusMessage.Deleted;
+
 		int maxPlayers = mapManager.GetMap(lobby.MapId).maxPlayers;
 		
 		//TODO: Check if lobbystatus is open and not closed or started

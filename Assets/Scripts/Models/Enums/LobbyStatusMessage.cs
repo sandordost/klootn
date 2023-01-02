@@ -2,5 +2,6 @@
 {
 	Open,
 	Full,
-	Started
+	Started,
+	Deleted,
 }
