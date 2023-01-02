@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AlertManager : MonoBehaviour
 {
@@ -17,8 +18,19 @@ public class AlertManager : MonoBehaviour
 		messageView.transform.Find("Title").GetComponent<TMP_Text>().text = title;
 		messageView.transform.Find("Description").GetComponent<TMP_Text>().text = description;
 		messageView.transform.Find("OkButton").Find("ButtonText").GetComponent<TMP_Text>().text = buttonText;
+
+		RebuildLayout();
+
 		messageView.SetActive(true);
 		ToggleAlertScreen(true);
+	}
+
+	private async void RebuildLayout()
+	{
+		Debug.Log("waiting 20 ms...");
+		await Task.Delay(20);
+
+		LayoutRebuilder.ForceRebuildLayoutImmediate(alertScreen.transform.Find("AlertScreen").GetComponent<RectTransform>());
 	}
 
 	public void ShowLoadingAlert(string loadingString)

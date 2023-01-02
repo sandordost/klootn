@@ -16,6 +16,7 @@ public class RegistrationManager : MonoBehaviour
 
 	private GameEventsManager gameEvents;
 	private InputValidator inputValidator = new InputValidator();
+	private AlertManager alertManager;
 
 	public int maxRegisterAttempts = 10;
 	public int secondsCooldown = 60;
@@ -28,6 +29,7 @@ public class RegistrationManager : MonoBehaviour
 		usernameErrorMessage.gameObject.SetActive(false);
 		passwordErrorMessage.gameObject.SetActive(false);
 		overalErrorMessage.gameObject.SetActive(false);
+		alertManager = UIManager.GetInstance().alertManager;
 
 		usernameInputField.characterLimit = inputValidator.maxPlayerNameSize;
 		passwordInputField.characterLimit = inputValidator.maxPasswordSize;
@@ -144,5 +146,6 @@ public class RegistrationManager : MonoBehaviour
 	{
 		playerManager.Client = player;
 		gameEvents.RegisterPlayer(this, player);
+		alertManager.ShowMessageAlert("Succesfuly registered", $"You have succesfully registered with the name \"{player.Name}\"");
 	}
 }
