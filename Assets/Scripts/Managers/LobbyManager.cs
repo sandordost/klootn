@@ -100,7 +100,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 		if (lobby.Players.Find((x) => x == playerId) is not null)
 			return LobbyStatusMessage.Open;
-		else if (lobby.Players.Count <= maxPlayers)
+		else if (lobby.Players.Count < maxPlayers)
 			return LobbyStatusMessage.Open;
 		return LobbyStatusMessage.Full;
 	}

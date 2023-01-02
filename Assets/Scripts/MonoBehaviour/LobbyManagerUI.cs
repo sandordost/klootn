@@ -84,6 +84,7 @@ public class LobbyManagerUI : MonoBehaviour
 		lobbyManager.RefreshLobbies();
 
 		LobbyStatusMessage statusMessage = await lobbyManager.CheckIfJoinable(playerManager.Client.Id, lobbyId);
+
 		if (statusMessage.Equals(LobbyStatusMessage.Full))
 		{
 			alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join is full", "That sucks!");
