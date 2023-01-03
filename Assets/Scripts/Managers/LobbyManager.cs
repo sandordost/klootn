@@ -214,4 +214,73 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	{
 		await databaseManager.SetHost(lobbyId, playerId);
 	}
+
+	public async Task<Dictionary<string, PlayerColor>> GetPlayerColors(string lobbyId)
+	{
+		return await databaseManager.GetLobbyColors(lobbyId);
+	}
+
+	public async Task<PlayerColor> GetPlayerColor(string lobbyId, string playerId)
+	{
+		return await databaseManager.GetPlayerColor(lobbyId, playerId);
+	}
+
+	public Color GetColor(PlayerColor playerColor)
+	{
+		switch (playerColor)
+		{
+			case PlayerColor.Red:
+				return Color.red;
+			case PlayerColor.Blue:
+				return Color.blue;
+			case PlayerColor.Green:
+				return Color.green;
+			case PlayerColor.Orange:
+				return new Color(226, 135, 67);
+			case PlayerColor.Yellow:
+				return Color.yellow;
+			case PlayerColor.Unset:
+				return Color.red;
+			case PlayerColor.Purple:
+				return new Color(153, 0, 204);
+			default:
+				return Color.red;
+		}
+	}
+
+	/// <summary>
+	/// Gets the player color and updates this in the database
+	/// </summary>
+	/// <param name="playerId"></param>
+	/// <param name="lobbyId"></param>
+	/// <returns></returns>
+	public async Task<Color> GetNextPlayerColor(string playerId, string lobbyId)
+	{
+		List<PlayerColor> availablePlayerColors = await GetAvailableColors(lobbyId);
+
+		PlayerColor newColor = availablePlayerColors.FirstOrDefault();
+
+		await databaseManager.UpdatePlayerColor(lobbyId, playerId, newColor);
+
+		return GetColor(newColor);
+	}
+
+	private async Task<List<PlayerColor>> GetAvailableColors(string lobbyId)
+	{
+		Dictionary<string, PlayerColor> playerColors = await GetPlayerColors(lobbyId);
+
+		PlayerColor[] allColorsArr = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
+
+		List<PlayerColor> allColorsList = allColorsArr.ToList();
+
+		foreach(var playerColor in playerColors)
+		{
+			allColorsList.Remove(playerColor.Value);
+		}
+
+		if (allColorsList.Contains(PlayerColor.Unset))
+			allColorsList.Remove(PlayerColor.Unset);
+
+		return allColorsList;
+	}
 }

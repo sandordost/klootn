@@ -136,7 +136,7 @@ public interface IDatabaseManager
 	/// <param name="lobbyId"></param>
 	/// <param name="playerId"></param>
 	/// <returns></returns>
-	public Task RemoveLobbyLastSeen(string lobbyId, string playerId);
+	public Task RemoveLobbyPlayerData(string lobbyId, string playerId);
 
 	/// <summary>
 	/// Updates the lobby mapId, within a database
@@ -180,4 +180,28 @@ public interface IDatabaseManager
 	/// <param name="lobbyId"></param>
 	/// <returns></returns>
 	public Task RemoveLobby(string lobbyId);
+
+	/// <summary>
+	/// Gets a dictionary of player ids and the color of that player
+	/// </summary>
+	/// <returns></returns>
+	public Task<Dictionary<string, PlayerColor>> GetLobbyColors(string lobbyId);
+
+	/// <summary>
+	/// Gets the current playercolor of the player with the id <paramref name="playerId"/>
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <param name="playerId"></param>
+	/// <returns></returns>
+	public Task<PlayerColor> GetPlayerColor(string lobbyId, string playerId);
+
+	/// <summary>
+	/// Sets the player color of player <paramref name="playerId"/> in the lobby with id <paramref name="lobbyId"/> in the database using <paramref name="color"/>
+	/// </summary>
+	/// <param name="lobbyId"></param>
+	/// <param name="playerId"></param>
+	/// <param name="color"></param>
+	/// <returns></returns>
+	public Task UpdatePlayerColor(string lobbyId, string playerId, PlayerColor color);
+
 }

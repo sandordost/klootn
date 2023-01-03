@@ -248,7 +248,13 @@ public class InLobbyManagerUI : MonoBehaviour
 
 		bool playerIsHost = player.Id.Equals(currentHost);
 
+		PlayerColor playerColor = await lobbyManager.GetPlayerColor(CurrentLobbyId, playerId);
+
+		Color color = lobbyManager.GetColor(playerColor);
+
 		playerObj.transform.Find("NameAndIcon").Find("PlayerNameHolder").Find("PlayerName").GetComponent<TMP_Text>().text = player.Name;
+
+		playerObj.transform.Find("NameAndIcon").Find("PlayerNameHolder").Find("PlayerName").GetComponent<TMP_Text>().color = color;
 
 		playerObj.transform.Find("NameAndIcon").Find("HostIcon").gameObject.SetActive(playerIsHost);
 
@@ -265,5 +271,10 @@ public class InLobbyManagerUI : MonoBehaviour
 	public void PromotePlayer(string playerId)
 	{
 		lobbyManager.SetHost(currentLobbyId, playerId);
+	}
+
+	public async void ChangePlayerColor()
+	{
+		await lobbyManager.GetNextPlayerColor(playerManager.Client.Id, CurrentLobbyId);
 	}
 }

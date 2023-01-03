@@ -146,7 +146,7 @@ public class FirebaseManager : IDatabaseManager
 		throw new NotImplementedException();
 	}
 
-	public Task RemoveLobbyLastSeen(string lobbyId, string playerId)
+	public Task RemoveLobbyPlayerData(string lobbyId, string playerId)
 	{
 		throw new NotImplementedException();
 	}
@@ -187,6 +187,21 @@ public class FirebaseManager : IDatabaseManager
 	}
 
 	public Task RemoveLobby(string lobbyId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<Dictionary<string, PlayerColor>> GetLobbyColors(string lobbyId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<PlayerColor> GetPlayerColor(string lobbyId, string playerId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task UpdatePlayerColor(string lobbyId, string playerId, PlayerColor color)
 	{
 		throw new NotImplementedException();
 	}

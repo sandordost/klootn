@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8597c966c3752a84e97fdd20f4859c7b, type: 3}
   m_Name: BallThrow
   m_EditorClassIdentifier: 
-  id: 
-  title: 
-  description: 
-  maxPlayers: 0
-  image: {fileID: 0}
-  sceneName: 
+  id: map_ballthrow
+  title: Ball Throw
+  description: Throw the ball against bottles and other objects to win points and
+    punish your friends
+  maxPlayers: 4
+  image: {fileID: 21300000, guid: 723a11288bab86e4ea852a1e79c69a9b, type: 3}
+  sceneName: GameBallThrow
