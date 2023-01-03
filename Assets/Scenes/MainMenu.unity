@@ -15020,7 +15020,7 @@ MonoBehaviour:
   usernameErrorMessage: {fileID: 1499270276}
   passwordErrorMessage: {fileID: 1930139706}
   overalErrorMessage: {fileID: 1907012356}
-  maxRegisterAttempts: 5
+  maxRegisterAttempts: 3
   secondsCooldown: 30
 --- !u!114 &2065954079
 MonoBehaviour:
@@ -15039,7 +15039,7 @@ MonoBehaviour:
   usernameErrorMessage: {fileID: 66685704}
   passwordErrorMessage: {fileID: 326021113}
   overalErrorMessage: {fileID: 1108414686}
-  maxLoginAttempts: 10
+  maxLoginAttempts: 4
   secondsCooldown: 30
 --- !u!114 &2065954080
 MonoBehaviour:

@@ -102,6 +102,8 @@ public class LobbyManagerUI : MonoBehaviour
 
 		lobbyManager.JoinLobby(lobbyId);
 
+		inLobbyManagerUI.ChangePlayerColor();
+
 		pageSwitcher.SwitchPage(inLobbyPage);
 	}
 
