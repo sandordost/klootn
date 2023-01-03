@@ -47,10 +47,10 @@ public class DataManager : MonoBehaviour
 				databaseManager = new FirebaseManager();
 				break;
 			case DatabaseOption.SQLDatabase:
-				databaseManager = null;
-				throw new NotImplementedException();
+				databaseManager = new SQLDatabaseManager();
+				break;
 			case DatabaseOption.Firestore:
-				databaseManager = new FirestoreManager();
+				//databaseManager = new FirestoreManager();
 				break;
 		}
 	}
