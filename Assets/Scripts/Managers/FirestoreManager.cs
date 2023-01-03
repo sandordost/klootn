@@ -327,7 +327,7 @@ public class FirestoreManager : IDatabaseManager
 	{
 		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
 
-		await lobbiesRef.Document($"{lobbyId}.LobbyPlayersData.{playerId}").DeleteAsync();
+		await lobbiesRef.Document(lobbyId).UpdateAsync($"LobbyPlayersData.{playerId}", FieldValue.Delete);
 	}
 
 	public async Task UpdateLobbyMap(string lobbyId, string mapId)
