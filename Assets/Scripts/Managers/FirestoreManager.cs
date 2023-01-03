@@ -327,13 +327,7 @@ public class FirestoreManager : IDatabaseManager
 	{
 		CollectionReference lobbiesRef = firestore.Collection("Lobbies");
 
-		DocumentReference lobbyRef = lobbiesRef.Document(lobbyId);
-
-		Dictionary<string, LobbyPlayerData> playersLastSeen = await GetLobbyPlayerData(lobbyId);
-
-		playersLastSeen.Remove(playerId);
-
-		await lobbyRef.UpdateAsync("PlayersLastSeen", playersLastSeen);
+		await lobbiesRef.Document($"{lobbyId}.PlayersLastSeen.{playerId}").DeleteAsync();
 	}
 
 	public async Task UpdateLobbyMap(string lobbyId, string mapId)
