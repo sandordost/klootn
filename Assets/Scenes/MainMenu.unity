@@ -8752,7 +8752,7 @@ PrefabInstance:
     - target: {fileID: 2914763605544596905, guid: bbd40ec0b5a50c34aa04ddaf7d537334,
         type: 3}
       propertyPath: UpdateClientLastSeenInterval
-      value: 3
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 2914763605544596910, guid: bbd40ec0b5a50c34aa04ddaf7d537334,
         type: 3}
@@ -15091,7 +15091,7 @@ MonoBehaviour:
   lobbyPrefab: {fileID: 7406276945054298260, guid: 7eba541938e281b478d0c703a26417b5,
     type: 3}
   pageSwitcher: {fileID: 2065954076}
-  lobbyRefreshTime: 1.2
+  lobbyRefreshTime: 2.5
   emptyAndIdleRemoveTime: 10
 --- !u!114 &2065954083
 MonoBehaviour:
@@ -15112,7 +15112,7 @@ MonoBehaviour:
     type: 3}
   mapGameObj: {fileID: 1914017836}
   mapChangeButton: {fileID: 343243072}
-  inLobbyRefreshTime: 0.6
+  inLobbyRefreshTime: 1.2
 --- !u!114 &2065954084
 MonoBehaviour:
   m_ObjectHideFlags: 0
