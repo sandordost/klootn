@@ -153,7 +153,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 						//Player changed
 						result.Add(newPlayer.Id, LobbyChangeState.Changed);
 					}
-					else if (!oldColors[newPlayer.Id].Equals(newColors[newPlayer.Id]))
+					else if (oldColors.ContainsKey(newPlayer.Id) && !oldColors[newPlayer.Id].Equals(newColors[newPlayer.Id]))
 					{
 						//Player color changed
 						result.Add(newPlayer.Id, LobbyChangeState.Changed);
