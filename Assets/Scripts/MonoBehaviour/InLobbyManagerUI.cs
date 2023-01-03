@@ -45,14 +45,6 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private void ClearPlayerListUI()
-	{
-		foreach (Transform t in playerUIPrefabParent.transform)
-		{
-			Destroy(t.gameObject);
-		}
-	}
-
 	private List<Player> currentPlayers;
 	private List<Player> CurrentPlayers
 	{
@@ -70,6 +62,23 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
+	private Dictionary<string, PlayerColor> currentPlayerColors;
+	private Dictionary<string, PlayerColor> CurrentPlayerColors
+	{
+		get
+		{
+			if (currentPlayerColors is null)
+			{
+				currentPlayerColors = new();
+			}
+			return currentPlayerColors;
+		}
+		set
+		{
+			currentPlayerColors = value;
+		}
+	}
+
 	private void Start()
 	{
 		GameManager gameManager = GameManager.GetInstance();
@@ -84,6 +93,14 @@ public class InLobbyManagerUI : MonoBehaviour
 		inLobbyRefreshTimeElapsed = inLobbyRefreshTime;
 
 		lobbyManager.OnLobbiesChanged += LobbiesChanged;
+	}
+
+	private void ClearPlayerListUI()
+	{
+		foreach (Transform t in playerUIPrefabParent.transform)
+		{
+			Destroy(t.gameObject);
+		}
 	}
 
 	private void LobbiesChanged(object sender, LobbiesChangedEventArgs e)
@@ -126,7 +143,7 @@ public class InLobbyManagerUI : MonoBehaviour
 
 		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
 
-		if (lobby is null) 
+		if (lobby is null)
 		{
 			alertManager.CloseLoadingAlert();
 			uiPageSwitcher.SwitchPage("LobbyPage");
@@ -173,7 +190,9 @@ public class InLobbyManagerUI : MonoBehaviour
 		//Change Player area
 		List<Player> lobbyPlayers = await lobbyManager.GetLobbyPlayers(CurrentLobbyId);
 
-		Dictionary<string, LobbyChangeState> lobbyPlayerChanges = lobbyManager.GetLobbyPlayersChanges(CurrentPlayers, lobbyPlayers);
+		Dictionary<string, PlayerColor> newColors = await lobbyManager.GetPlayerColors(CurrentLobbyId);
+
+		Dictionary<string, LobbyChangeState> lobbyPlayerChanges = lobbyManager.GetLobbyPlayersChanges(CurrentPlayers, lobbyPlayers, CurrentPlayerColors, newColors);
 
 		foreach (var playerChange in lobbyPlayerChanges)
 		{
@@ -191,6 +210,7 @@ public class InLobbyManagerUI : MonoBehaviour
 			}
 		}
 
+		CurrentPlayerColors = newColors;
 		CurrentPlayers = lobbyPlayers;
 	}
 

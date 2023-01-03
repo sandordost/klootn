@@ -119,7 +119,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		return await databaseManager.GetLobbyPlayers(lobbyId);
 	}
 
-	public Dictionary<string, LobbyChangeState> GetLobbyPlayersChanges(List<Player> oldPlayerList, List<Player> newPlayerList)
+	public Dictionary<string, LobbyChangeState> GetLobbyPlayersChanges(List<Player> oldPlayerList, List<Player> newPlayerList, Dictionary<string, PlayerColor> oldColors, Dictionary<string, PlayerColor> newColors)
 	{
 		Dictionary<string, LobbyChangeState> result = new();
 		//Check for removals
@@ -151,6 +151,11 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 					if (!foundNewPlayer.ComparePlayer(newPlayer))
 					{
 						//Player changed
+						result.Add(newPlayer.Id, LobbyChangeState.Changed);
+					}
+					else if (!oldColors[newPlayer.Id].Equals(newColors[newPlayer.Id]))
+					{
+						//Player color changed
 						result.Add(newPlayer.Id, LobbyChangeState.Changed);
 					}
 				}
