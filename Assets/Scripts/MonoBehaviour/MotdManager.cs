@@ -25,18 +25,23 @@ public class MotdManager : MonoBehaviour
 		SetUIComponents();
 	}
 
-	private async void SetUIComponents()
+	private IEnumerator SetUIComponents()
 	{
-		Motd motd = await GetLatestMotd();
+		Motd motd = null;
+		yield return GetLatestMotd((dbMotd) => 
+		{
+			motd = dbMotd;
+			title.text = motd.Title;
+			message.text = motd.Message;
+		});
 
-		title.text = motd.Title;
-		message.text = motd.Message;
+		yield return GetMotdImage(motd, (text) => 
+		{
+			motdImage.texture = text;
 
-		Texture texture = await GetMotdImage(motd);
-		motdImage.texture = texture;
-
-		motdImage.color = Color.white;
-		altImage.gameObject.SetActive(false);
+			motdImage.color = Color.white;
+			altImage.gameObject.SetActive(false);
+		});
 	}
 
 	/// <summary>
@@ -45,9 +50,12 @@ public class MotdManager : MonoBehaviour
 	/// <param name="motd"></param>
 	/// <param name="callback"></param>
 	/// <returns></returns>
-	private async Task<Texture> GetMotdImage(Motd motd)
+	private IEnumerator GetMotdImage(Motd motd, Action<Texture> callback)
 	{
-		return await storageManager.GetImage(motd);
+		yield return storageManager.GetImage(motd, (tex) =>
+		{
+			callback.Invoke(tex);
+		});
 	}
 
 	/// <summary>
@@ -55,8 +63,11 @@ public class MotdManager : MonoBehaviour
 	/// </summary>
 	/// <param name="callback"></param>
 	/// <returns></returns>
-	private async Task<Motd> GetLatestMotd()
+	private IEnumerator GetLatestMotd(Action<Motd> callback)
 	{
-		return await databaseManager.GetLatestMotd();
+		yield return databaseManager.GetLatestMotd((motd) => 
+		{
+			callback.Invoke(motd);
+		});
 	}
 }

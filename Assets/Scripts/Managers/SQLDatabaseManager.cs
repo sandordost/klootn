@@ -1,142 +1,146 @@
 ﻿
 using Firebase.Firestore;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Networking;
 
 public class SQLDatabaseManager : IDatabaseManager
 {
-	public Task AddPlayerToLobby(string lobbyId, string playerId)
+	public IEnumerator AddPlayerToLobby(string lobbyId, string playerId)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Lobby> CreateLobby(Player host, string name, string description, string mapId)
+	public IEnumerator CreateLobby(Player host, string name, string description, string mapId, Action<Lobby> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<List<Player>> GetAllPlayers()
+	public IEnumerator GetAllPlayers(Action<List<Player>> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<List<Player>> GetAllPlayers(string[] playerIds)
+	public IEnumerator GetAllPlayers(string[] playerIds, Action<List<Player>> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Motd> GetLatestMotd()
+	public IEnumerator GetLatestMotd(Action<Motd> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<List<Lobby>> GetLobbies()
+	public IEnumerator GetLobbies(Action<List<Lobby>> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Lobby> GetLobby(string id)
+	public IEnumerator GetLobby(string id, Action<Lobby> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Dictionary<string, PlayerColor>> GetLobbyColors(string lobbyId)
+	public IEnumerator GetLobbyColors(string lobbyId, Action<Dictionary<string, PlayerColor>> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<string> GetLobbyHost(string lobbyId)
+	public IEnumerator GetLobbyHost(string lobbyId, Action<string> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<string> GetLobbyMap(string lobbyId)
+	public IEnumerator GetLobbyMap(string lobbyId, Action<string> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<List<Player>> GetLobbyPlayers(string lobbyId)
+	public IEnumerator GetLobbyPlayers(string lobbyId, Action<List<Player>> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Player> GetPlayerById(string id)
+	public IEnumerator GetPlayerById(string id, Action<Player> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Player> GetPlayerByName(string name)
+	public IEnumerator GetPlayerByName(string name, Action<Player> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<PlayerColor> GetPlayerColor(string lobbyId, string playerId)
+	public IEnumerator GetPlayerColor(string lobbyId, string playerId, Action<PlayerColor> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Player> Login(Player newPlayer)
+	public IEnumerator Login(Player newPlayer, Action<Player> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<bool> PlayerExists(Player newPlayer)
+	public IEnumerator PlayerExists(Player newPlayer, Action<bool> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task<Player> RegisterPlayer(Player newPlayer)
+	public IEnumerator RegisterPlayer(Player newPlayer, Action<Player> callback)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task RemoveEmptyLobbies()
+	public IEnumerator RemoveEmptyLobbies()
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task RemoveInactivePlayersFromLobby(string lobbyId, int secondsTimeout)
+	public IEnumerator RemoveInactivePlayersFromLobby(string lobbyId, int secondsTimeout)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task RemoveLobby(string lobbyId)
+	public IEnumerator RemoveLobby(string lobbyId)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task RemoveLobbyPlayerData(string lobbyId, string playerId)
+	public IEnumerator RemoveLobbyPlayerData(string lobbyId, string playerId)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task RemovePlayerFromLobby(string lobbyId, string playerId)
+	public IEnumerator RemovePlayerFromLobby(string lobbyId, string playerId)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task SetHost(string lobbyId, string playerId)
+	public IEnumerator SetHost(string lobbyId, string playerId)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task UpdateLastSeen(string playerId, Timestamp timestamp)
+	public IEnumerator UpdateLastSeen(string playerId, Timestamp timestamp)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
+	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task UpdateLobbyMap(string lobbyId, string mapId)
+	public IEnumerator UpdateLobbyMap(string lobbyId, string mapId)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 
-	public Task UpdatePlayerColor(string lobbyId, string playerId, PlayerColor color)
+	public IEnumerator UpdatePlayerColor(string lobbyId, string playerId, PlayerColor color)
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
 	}
 }

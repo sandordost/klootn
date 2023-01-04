@@ -4,7 +4,7 @@
 	ShortStringLength,
 	LargeStringLength,
 	UnusableCharacters,
-	AlreadyExists,
+	Exists,
 	DoesNotExist,
 	PasswordIncorrect
 }

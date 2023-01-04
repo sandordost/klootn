@@ -1,5 +1,6 @@
 using Firebase.Firestore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,9 +27,13 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		playerManager = gameManager.dataManager.playerManager;
 	}
 
-	public async Task RetrieveData()
+	public IEnumerator RetrieveData()
 	{
-		List<Lobby> newLobbies = await databaseManager.GetLobbies();
+		List<Lobby> newLobbies = null;
+		yield return databaseManager.GetLobbies((lobbyList) =>
+		{
+			newLobbies = lobbyList;
+		});
 
 		Dictionary<string, LobbyChangeState> changedLobbies = new();
 
@@ -77,46 +82,69 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	}
 
-	public async void RemoveEmptyLobbies()
+	public IEnumerator RemoveEmptyLobbies()
 	{
-		await databaseManager.RemoveEmptyLobbies();
+		yield return databaseManager.RemoveEmptyLobbies();
 	}
 
-	public async Task<Lobby> CreateLobby()
+	public IEnumerator CreateLobby(Action<Lobby> callback)
 	{
-		return await databaseManager.CreateLobby(playerManager.Client,
+		Lobby lobby = null;
+		yield return databaseManager.CreateLobby(playerManager.Client,
 			$"{playerManager.Client.Name}'s lobby",
 			$"Join {playerManager.Client.Name}'s lobby to feel accomplished",
-			mapManager.DefaultMap);
+			mapManager.DefaultMap,
+			(dblobby) =>
+			{
+				lobby = dblobby;
+			});
+		callback.Invoke(lobby);
 	}
 
-	public async Task<LobbyStatusMessage> CheckIfJoinable(string playerId, string lobbyId)
+	public IEnumerator CheckIfJoinable(string playerId, string lobbyId, Action<LobbyStatusMessage> callback)
 	{
-		Lobby lobby = await databaseManager.GetLobby(lobbyId);
+		Lobby lobby = null;
+		yield return databaseManager.GetLobby(lobbyId, (dblobby) =>
+		{
+			lobby = dblobby;
+		});
 
-		if (lobby is null) return LobbyStatusMessage.Deleted;
+		if (lobby is null)
+		{
+			callback.Invoke(LobbyStatusMessage.Deleted);
+			yield break;
+		}
 
 		int maxPlayers = mapManager.GetMap(lobby.MapId).maxPlayers;
 		
 		//TODO: Check if lobbystatus is open and not closed or started
 
 		if (lobby.Players.Find((x) => x == playerId) is not null)
-			return LobbyStatusMessage.Open;
+		{
+			callback.Invoke(LobbyStatusMessage.Open);
+			yield break;
+		}
 		else if (lobby.Players.Count < maxPlayers)
-			return LobbyStatusMessage.Open;
-		return LobbyStatusMessage.Full;
+		{
+			callback.Invoke(LobbyStatusMessage.Open);
+			yield break;
+		}
+		callback.Invoke(LobbyStatusMessage.Full);
 	}
 
-	public async Task<Lobby> GetLobby(string id)
+	public IEnumerator GetLobby(string id, Action<Lobby> callback)
 	{
-		Lobby lobby = await databaseManager.GetLobby(id);
-
-		return lobby;
+		Lobby lobby = null;
+		yield return databaseManager.GetLobby(id, (dbLobby) => lobby = dbLobby);
+		callback.Invoke(lobby);
 	}
 
-	public async Task<List<Player>> GetLobbyPlayers(string lobbyId)
+	public IEnumerator GetLobbyPlayers(string lobbyId, Action<List<Player>> callback)
 	{
-		return await databaseManager.GetLobbyPlayers(lobbyId);
+		yield return databaseManager.GetLobbyPlayers(lobbyId, (players) =>
+		{
+			callback.Invoke(players);
+		});
 	}
 
 	public Dictionary<string, LobbyChangeState> GetLobbyPlayersChanges(List<Player> oldPlayerList, List<Player> newPlayerList, Dictionary<string, PlayerColor> oldColors, Dictionary<string, PlayerColor> newColors)
@@ -165,69 +193,85 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		return result;
 	}
 
-	public async void JoinLobby(string lobbyId)
+	public IEnumerator JoinLobby(string lobbyId)
 	{
-		await databaseManager.AddPlayerToLobby(lobbyId, playerManager.Client.Id);
+		yield return databaseManager.AddPlayerToLobby(lobbyId, playerManager.Client.Id);
 	}
 
-	public async void KickPlayer(string lobbyId, string playerId)
+	public IEnumerator KickPlayer(string lobbyId, string playerId)
 	{
-		await databaseManager.RemovePlayerFromLobby(lobbyId, playerId);
+		yield return databaseManager.RemovePlayerFromLobby(lobbyId, playerId);
 	}
 
-	public async void UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
+	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
 	{
-		await databaseManager.UpdateLobbyLastSeen(playerId, lobbyId, timestamp);
-		await databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
+		yield return databaseManager.UpdateLobbyLastSeen(playerId, lobbyId, timestamp);
+		yield return databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
 	}
 
-	public async Task FindAndRemoveInactivePlayers(string lobbyId)
+	public IEnumerator FindAndRemoveInactivePlayers(string lobbyId)
 	{
-		await databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
+		yield return databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
 	}
 
-	public async Task FindAndRemoveInactivePlayers()
+	public IEnumerator FindAndRemoveInactivePlayers()
 	{
-		List<Lobby> lobbies = await databaseManager.GetLobbies();
+		List<Lobby> lobbies = null;
+		yield return databaseManager.GetLobbies((lobbyList) =>
+		{
+			lobbies = lobbyList;
+		});
 
 		foreach (Lobby lobby in lobbies)
 		{
-			await FindAndRemoveInactivePlayers(lobby.Id);
+			yield return FindAndRemoveInactivePlayers(lobby.Id);
 		}
 	}
 
-	public async void RefreshLobbies()
+	public IEnumerator RefreshLobbies()
 	{
-		await RetrieveData();
+		yield return RetrieveData();
 	}
 
-	public async Task<string> GetHost(string lobbyId)
+	public IEnumerator GetHost(string lobbyId, Action<string> callback)
 	{
-		string hostId = await databaseManager.GetLobbyHost(lobbyId);
+		string hostId = null;
+		yield return databaseManager.GetLobbyHost(lobbyId, (hostid) =>
+		{
+			hostId = hostid;
+		});
 
-		return hostId;
+		callback.Invoke(hostId);
 	}
 
-	public async Task<bool> ClientIsHost(string lobbyId)
+	public IEnumerator ClientIsHost(string lobbyId, Action<bool> callback)
 	{
-		string hostId = await GetHost(lobbyId);
+		string hostId = null;
 
-		return hostId.Equals(playerManager.Client.Id);
+		yield return GetHost(lobbyId, (hostid) => hostId = hostid);
+
+		callback.Invoke(hostId.Equals(playerManager.Client.Id));
 	}
 
-	public async void SetHost(string lobbyId, string playerId)
+	public IEnumerator SetHost(string lobbyId, string playerId)
 	{
-		await databaseManager.SetHost(lobbyId, playerId);
+		yield return databaseManager.SetHost(lobbyId, playerId);
 	}
 
-	public async Task<Dictionary<string, PlayerColor>> GetPlayerColors(string lobbyId)
+	public IEnumerator GetPlayerColors(string lobbyId, Action<Dictionary<string, PlayerColor>> callback)
 	{
-		return await databaseManager.GetLobbyColors(lobbyId);
+		yield return databaseManager.GetLobbyColors(lobbyId, (playerColors) =>
+		{
+			callback.Invoke(playerColors);
+		});
 	}
 
-	public async Task<PlayerColor> GetPlayerColor(string lobbyId, string playerId)
+	public IEnumerator GetPlayerColor(string lobbyId, string playerId, Action<PlayerColor> callback)
 	{
-		return await databaseManager.GetPlayerColor(lobbyId, playerId);
+		yield return databaseManager.GetPlayerColor(lobbyId, playerId, (playerColor) =>
+		{
+			callback.Invoke(playerColor);
+		});
 	}
 
 	public Color GetColor(PlayerColor playerColor)
@@ -259,20 +303,28 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	/// <param name="playerId"></param>
 	/// <param name="lobbyId"></param>
 	/// <returns></returns>
-	public async Task<Color> GetNextPlayerColor(string playerId, string lobbyId)
+	public IEnumerator GetNextPlayerColor(string playerId, string lobbyId, Action<Color> callback)
 	{
-		List<PlayerColor> availablePlayerColors = await GetAvailableColors(lobbyId);
+		List<PlayerColor> availablePlayerColors = null;
+		yield return GetAvailableColors(lobbyId, (playercolors) =>
+		{
+			availablePlayerColors = playercolors;
+		});
 
 		PlayerColor newColor = availablePlayerColors.FirstOrDefault();
 
-		await databaseManager.UpdatePlayerColor(lobbyId, playerId, newColor);
+		yield return databaseManager.UpdatePlayerColor(lobbyId, playerId, newColor);
 
-		return GetColor(newColor);
+		callback.Invoke(GetColor(newColor));
 	}
 
-	private async Task<List<PlayerColor>> GetAvailableColors(string lobbyId)
+	private IEnumerator GetAvailableColors(string lobbyId, Action<List<PlayerColor>> callback)
 	{
-		Dictionary<string, PlayerColor> playerColors = await GetPlayerColors(lobbyId);
+		Dictionary<string, PlayerColor> playerColors = null;
+		yield return GetPlayerColors(lobbyId, (dbplayercolors) =>
+		{
+			playerColors = dbplayercolors;
+		});
 
 		PlayerColor[] allColorsArr = (PlayerColor[])Enum.GetValues(typeof(PlayerColor));
 
@@ -286,6 +338,6 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		if (allColorsList.Contains(PlayerColor.Unset))
 			allColorsList.Remove(PlayerColor.Unset);
 
-		return allColorsList;
+		callback.Invoke(allColorsList);
 	}
 }

@@ -52,14 +52,16 @@ public class InputValidator
 	/// <param name="databaseManager"></param>
 	/// <param name="callback"></param>
 	/// <returns>
-	/// <para><see cref="ValidationResult.AlreadyExists"/> : <paramref name="newPlayer"/> already exists in database</para>
+	/// <para><see cref="ValidationResult.Exists"/> : <paramref name="newPlayer"/> already exists in database</para>
 	/// <para><see cref="ValidationResult.Validated"/> : <paramref name="newPlayer"/> does not exists in the database yet</para>
 	/// </returns>
-	public async Task<ValidationResult> ValidatePlayerNameExists(Player newPlayer, IDatabaseManager databaseManager)
+	public IEnumerator ValidatePlayerNameExists(Player newPlayer, IDatabaseManager databaseManager, Action<ValidationResult> callback)
 	{
-		bool playerExists = await databaseManager.PlayerExists(newPlayer);
+		bool playerExists = false;
 
-		return playerExists ? ValidationResult.AlreadyExists : ValidationResult.Validated;
+		yield return databaseManager.PlayerExists(newPlayer, (exists) => { playerExists = exists; });
+
+		callback.Invoke(playerExists ? ValidationResult.Exists : ValidationResult.Validated);
 	}
 
 	/// <summary>
@@ -118,7 +120,7 @@ public class InputValidator
 				$"Username is larger than {maxPlayerNameSize} characters",
 			ValidationResult.UnusableCharacters =>
 				$"Username contains unusable characters",
-			ValidationResult.AlreadyExists =>
+			ValidationResult.Exists =>
 				$"Username already exists",
 			ValidationResult.DoesNotExist =>
 				$"Username does not exist",

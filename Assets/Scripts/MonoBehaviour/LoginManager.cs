@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using TMPro;
 using UnityEngine;
@@ -59,7 +60,7 @@ public class LoginManager : MonoBehaviour
 	/// <summary>
 	/// Attempt to login using "<see cref="usernameInputField"/>" and "<see cref="passwordInputField"/>" as input data
 	/// </summary>
-	private async void TryLogin()
+	private IEnumerator TryLogin()
 	{
 		usernameErrorMessage.gameObject.SetActive(false);
 		passwordErrorMessage.gameObject.SetActive(false);
@@ -73,10 +74,14 @@ public class LoginManager : MonoBehaviour
 		if (nameResult.Equals(ValidationResult.Validated) &&
 			passwordResult.Equals(ValidationResult.Validated))
 		{
-			ValidationResult validationResult = await inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager);
-			if (validationResult.Equals(ValidationResult.AlreadyExists))
+			ValidationResult validationResult = ValidationResult.DoesNotExist;
+			yield return inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (result) => validationResult = result);
+
+			if (validationResult.Equals(ValidationResult.Exists))
 			{
-				Player player = await databaseManager.Login(newPlayer);
+				Player player = null; 
+				yield return databaseManager.Login(newPlayer, (dbPlayer) => player = dbPlayer);
+
 				if (player != null)
 				{
 					PlayerLoggedIn(player);

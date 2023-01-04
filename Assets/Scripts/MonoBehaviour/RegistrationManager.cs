@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using TMPro;
 using UnityEngine;
@@ -60,7 +61,7 @@ public class RegistrationManager : MonoBehaviour
 	/// <summary>
 	/// Attempt to register using "<see cref="usernameInputField"/>" and "<see cref="passwordInputField"/>" as input data
 	/// </summary>
-	private async void TryRegister()
+	private IEnumerator TryRegister()
 	{
 		usernameErrorMessage.gameObject.SetActive(false);
 		passwordErrorMessage.gameObject.SetActive(false);
@@ -74,12 +75,22 @@ public class RegistrationManager : MonoBehaviour
 		if (nameResult.Equals(ValidationResult.Validated) &&
 			passwordResult.Equals(ValidationResult.Validated))
 		{
-			ValidationResult validationResult = await inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager);
-			if (validationResult == ValidationResult.AlreadyExists)
+			ValidationResult validationResult = ValidationResult.DoesNotExist;
+			yield return inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (result) =>
+			{
+				validationResult = result;
+			});
+
+			if (validationResult == ValidationResult.Exists)
 				ShowValidationError(validationResult, passwordResult);
 			else
 			{
-				Player player = await databaseManager.RegisterPlayer(newPlayer);
+
+				Player player = null;
+				yield return databaseManager.RegisterPlayer(newPlayer, (newplayer) =>
+				{
+					player = newplayer;
+				});
 				PlayerRegistered(player);
 			}
 		}

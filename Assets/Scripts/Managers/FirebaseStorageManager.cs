@@ -1,4 +1,5 @@
-﻿using Firebase.Storage;
+﻿using Firebase.Extensions;
+using Firebase.Storage;
 using System;
 using System.Collections;
 using System.Threading.Tasks;
@@ -17,16 +18,21 @@ public class FirebaseStorageManager : IStorageManager
 		mainStorageRef = firebaseStorage.RootReference;
 	}
 
-	public async Task<Texture> GetImage(Motd motd)
+	public IEnumerator GetImage(Motd motd, Action<Texture> callback)
 	{
 		StorageReference motdImageRef = firebaseStorage.GetReferenceFromUrl(motd.ImageUrl);
 
 		Texture2D texture = new Texture2D(1, 1);
 
-		var result = await motdImageRef.GetBytesAsync(maxFileSize);
 
-		texture.LoadImage(result);
+		var getImageTask = motdImageRef.GetBytesAsync(maxFileSize);
 
-		return texture;
+		getImageTask.Start();
+
+		yield return new WaitUntil(() => getImageTask.IsCompleted);
+
+		texture.LoadImage(getImageTask.Result);
+
+		callback.Invoke(texture);
 	}
 }

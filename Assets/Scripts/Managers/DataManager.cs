@@ -50,7 +50,7 @@ public class DataManager : MonoBehaviour
 				databaseManager = new SQLDatabaseManager();
 				break;
 			case DatabaseOption.Firestore:
-				//databaseManager = new FirestoreManager();
+				databaseManager = new FirestoreManager();
 				break;
 		}
 	}

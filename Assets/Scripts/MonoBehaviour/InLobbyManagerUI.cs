@@ -137,22 +137,24 @@ public class InLobbyManagerUI : MonoBehaviour
 		inLobbyRefreshTimeElapsed = 0;
 	}
 
-	private async void UpdateInLobbyUI()
+	private IEnumerator UpdateInLobbyUI()
 	{
 		alertManager.ShowLoadingAlert("Loading lobby ...");
 
-		Lobby lobby = await lobbyManager.GetLobby(CurrentLobbyId);
+		Lobby lobby = null;
+		yield return lobbyManager.GetLobby(CurrentLobbyId, (dbLobby) => lobby = dbLobby);
 
 		if (lobby is null)
 		{
 			alertManager.CloseLoadingAlert();
 			uiPageSwitcher.SwitchPage("LobbyPage");
-			return;
+			yield break;
 		}
 
-		ClientIsHost = await lobbyManager.ClientIsHost(lobby.Id);
+		yield return lobbyManager.ClientIsHost(lobby.Id, (isHost) => ClientIsHost = isHost);
 
-		KlootnMap map = await mapManager.GetCurrentKlootnMap(CurrentLobbyId);
+		KlootnMap map = null;
+		yield return mapManager.GetCurrentKlootnMap(CurrentLobbyId, (klootnmap) => map = klootnmap);
 
 		mapGameObj.transform.Find("Image").GetComponent<Image>().sprite = map.image;
 
@@ -167,13 +169,14 @@ public class InLobbyManagerUI : MonoBehaviour
 		alertManager.CloseLoadingAlert();
 	}
 
-	private async void UpdateHostControls(bool clientIsHost)
+	private IEnumerator UpdateHostControls(bool clientIsHost)
 	{
 		Transform parent = playerUIPrefabParent.transform;
 
 		mapChangeButton.SetActive(clientIsHost);
 
-		string currentHost = await lobbyManager.GetHost(CurrentLobbyId);
+		string currentHost = null;
+		yield return lobbyManager.GetHost(CurrentLobbyId, (newhost) => currentHost = newhost);
 
 		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
 		{
@@ -185,12 +188,20 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private async void UpdatePlayerListUI()
+	private IEnumerator UpdatePlayerListUI()
 	{
 		//Change Player area
-		List<Player> lobbyPlayers = await lobbyManager.GetLobbyPlayers(CurrentLobbyId);
+		List<Player> lobbyPlayers = null;
+		yield return lobbyManager.GetLobbyPlayers(CurrentLobbyId, (players) =>
+		{
+			lobbyPlayers = players;
+		});
 
-		Dictionary<string, PlayerColor> newColors = await lobbyManager.GetPlayerColors(CurrentLobbyId);
+		Dictionary<string, PlayerColor> newColors = null;
+		yield return lobbyManager.GetPlayerColors(CurrentLobbyId, (newplayercolors) =>
+		{
+			newColors = newplayercolors;
+		});
 
 		Dictionary<string, LobbyChangeState> lobbyPlayerChanges = lobbyManager.GetLobbyPlayersChanges(CurrentPlayers, lobbyPlayers, CurrentPlayerColors, newColors);
 
@@ -260,15 +271,28 @@ public class InLobbyManagerUI : MonoBehaviour
 		SetPlayerObject(objectToUpdate, playerId);
 	}
 
-	private async void SetPlayerObject(GameObject playerObj, string playerId)
+	private IEnumerator SetPlayerObject(GameObject playerObj, string playerId)
 	{
-		Player player = await playerManager.GetPlayer(playerId);
+		Player player = null;
+		yield return playerManager.GetPlayer(playerId, (dbplayer) =>
+		{
+			player = dbplayer;
+		});
 
-		string currentHost = await lobbyManager.GetHost(CurrentLobbyId);
+		string currentHost = null;
+		yield return lobbyManager.GetHost(CurrentLobbyId, (dbhost) =>
+		{
+			currentHost = dbhost;
+		});
 
 		bool playerIsHost = player.Id.Equals(currentHost);
 
-		PlayerColor playerColor = await lobbyManager.GetPlayerColor(CurrentLobbyId, playerId);
+		PlayerColor playerColor = PlayerColor.Red;
+		yield return lobbyManager.GetPlayerColor(CurrentLobbyId, playerId, (dbplayercolor) =>
+		{
+			playerColor = dbplayercolor;
+		});
+
 
 		Color color = lobbyManager.GetColor(playerColor);
 
@@ -283,7 +307,7 @@ public class InLobbyManagerUI : MonoBehaviour
 		else
 			playerObj.transform.Find("KickAndPromote").gameObject.SetActive(ClientIsHost);
 
-		await Task.Delay(20);
+		yield return new WaitForSeconds(0.02f);
 
 		LayoutRebuilder.ForceRebuildLayoutImmediate(playerObj.transform.Find("NameAndIcon").GetComponent<RectTransform>());
 	}
@@ -293,8 +317,8 @@ public class InLobbyManagerUI : MonoBehaviour
 		lobbyManager.SetHost(currentLobbyId, playerId);
 	}
 
-	public async void ChangePlayerColor()
+	public IEnumerator ChangePlayerColor()
 	{
-		await lobbyManager.GetNextPlayerColor(playerManager.Client.Id, CurrentLobbyId);
+		yield return lobbyManager.GetNextPlayerColor(playerManager.Client.Id, CurrentLobbyId, (color) => { });
 	}
 }

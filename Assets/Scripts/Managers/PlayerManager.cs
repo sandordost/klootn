@@ -1,5 +1,6 @@
 using Firebase.Firestore;
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Timers;
@@ -43,24 +44,30 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 		UpdateLastSeen();
 	}
 
-	private async void UpdateLastSeen()
+	private IEnumerator UpdateLastSeen()
 	{
 		Client.LastSeen = Timestamp.GetCurrentTimestamp();
-		await databaseManager.UpdateLastSeen(Client.Id, Client.LastSeen);
+		yield return databaseManager.UpdateLastSeen(Client.Id, Client.LastSeen);
 	}
 
-	public async Task<Player> GetPlayer(string playerId)
+	public IEnumerator GetPlayer(string playerId, Action<Player> callback)
 	{
-		return await databaseManager.GetPlayerById(playerId);
+		yield return databaseManager.GetPlayerById(playerId, (player) => 
+		{
+			callback.Invoke(player);
+		});
 	}
 
-	public Task RetrieveData()
+	public IEnumerator RetrieveData()
 	{
 		throw new System.NotImplementedException();
 	}
 
-	private async void SetTestClient()
+	private IEnumerator SetTestClient()
 	{
-		Client = await GameManager.GetInstance().dataManager.databaseManager.GetPlayerByName("sandor");
+		yield return databaseManager.GetPlayerByName("sandor", (player) => 
+		{
+			Client = player;
+		});
 	}
 }

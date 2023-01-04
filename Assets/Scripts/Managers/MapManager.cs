@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
+using System.Collections;
 
 public class MapManager : MonoBehaviour, IDataRecievable
 {
@@ -28,21 +29,29 @@ public class MapManager : MonoBehaviour, IDataRecievable
 		return maps;
 	}
 
-	public Task RetrieveData()
+	public IEnumerator RetrieveData()
 	{
 		throw new NotImplementedException();
 	}
 
-	public async void UpdateMapId(string lobbyId, string mapId)
+	public IEnumerator UpdateMapId(string lobbyId, string mapId)
 	{
-		await databaseManager.UpdateLobbyMap(lobbyId, mapId);
+		yield return databaseManager.UpdateLobbyMap(lobbyId, mapId);
 	}
 
-	public async Task<KlootnMap> GetCurrentKlootnMap(string lobbyId)
+	public IEnumerator GetCurrentKlootnMap(string lobbyId, Action<KlootnMap> callback)
 	{
-		string mapId = await databaseManager.GetLobbyMap(lobbyId);
+		string mapId = null;
+		yield return databaseManager.GetLobbyMap(lobbyId, (dbMapId) =>
+		{
+			mapId = dbMapId;
+		});
 
-		return maps.FirstOrDefault((map) => map.id.Equals(mapId));
+		if (mapId is null)
+			callback.Invoke(null);
+
+
+		callback.Invoke(maps.FirstOrDefault((map) => map.id.Equals(mapId)));
 	}
 
 	public KlootnMap GetMap(string mapId)

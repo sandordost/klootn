@@ -53,8 +53,8 @@ public class LobbyManagerUI : MonoBehaviour
 				lobbyRefreshTimeElapsed += Time.deltaTime;
 			}
 
-			if(emptyAndIdleRemoveTimeElapsed > emptyAndIdleRemoveTime)
-			{				
+			if (emptyAndIdleRemoveTimeElapsed > emptyAndIdleRemoveTime)
+			{
 				RemoveIdleAndEmptyLobbies();
 				emptyAndIdleRemoveTimeElapsed = 0;
 			}
@@ -65,42 +65,49 @@ public class LobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private async void RemoveIdleAndEmptyLobbies()
+	private IEnumerator RemoveIdleAndEmptyLobbies()
 	{
 		Debug.Log("Removing idle players and empty lobbies");
-		await lobbyManager.FindAndRemoveInactivePlayers();
+		yield return lobbyManager.FindAndRemoveInactivePlayers();
 		lobbyManager.RemoveEmptyLobbies();
 	}
 
-	public async void CreateNewLobby()
+	public IEnumerator CreateNewLobby()
 	{
 		alertManager.ShowLoadingAlert("Creating new lobby ...");
-		Lobby lobby = await lobbyManager.CreateLobby();
+
+		Lobby lobby = null;
+		yield return lobbyManager.CreateLobby((dblobby) =>
+		{
+			lobby = dblobby;
+		});
+
 		OpenLobbyUI(lobby.Id);
 	}
 
-	public async void OpenLobbyUI(string lobbyId)
+	public IEnumerator OpenLobbyUI(string lobbyId)
 	{
 		lobbyManager.RefreshLobbies();
 
-		LobbyStatusMessage statusMessage = await lobbyManager.CheckIfJoinable(playerManager.Client.Id, lobbyId);
+		LobbyStatusMessage statusMessage = LobbyStatusMessage.Deleted;
+		yield return lobbyManager.CheckIfJoinable(playerManager.Client.Id, lobbyId, (message) => statusMessage = message);
 
 		switch (statusMessage)
 		{
 			case LobbyStatusMessage.Full:
 				alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join is full", "That sucks!");
-				return;
+				yield break;
 			case LobbyStatusMessage.Started:
 				alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join has already started", "Oh man!");
-				return;
+				yield break;
 			case LobbyStatusMessage.Deleted:
 				alertManager.ShowMessageAlert("Could not join lobby", "The lobby you tried to join does not exist anymore", "Yikes");
-				return;
+				yield break;
 		}
 
 		inLobbyManagerUI.CurrentLobbyId = lobbyId;
 
-		lobbyManager.JoinLobby(lobbyId);
+		yield return lobbyManager.JoinLobby(lobbyId);
 
 		inLobbyManagerUI.ChangePlayerColor();
 
@@ -153,7 +160,7 @@ public class LobbyManagerUI : MonoBehaviour
 	}
 
 	private void AddLobbyToUI(string lobbyId)
-	{ 
+	{
 		GameObject newLobby = Instantiate(lobbyPrefab, lobbyPrefabParent.transform);
 
 		newLobby.GetComponent<LobbyClick>().LobbyId = lobbyId;
@@ -161,9 +168,13 @@ public class LobbyManagerUI : MonoBehaviour
 		UpdateLobbyUIObject(newLobby, lobbyId);
 	}
 
-	private async void UpdateLobbyUIObject(GameObject lobbyObject, string lobbyId)
+	private IEnumerator UpdateLobbyUIObject(GameObject lobbyObject, string lobbyId)
 	{
-		Lobby lobby = await lobbyManager.GetLobby(lobbyId);
+		Lobby lobby = null;
+		yield return lobbyManager.GetLobby(lobbyId, (dblobby) =>
+		{
+			lobby = dblobby;
+		});
 
 		KlootnMap lobbyMap = mapManager.GetMap(lobby.MapId);
 
