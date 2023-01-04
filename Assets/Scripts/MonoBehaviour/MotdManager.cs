@@ -15,14 +15,16 @@ public class MotdManager : MonoBehaviour
 	private IDatabaseManager databaseManager;
 	private IStorageManager storageManager;
 
+	private Coroutine setUIComps;
+
 	private void Start()
 	{
 		GameManager gameManager = GameManager.GetInstance();
 
 		databaseManager = gameManager.dataManager.databaseManager;
 		storageManager = gameManager.dataManager.storageManager;
-
-		SetUIComponents();
+		
+		setUIComps = StartCoroutine(SetUIComponents());
 	}
 
 	private IEnumerator SetUIComponents()

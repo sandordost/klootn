@@ -9,6 +9,8 @@ using UnityEngine.Networking;
 
 public class SQLDatabaseManager : IDatabaseManager
 {
+	private const string klootnUrl = "https://sandordost.nl/klootn/database/";
+	
 	public IEnumerator AddPlayerToLobby(string lobbyId, string playerId)
 	{
 		throw new NotImplementedException();
@@ -31,7 +33,21 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator GetLatestMotd(Action<Motd> callback)
 	{
-		throw new NotImplementedException();
+		UnityWebRequest webrequest = new UnityWebRequest("https://sandordost.nl/klootn/database/motd.php", "GET");
+		webrequest.downloadHandler = new DownloadHandlerBuffer();
+		yield return webrequest.SendWebRequest();
+
+		if (webrequest.result.Equals(UnityWebRequest.Result.Success))
+		{
+			//Convert JSON to object
+			var result = webrequest.downloadHandler.text;
+
+			Motd motd = JsonUtility.FromJson<Motd>(result);
+
+			callback.Invoke(motd);
+		}
+
+		
 	}
 
 	public IEnumerator GetLobbies(Action<List<Lobby>> callback)

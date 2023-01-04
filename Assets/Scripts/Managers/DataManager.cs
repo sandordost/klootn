@@ -44,13 +44,13 @@ public class DataManager : MonoBehaviour
 		switch (option)
 		{
 			case DatabaseOption.Firebase:
-				databaseManager = new FirebaseManager();
+				//databaseManager = new FirebaseManager();
 				break;
 			case DatabaseOption.SQLDatabase:
 				databaseManager = new SQLDatabaseManager();
 				break;
 			case DatabaseOption.Firestore:
-				databaseManager = new FirestoreManager();
+				//databaseManager = new FirestoreManager();
 				break;
 		}
 	}

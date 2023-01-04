@@ -9,30 +9,29 @@ public class FirebaseStorageManager : IStorageManager
 {
 	const long maxFileSize = 1 * 1024 * 1024;
 
-	FirebaseStorage firebaseStorage;
 	StorageReference mainStorageRef;
 
 	public FirebaseStorageManager()
 	{
-		firebaseStorage = FirebaseStorage.DefaultInstance;
-		mainStorageRef = firebaseStorage.RootReference;
+		mainStorageRef = FirebaseStorage.DefaultInstance.RootReference;
 	}
 
 	public IEnumerator GetImage(Motd motd, Action<Texture> callback)
 	{
-		StorageReference motdImageRef = firebaseStorage.GetReferenceFromUrl(motd.ImageUrl);
+		//StorageReference motdImageRef = firebaseStorage.GetReferenceFromUrl(motd.ImageUrl);
 
-		Texture2D texture = new Texture2D(1, 1);
+		//Texture2D texture = new Texture2D(1, 1);
 
 
-		var getImageTask = motdImageRef.GetBytesAsync(maxFileSize);
+		//var getImageTask = motdImageRef.GetBytesAsync(maxFileSize);
 
-		getImageTask.Start();
+		//getImageTask.Start();
 
-		yield return new WaitUntil(() => getImageTask.IsCompleted);
+		//yield return new WaitUntil(() => getImageTask.IsCompleted);
 
-		texture.LoadImage(getImageTask.Result);
+		//texture.LoadImage(getImageTask.Result);
 
-		callback.Invoke(texture);
+		//callback.Invoke(texture);
+		yield return null;
 	}
 }
