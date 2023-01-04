@@ -32,6 +32,12 @@ public class MotdManager : MonoBehaviour
 		Motd motd = null;
 		yield return GetLatestMotd((dbMotd) => 
 		{
+			if (dbMotd is null)
+			{
+				Debug.LogWarning("Latest motd could not be found");
+				return;
+			}
+
 			motd = dbMotd;
 			title.text = motd.Title;
 			message.text = motd.Message;

@@ -18,7 +18,7 @@ public class DataManager : MonoBehaviour
 	private void Awake()
 	{
 		SetDatabaseManager(databaseOption);
-		SetStorageOption(StorageOption.FirebaseStorage);
+		SetStorageOption(storageOption);
 	}
 
 	/// <summary>
