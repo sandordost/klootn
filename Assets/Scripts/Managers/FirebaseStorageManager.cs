@@ -16,9 +16,9 @@ public class FirebaseStorageManager : IStorageManager
 		mainStorageRef = FirebaseStorage.DefaultInstance.RootReference;
 	}
 
-	public IEnumerator GetImage(Motd motd, Action<Texture> callback)
+	public IEnumerator GetImage(string imageUrl, Action<Texture> callback)
 	{
-		//StorageReference motdImageRef = firebaseStorage.GetReferenceFromUrl(motd.ImageUrl);
+		//StorageReference motdImageRef = firebaseStorage.GetReferenceFromUrl(imageUrl);
 
 		//Texture2D texture = new Texture2D(1, 1);
 

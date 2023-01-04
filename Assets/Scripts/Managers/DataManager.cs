@@ -32,6 +32,9 @@ public class DataManager : MonoBehaviour
 			case StorageOption.FirebaseStorage:
 				storageManager = new FirebaseStorageManager();
 				break;
+			case StorageOption.WebStorage:
+				storageManager = new WebStorageManager();
+				break;
 		}
 	}
 

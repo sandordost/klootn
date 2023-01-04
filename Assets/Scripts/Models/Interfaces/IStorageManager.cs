@@ -11,5 +11,5 @@ public interface IStorageManager
 	/// <param name="motd"></param>
 	/// <param name="callback"></param>
 	/// <returns></returns>
-	public IEnumerator GetImage(Motd motd, Action<Texture> callback);
+	public IEnumerator GetImage(string imageUrl, Action<Texture> callback);
 }

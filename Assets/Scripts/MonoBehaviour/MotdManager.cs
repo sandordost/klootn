@@ -37,6 +37,8 @@ public class MotdManager : MonoBehaviour
 			message.text = motd.Message;
 		});
 
+		Debug.Log("Done with getting latest motd");
+
 		yield return GetMotdImage(motd, (text) => 
 		{
 			motdImage.texture = text;
@@ -44,6 +46,8 @@ public class MotdManager : MonoBehaviour
 			motdImage.color = Color.white;
 			altImage.gameObject.SetActive(false);
 		});
+
+		Debug.Log("Done setting components");
 	}
 
 	/// <summary>
@@ -54,7 +58,7 @@ public class MotdManager : MonoBehaviour
 	/// <returns></returns>
 	private IEnumerator GetMotdImage(Motd motd, Action<Texture> callback)
 	{
-		yield return storageManager.GetImage(motd, (tex) =>
+		yield return storageManager.GetImage(motd.ImageUrl, (tex) =>
 		{
 			callback.Invoke(tex);
 		});
