@@ -25,6 +25,8 @@ public class LoginManager : MonoBehaviour
 	private int loginAttempts = 0;
 	private Stopwatch loginCooldownTimer = new Stopwatch();
 
+	private Coroutine loginRoutine;
+
 	private void Start()
 	{
 		GameManager gameManager = GameManager.GetInstance();
@@ -49,7 +51,9 @@ public class LoginManager : MonoBehaviour
 	{
 		if (HasLoginAttempts())
 		{
-			TryLogin();
+			if (loginRoutine is not null) StopCoroutine(loginRoutine);
+
+			StartCoroutine(TryLogin());
 		}
 		else
 		{
@@ -75,7 +79,7 @@ public class LoginManager : MonoBehaviour
 			passwordResult.Equals(ValidationResult.Validated))
 		{
 			ValidationResult validationResult = ValidationResult.DoesNotExist;
-			yield return inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (result) => validationResult = result);
+			yield return inputValidator.PlayerNameExists(newPlayer, databaseManager, (result) => validationResult = result);
 
 			if (validationResult.Equals(ValidationResult.Exists))
 			{

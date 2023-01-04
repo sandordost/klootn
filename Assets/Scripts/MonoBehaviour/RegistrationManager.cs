@@ -25,6 +25,9 @@ public class RegistrationManager : MonoBehaviour
 	private int registerAttempts = 0;
 	private Stopwatch registerCooldownTimer = new Stopwatch();
 
+	//Coroutines
+	Coroutine registrationRoutine;
+
 	private void Start()
 	{
 		usernameErrorMessage.gameObject.SetActive(false);
@@ -50,7 +53,9 @@ public class RegistrationManager : MonoBehaviour
 	{
 		if (HasRegisterAttempts())
 		{
-			TryRegister();
+			if (registrationRoutine is not null)
+				StopCoroutine(registrationRoutine);
+			registrationRoutine = StartCoroutine(TryRegister());
 		}
 		else
 		{
@@ -76,7 +81,7 @@ public class RegistrationManager : MonoBehaviour
 			passwordResult.Equals(ValidationResult.Validated))
 		{
 			ValidationResult validationResult = ValidationResult.DoesNotExist;
-			yield return inputValidator.ValidatePlayerNameExists(newPlayer, databaseManager, (result) =>
+			yield return inputValidator.PlayerNameExists(newPlayer, databaseManager, (result) =>
 			{
 				validationResult = result;
 			});

@@ -55,7 +55,7 @@ public class InputValidator
 	/// <para><see cref="ValidationResult.Exists"/> : <paramref name="newPlayer"/> already exists in database</para>
 	/// <para><see cref="ValidationResult.Validated"/> : <paramref name="newPlayer"/> does not exists in the database yet</para>
 	/// </returns>
-	public IEnumerator ValidatePlayerNameExists(Player newPlayer, IDatabaseManager databaseManager, Action<ValidationResult> callback)
+	public IEnumerator PlayerNameExists(Player newPlayer, IDatabaseManager databaseManager, Action<ValidationResult> callback)
 	{
 		bool playerExists = false;
 

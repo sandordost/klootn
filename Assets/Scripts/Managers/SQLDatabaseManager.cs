@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 public class SQLDatabaseManager : IDatabaseManager
 {
 	private const string klootnUrl = "https://sandordost.nl/klootn/database/";
-	private const string motdsUrl = "mods.php";
+	private const string motdsUrl = "motds.php";
 	private const string playersUrl = "players.php";
 
 	public IEnumerator AddPlayerToLobby(string lobbyId, string playerId)
@@ -66,10 +66,21 @@ public class SQLDatabaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator GetPlayerById(string id, Action<Player> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Name", id);
+
+		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "getplayerbyid", (result) =>
+		{
+			if (result.Length > 0)
+				callback.Invoke(JsonUtility.FromJson<Player>(result));
+			else callback.Invoke(null);
+		});
 	}
+
 	public IEnumerator GetPlayerByName(string name, Action<Player> callback)
 	{
 		throw new NotImplementedException();
@@ -78,9 +89,28 @@ public class SQLDatabaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator Login(Player newPlayer, Action<Player> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Name", newPlayer.Name);
+		formdata.AddField("Password", newPlayer.Password);
+
+		string foundplayerId = null;
+		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "login", (playerId) =>
+		{
+			if(playerId.Length > 0)
+				foundplayerId = playerId;
+		});
+
+		if (foundplayerId is not null)
+		{
+			yield return GetPlayerById(foundplayerId, (player) =>
+			{
+				callback.Invoke(player);
+			});
+		}
 	}
 
 	public IEnumerator PlayerExists(Player newPlayer, Action<bool> callback)
@@ -88,18 +118,35 @@ public class SQLDatabaseManager : IDatabaseManager
 		WWWForm formdata = new WWWForm();
 
 		formdata.AddField("Name", newPlayer.Name);
-		formdata.AddField("Password", newPlayer.Password);
 
-		yield return SendPostRequest(klootnUrl + playersUrl, formdata, (reply) =>
+		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "checkplayerexists", (reply) =>
 		{
-			Debug.Log(reply);
+			callback.Invoke(reply.Equals("1"));
 		});
 	}
 
 	public IEnumerator RegisterPlayer(Player newPlayer, Action<Player> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Name", newPlayer.Name);
+		formdata.AddField("Password", newPlayer.Password);
+
+		string createdPlayerId = null;
+		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "register", (reply) =>
+		{
+			if(int.TryParse(reply, out int parsedId))
+			{
+				createdPlayerId = parsedId.ToString();
+			}
+		});
+
+		yield return GetPlayerById(createdPlayerId, (player) =>
+		{
+			callback.Invoke(player);
+		});
 	}
+
 	public IEnumerator RemoveEmptyLobbies()
 	{
 		throw new NotImplementedException();
@@ -153,10 +200,7 @@ public class SQLDatabaseManager : IDatabaseManager
 		{
 			var result = webrequest.downloadHandler.text;
 			callback.Invoke(result);
-			yield break;
 		}
-
-		callback.Invoke(null);
 	}
 
 	private IEnumerator SendPostRequest(string url, WWWForm formdata, Action<string> callback)
@@ -168,10 +212,16 @@ public class SQLDatabaseManager : IDatabaseManager
 		if (webrequest.result.Equals(UnityWebRequest.Result.Success))
 		{
 			callback.Invoke(webrequest.downloadHandler.text);
-			yield break;
 		}
+	}
 
-		callback.Invoke(null);
+	private IEnumerator SendPostRequest(string url, WWWForm formdata, string action, Action<string> callback)
+	{
+		formdata.AddField("action", action);
+		yield return SendPostRequest(url, formdata, (result) =>
+		{
+			callback.Invoke(result);
+		});
 	}
 
 	private IEnumerator SendPostRequest(string url, object jsonData, Action<string> callback)
@@ -189,7 +239,5 @@ public class SQLDatabaseManager : IDatabaseManager
 			var result = webrequest.downloadHandler.text;
 			callback.Invoke(result);
 		}
-
-		callback.Invoke(null);
 	}
 }

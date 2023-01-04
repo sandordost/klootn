@@ -2,19 +2,24 @@ using Firebase.Firestore;
 using System;
 
 [FirestoreData]
+[Serializable]
 public class Player
 {
-	[FirestoreDocumentId]
-	public string Id { get; set; }
+	//[FirestoreDocumentId]
+	//public string Id { get; set; }
+	public string Id;
 
-	[FirestoreProperty]
-	public string Name { get; set; }
+	//[FirestoreProperty]
+	//public string Name { get; set; }
+	public string Name;
 
-	[FirestoreProperty]
-	public string Password { get; set; }
+	//[FirestoreProperty]
+	//public string Password { get; set; }
+	public string Password;
 
-	[FirestoreProperty]
-	public Timestamp LastSeen { get; set; }
+	//[FirestoreProperty]
+	//public Timestamp LastSeen { get; set; }
+	public string LastSeen;
 
 	public Player(string name, string id)
 	{
