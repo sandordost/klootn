@@ -79,6 +79,8 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
+	private Coroutine refreshAndUpdateCoroutine;
+
 	private void Start()
 	{
 		GameManager gameManager = GameManager.GetInstance();
@@ -119,7 +121,8 @@ public class InLobbyManagerUI : MonoBehaviour
 		{
 			if (inLobbyRefreshTimeElapsed > inLobbyRefreshTime)
 			{
-				RefreshAndUpdate();
+				if (refreshAndUpdateCoroutine is not null) StopCoroutine(refreshAndUpdateCoroutine);
+				refreshAndUpdateCoroutine = StartCoroutine(RefreshAndUpdate());
 			}
 			else
 			{
@@ -128,12 +131,12 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private void RefreshAndUpdate()
+	private IEnumerator RefreshAndUpdate()
 	{
 		Debug.Log("Updating Lobbies from inLobbyUI");
-		lobbyManager.RefreshLobbies();
-		lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, CurrentLobbyId, Timestamp.GetCurrentTimestamp());
-		UpdatePlayerListUI();
+		yield return lobbyManager.RefreshLobbies();
+		yield return lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, CurrentLobbyId, Timestamp.GetCurrentTimestamp());
+		yield return UpdatePlayerListUI();
 		inLobbyRefreshTimeElapsed = 0;
 	}
 

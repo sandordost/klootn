@@ -26,6 +26,10 @@ public class LobbyManagerUI : MonoBehaviour
 	public float emptyAndIdleRemoveTime = 5;
 	private float emptyAndIdleRemoveTimeElapsed = 5;
 
+	private Coroutine co_RemoveIdleAndEmptyLobbies;
+	private Coroutine co_RefreshLobbies;
+	private Coroutine co_CreateNewLobby;
+
 	void Start()
 	{
 		UIManager uiManager = UIManager.GetInstance();
@@ -55,7 +59,9 @@ public class LobbyManagerUI : MonoBehaviour
 
 			if (emptyAndIdleRemoveTimeElapsed > emptyAndIdleRemoveTime)
 			{
-				RemoveIdleAndEmptyLobbies();
+				if (co_RemoveIdleAndEmptyLobbies is not null) StopCoroutine(co_RemoveIdleAndEmptyLobbies);
+				co_RemoveIdleAndEmptyLobbies = StartCoroutine(RemoveIdleAndEmptyLobbies());
+
 				emptyAndIdleRemoveTimeElapsed = 0;
 			}
 			else
@@ -69,7 +75,13 @@ public class LobbyManagerUI : MonoBehaviour
 	{
 		Debug.Log("Removing idle players and empty lobbies");
 		yield return lobbyManager.FindAndRemoveInactivePlayers();
-		lobbyManager.RemoveEmptyLobbies();
+		yield return lobbyManager.RemoveEmptyLobbies();
+	}
+
+	public void ButtonCreateNewLobbyClicked()
+	{
+		if (co_CreateNewLobby is not null) StopCoroutine(co_CreateNewLobby);
+		co_CreateNewLobby = StartCoroutine(CreateNewLobby());
 	}
 
 	public IEnumerator CreateNewLobby()
@@ -82,12 +94,14 @@ public class LobbyManagerUI : MonoBehaviour
 			lobby = dblobby;
 		});
 
-		OpenLobbyUI(lobby.Id);
+		yield return OpenLobbyUI(lobby.Id);
+
+		alertManager.CloseLoadingAlert();
 	}
 
 	public IEnumerator OpenLobbyUI(string lobbyId)
 	{
-		lobbyManager.RefreshLobbies();
+		yield return lobbyManager.RefreshLobbies();
 
 		LobbyStatusMessage statusMessage = LobbyStatusMessage.Deleted;
 		yield return lobbyManager.CheckIfJoinable(playerManager.Client.Id, lobbyId, (message) => statusMessage = message);
@@ -109,7 +123,7 @@ public class LobbyManagerUI : MonoBehaviour
 
 		yield return lobbyManager.JoinLobby(lobbyId);
 
-		inLobbyManagerUI.ChangePlayerColor();
+		yield return inLobbyManagerUI.ChangePlayerColor();
 
 		pageSwitcher.SwitchPage(inLobbyPage);
 	}
@@ -117,7 +131,8 @@ public class LobbyManagerUI : MonoBehaviour
 	public void RefreshLobbies()
 	{
 		Debug.Log("Updating Lobbies from LobbyUI");
-		lobbyManager.RefreshLobbies();
+		if (co_RefreshLobbies is not null) StopCoroutine(co_RefreshLobbies);
+		co_RefreshLobbies = StartCoroutine(lobbyManager.RefreshLobbies());
 		lobbyRefreshTimeElapsed = 0;
 	}
 

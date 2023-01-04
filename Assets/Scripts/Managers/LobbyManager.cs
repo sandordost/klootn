@@ -17,6 +17,8 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	private MapManager mapManager;
 	private List<Lobby> Lobbies { get; set; }
 
+	private Coroutine RefreshLobbiesCoroutine;
+
 
 	private void Start()
 	{
