@@ -29,6 +29,8 @@ public class LobbyManagerUI : MonoBehaviour
 	private Coroutine co_RemoveIdleAndEmptyLobbies;
 	private Coroutine co_RefreshLobbies;
 	private Coroutine co_CreateNewLobby;
+	private Dictionary<string, Coroutine> co_UpdateLobbyUI = new Dictionary<string, Coroutine>();
+	private Dictionary<string, Coroutine> co_AddLobbyUI = new Dictionary<string, Coroutine>();
 
 	void Start()
 	{
@@ -59,7 +61,7 @@ public class LobbyManagerUI : MonoBehaviour
 
 			if (emptyAndIdleRemoveTimeElapsed > emptyAndIdleRemoveTime)
 			{
-				if (co_RemoveIdleAndEmptyLobbies is not null) StopCoroutine(co_RemoveIdleAndEmptyLobbies);
+				if (co_RemoveIdleAndEmptyLobbies != null) StopCoroutine(co_RemoveIdleAndEmptyLobbies);
 				co_RemoveIdleAndEmptyLobbies = StartCoroutine(RemoveIdleAndEmptyLobbies());
 
 				emptyAndIdleRemoveTimeElapsed = 0;
@@ -80,7 +82,7 @@ public class LobbyManagerUI : MonoBehaviour
 
 	public void ButtonCreateNewLobbyClicked()
 	{
-		if (co_CreateNewLobby is not null) StopCoroutine(co_CreateNewLobby);
+		if (co_CreateNewLobby != null) StopCoroutine(co_CreateNewLobby);
 		co_CreateNewLobby = StartCoroutine(CreateNewLobby());
 	}
 
@@ -131,7 +133,7 @@ public class LobbyManagerUI : MonoBehaviour
 	public void RefreshLobbies()
 	{
 		Debug.Log("Updating Lobbies from LobbyUI");
-		if (co_RefreshLobbies is not null) StopCoroutine(co_RefreshLobbies);
+		if (co_RefreshLobbies != null) StopCoroutine(co_RefreshLobbies);
 		co_RefreshLobbies = StartCoroutine(lobbyManager.RefreshLobbies());
 		lobbyRefreshTimeElapsed = 0;
 	}
@@ -143,10 +145,20 @@ public class LobbyManagerUI : MonoBehaviour
 			switch (lobbyChange.Value)
 			{
 				case LobbyChangeState.New:
-					AddLobbyToUI(lobbyChange.Key);
+					if (co_AddLobbyUI.ContainsKey(lobbyChange.Key))
+					{
+						StopCoroutine(co_AddLobbyUI[lobbyChange.Key]);
+						co_AddLobbyUI.Remove(lobbyChange.Key);
+					}
+					co_AddLobbyUI.Add(lobbyChange.Key, StartCoroutine(AddLobbyToUI(lobbyChange.Key)));
 					break;
 				case LobbyChangeState.Changed:
-					UpdateLobbyUI(lobbyChange.Key);
+					if (co_UpdateLobbyUI.ContainsKey(lobbyChange.Key))
+					{
+						StopCoroutine(co_UpdateLobbyUI[lobbyChange.Key]);
+						co_UpdateLobbyUI.Remove(lobbyChange.Key);
+					}
+					co_UpdateLobbyUI.Add(lobbyChange.Key, StartCoroutine(UpdateLobbyUI(lobbyChange.Key)));
 					break;
 				case LobbyChangeState.Deleted:
 					RemoveLobbyFromUI(lobbyChange.Key);
@@ -167,20 +179,20 @@ public class LobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private void UpdateLobbyUI(string lobbyId)
+	private IEnumerator UpdateLobbyUI(string lobbyId)
 	{
 		GameObject existingLobby = FindLobbyCardUI(lobbyId);
 
-		UpdateLobbyUIObject(existingLobby, lobbyId);
+		yield return UpdateLobbyUIObject(existingLobby, lobbyId);
 	}
 
-	private void AddLobbyToUI(string lobbyId)
+	private IEnumerator AddLobbyToUI(string lobbyId)
 	{
 		GameObject newLobby = Instantiate(lobbyPrefab, lobbyPrefabParent.transform);
 
 		newLobby.GetComponent<LobbyClick>().LobbyId = lobbyId;
 
-		UpdateLobbyUIObject(newLobby, lobbyId);
+		yield return UpdateLobbyUIObject(newLobby, lobbyId);
 	}
 
 	private IEnumerator UpdateLobbyUIObject(GameObject lobbyObject, string lobbyId)
@@ -191,11 +203,22 @@ public class LobbyManagerUI : MonoBehaviour
 			lobby = dblobby;
 		});
 
+		if (lobby == null)
+			yield break;
+
 		KlootnMap lobbyMap = mapManager.GetMap(lobby.MapId);
+
+		List<Player> lobbyPlayers = new List<Player>();
+		yield return lobbyManager.GetLobbyPlayers(lobby.Id, (players) =>
+		{
+			lobbyPlayers = players;
+		});
+
+		int amountOfPlayer =  lobbyPlayers == null ? 0 : lobbyPlayers.Count;
 
 		lobbyObject.transform.Find("LobbyTitle").GetComponent<TMP_Text>().text = lobby.Name;
 		lobbyObject.transform.Find("LobbyDescription").GetComponent<TMP_Text>().text = lobby.Description;
-		lobbyObject.transform.Find("LobbyPlayers").GetComponent<TMP_Text>().text = $"{lobby.Players.Count}/{lobbyMap.maxPlayers}";
+		lobbyObject.transform.Find("LobbyPlayers").GetComponent<TMP_Text>().text = $"{amountOfPlayer}/{lobbyMap.maxPlayers}";
 	}
 
 

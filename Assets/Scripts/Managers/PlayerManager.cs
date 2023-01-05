@@ -33,7 +33,7 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 	{
 		databaseManager = GameManager.GetInstance().dataManager.databaseManager;
 
-		if (co_SetTestClient is not null) StopCoroutine(co_SetTestClient);
+		if (co_SetTestClient != null) StopCoroutine(co_SetTestClient);
 		co_SetTestClient = StartCoroutine(SetTestClient());
 
 		UpdateLastSeenTimer = new Timer(UpdateClientLastSeenInterval * 1000);

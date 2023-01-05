@@ -24,7 +24,6 @@ public class LoginManager : MonoBehaviour
 
 	private int loginAttempts = 0;
 	private Stopwatch loginCooldownTimer = new Stopwatch();
-
 	private Coroutine loginRoutine;
 
 	private void Start()
@@ -51,9 +50,8 @@ public class LoginManager : MonoBehaviour
 	{
 		if (HasLoginAttempts())
 		{
-			if (loginRoutine is not null) StopCoroutine(loginRoutine);
-
-			StartCoroutine(TryLogin());
+			if (loginRoutine != null) StopCoroutine(loginRoutine);
+			loginRoutine = StartCoroutine(TryLogin());
 		}
 		else
 		{

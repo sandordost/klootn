@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 public class SQLDatabaseManager : IDatabaseManager
 {
@@ -16,7 +17,11 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator AddPlayerToLobby(string lobbyId, string playerId)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("LobbyId", lobbyId);
+		formdata.AddField("PlayerId", playerId);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, "addplayertolobby", (result) => { });
 	}
 
 	public IEnumerator CreateLobby(Player host, string name, string description, string mapId, Action<Lobby> callback)
@@ -37,7 +42,7 @@ public class SQLDatabaseManager : IDatabaseManager
 			}
 		});
 
-		if(lobbyId is not null)
+		if(lobbyId != null)
 		{
 			yield return GetLobby(lobbyId, (lobby) =>
 			{
@@ -48,11 +53,28 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator GetAllPlayers(Action<List<Player>> callback)
 	{
-		throw new NotImplementedException();
+		yield return SendGetRequest(klootnUrl + playersUrl, (result) =>
+		{
+			Player[] players = JsonConvert.DeserializeObject<Player[]>(result);
+			callback.Invoke(new List<Player>(players));
+		});
 	}
+
 	public IEnumerator GetAllPlayers(string[] playerIds, Action<List<Player>> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		string jsonstring = JsonConvert.SerializeObject(playerIds);
+		formdata.AddField("PlayerIds", jsonstring);
+
+		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "getplayersbyid", (result) =>
+		{
+			if (!result.Equals("null"))
+			{
+				Player[] players = JsonConvert.DeserializeObject<Player[]>(result);
+				callback.Invoke(new List<Player>(players));
+			}
+			else callback.Invoke(null);
+		});
 	}
 
 	public IEnumerator GetLatestMotd(Action<Motd> callback)
@@ -69,7 +91,11 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator GetLobbies(Action<List<Lobby>> callback)
 	{
-		throw new NotImplementedException();
+		yield return SendGetRequest(klootnUrl + lobbiesUrl, (result) =>
+		{
+			Lobby[] lobbies = JsonConvert.DeserializeObject<Lobby[]>(result);
+			callback.Invoke(new List<Lobby>(lobbies));
+		});
 	}
 
 	public IEnumerator GetLobby(string id, Action<Lobby> callback)
@@ -78,7 +104,7 @@ public class SQLDatabaseManager : IDatabaseManager
 
 		formdata.AddField("Id", id);
 
-		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "getlobbybyid", (result) =>
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "getlobbybyid", (result) =>
 		{
 			if (result.Length > 0)
 				callback.Invoke(JsonUtility.FromJson<Lobby>(result));
@@ -90,17 +116,63 @@ public class SQLDatabaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator GetLobbyHost(string lobbyId, Action<string> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("Id", lobbyId);
+
+		string hostId = null;
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "getlobbyhost", (result) =>
+		{
+			if (int.TryParse(result, out int parsedId))
+			{
+				hostId = parsedId.ToString();
+			}
+		});
+
+		if (hostId != null)
+			callback.Invoke(hostId);
 	}
+
 	public IEnumerator GetLobbyMap(string lobbyId, Action<string> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("Id", lobbyId);
+
+		string mapId = null;
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "getlobbymap", (result) =>
+		{
+			if (int.TryParse(result, out int parsedId))
+			{
+				mapId = parsedId.ToString();
+			}
+		});
+
+		if (mapId != null)
+			callback.Invoke(mapId);
 	}
+
 	public IEnumerator GetLobbyPlayers(string lobbyId, Action<List<Player>> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("Id", lobbyId);
+
+		string[] playerIds = null;
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "getlobbyplayerids", (result) =>
+		{
+			playerIds = JsonConvert.DeserializeObject<string[]>(result);
+		});
+
+		if(playerIds != null)
+		{
+			yield return GetAllPlayers(playerIds, (result) =>
+			{
+				callback.Invoke(result);
+			});
+		}
 	}
 
 	public IEnumerator GetPlayerById(string id, Action<Player> callback)
@@ -150,7 +222,7 @@ public class SQLDatabaseManager : IDatabaseManager
 				foundplayerId = playerId;
 		});
 
-		if (foundplayerId is not null)
+		if (foundplayerId != null)
 		{
 			yield return GetPlayerById(foundplayerId, (player) =>
 			{
@@ -234,6 +306,7 @@ public class SQLDatabaseManager : IDatabaseManager
 		throw new NotImplementedException();
 	}
 
+
 	private IEnumerator SendGetRequest(string url, Action<string> callback)
 	{
 		UnityWebRequest webrequest = new UnityWebRequest(url, "GET");
@@ -248,7 +321,6 @@ public class SQLDatabaseManager : IDatabaseManager
 			callback.Invoke(result);
 		}
 	}
-
 	private IEnumerator SendPostRequest(string url, WWWForm formdata, Action<string> callback)
 	{
 		UnityWebRequest webrequest = UnityWebRequest.Post(url, formdata);
@@ -260,7 +332,6 @@ public class SQLDatabaseManager : IDatabaseManager
 			callback.Invoke(webrequest.downloadHandler.text);
 		}
 	}
-
 	private IEnumerator SendPostRequest(string url, WWWForm formdata, string action, Action<string> callback)
 	{
 		formdata.AddField("action", action);
@@ -269,7 +340,6 @@ public class SQLDatabaseManager : IDatabaseManager
 			callback.Invoke(result);
 		});
 	}
-
 	private IEnumerator SendPostRequest(string url, object jsonData, Action<string> callback)
 	{
 		string jsonString = JsonUtility.ToJson(jsonData);

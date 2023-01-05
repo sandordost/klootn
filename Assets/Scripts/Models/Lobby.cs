@@ -12,14 +12,6 @@ public class Lobby
 	public string Id;
 
 	//[FirestoreProperty]
-	//public List<string> Players { get; set; }
-	public List<string> Players;
-
-	//[FirestoreProperty]
-	//public Dictionary<string, LobbyPlayerData> LobbyPlayersData { get; set; }
-	public Dictionary<string, LobbyPlayerData> LobbyPlayersData;
-
-	//[FirestoreProperty]
 	//public string HostId { get; set; }
 	public string HostId;
 
@@ -43,7 +35,6 @@ public static class LobbyExtensions
 		if (currentLobby.Id.Equals(comparedLobby.Id) &&
 			currentLobby.Name.Equals(comparedLobby.Name) &&
 			currentLobby.Description.Equals(comparedLobby.Description) &&
-			currentLobby.Players.SequenceEqual(comparedLobby.Players) &&
 			currentLobby.MapId.Equals(comparedLobby.MapId) &&
 			currentLobby.HostId.Equals(comparedLobby.HostId))
 		{

@@ -52,7 +52,7 @@ public class InLobbyManagerUI : MonoBehaviour
 		{
 			if (currentPlayers is null)
 			{
-				currentPlayers = new();
+				currentPlayers = new List<Player>();
 			}
 			return currentPlayers;
 		}
@@ -67,9 +67,9 @@ public class InLobbyManagerUI : MonoBehaviour
 	{
 		get
 		{
-			if (currentPlayerColors is null)
+			if (currentPlayerColors == null)
 			{
-				currentPlayerColors = new();
+				currentPlayerColors = new Dictionary<string, PlayerColor>();
 			}
 			return currentPlayerColors;
 		}
@@ -107,7 +107,7 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private void LobbiesChanged(object sender, LobbiesChangedEventArgs e)
 	{
-		if (CurrentLobbyId is not null && e.ChangedLobbies.ContainsKey(CurrentLobbyId))
+		if (CurrentLobbyId != null && e.ChangedLobbies.ContainsKey(CurrentLobbyId))
 		{
 			if (e.ChangedLobbies[CurrentLobbyId].Equals(LobbyChangeState.Deleted))
 				uiPageSwitcher.SwitchPage("LobbyPage");
@@ -121,7 +121,7 @@ public class InLobbyManagerUI : MonoBehaviour
 		{
 			if (inLobbyRefreshTimeElapsed > inLobbyRefreshTime)
 			{
-				if (refreshAndUpdateCoroutine is not null) StopCoroutine(refreshAndUpdateCoroutine);
+				if (refreshAndUpdateCoroutine != null) StopCoroutine(refreshAndUpdateCoroutine);
 				refreshAndUpdateCoroutine = StartCoroutine(RefreshAndUpdate());
 			}
 			else
@@ -249,7 +249,7 @@ public class InLobbyManagerUI : MonoBehaviour
 		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
 			if (playerUI.PlayerId.Equals(playerId)) objectToRemove = playerUI.gameObject;
 
-		if (objectToRemove is not null)
+		if (objectToRemove != null)
 			Destroy(objectToRemove);
 	}
 

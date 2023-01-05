@@ -37,7 +37,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 			newLobbies = lobbyList;
 		});
 
-		Dictionary<string, LobbyChangeState> changedLobbies = new();
+		Dictionary<string, LobbyChangeState> changedLobbies = new Dictionary<string, LobbyChangeState>();
 
 		if (Lobbies != null)
 		{
@@ -117,16 +117,23 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 			yield break;
 		}
 
-		int maxPlayers = mapManager.GetMap(lobby.MapId).maxPlayers;
 		
-		//TODO: Check if lobbystatus is open and not closed or started
 
-		if (lobby.Players.Find((x) => x == playerId) is not null)
+		int maxPlayers = mapManager.GetMap(lobby.MapId).maxPlayers;
+
+		//TODO: Check if lobbystatus is open and not closed or started
+		List<Player> lobbyPlayers = null;
+		yield return databaseManager.GetLobbyPlayers(lobby.Id, (players) =>
+		{
+			lobbyPlayers = players;
+		});
+
+		if (lobbyPlayers.Find((x) => x.Id == playerId) != null)
 		{
 			callback.Invoke(LobbyStatusMessage.Open);
 			yield break;
 		}
-		else if (lobby.Players.Count < maxPlayers)
+		else if (lobbyPlayers.Count < maxPlayers)
 		{
 			callback.Invoke(LobbyStatusMessage.Open);
 			yield break;
@@ -137,7 +144,10 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	public IEnumerator GetLobby(string id, Action<Lobby> callback)
 	{
 		Lobby lobby = null;
-		yield return databaseManager.GetLobby(id, (dbLobby) => lobby = dbLobby);
+		yield return databaseManager.GetLobby(id, (dbLobby) => 
+		{
+			lobby = dbLobby;
+		});
 		callback.Invoke(lobby);
 	}
 
@@ -151,7 +161,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	public Dictionary<string, LobbyChangeState> GetLobbyPlayersChanges(List<Player> oldPlayerList, List<Player> newPlayerList, Dictionary<string, PlayerColor> oldColors, Dictionary<string, PlayerColor> newColors)
 	{
-		Dictionary<string, LobbyChangeState> result = new();
+		Dictionary<string, LobbyChangeState> result = new Dictionary<string, LobbyChangeState>();
 		//Check for removals
 		foreach (Player oldPlayer in oldPlayerList)
 		{
@@ -164,7 +174,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		}
 
 		//Check for adds or updates
-		if (newPlayerList is not null)
+		if (newPlayerList != null)
 		{
 			foreach (Player newPlayer in newPlayerList)
 			{

@@ -53,7 +53,7 @@ public class RegistrationManager : MonoBehaviour
 	{
 		if (HasRegisterAttempts())
 		{
-			if (registrationRoutine is not null)
+			if (registrationRoutine != null)
 				StopCoroutine(registrationRoutine);
 			registrationRoutine = StartCoroutine(TryRegister());
 		}
