@@ -17,9 +17,6 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 	private MapManager mapManager;
 	private List<Lobby> Lobbies { get; set; }
 
-	private Coroutine RefreshLobbiesCoroutine;
-
-
 	private void Start()
 	{
 		GameManager gameManager = GameManager.GetInstance();
@@ -215,9 +212,10 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 		yield return databaseManager.RemovePlayerFromLobby(lobbyId, playerId);
 	}
 
-	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
+	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId)
 	{
-		yield return databaseManager.UpdateLobbyLastSeen(playerId, lobbyId, timestamp);
+		yield return databaseManager.UpdateLobbyLastSeen(playerId, lobbyId);
+
 		yield return databaseManager.RemoveInactivePlayersFromLobby(lobbyId, timeoutSeconds);
 	}
 
@@ -228,6 +226,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	public IEnumerator FindAndRemoveInactivePlayers()
 	{
+		//TODO: Optimize
 		List<Lobby> lobbies = null;
 		yield return databaseManager.GetLobbies((lobbyList) =>
 		{

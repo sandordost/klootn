@@ -114,7 +114,22 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator GetLobbyColors(string lobbyId, Action<Dictionary<string, PlayerColor>> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("LobbyId", lobbyId);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "getallplayerdata", (result) =>
+		{
+			Dictionary<string, PlayerColor> colors = new Dictionary<string, PlayerColor>();
+
+			LobbyPlayerData[] playerDatas = JsonConvert.DeserializeObject<LobbyPlayerData[]>(result);
+
+			foreach(var item in playerDatas)
+			{
+				colors.Add(item.PlayerId, item.Color);
+			}
+
+			callback.Invoke(colors);
+		});
 	}
 
 	public IEnumerator GetLobbyHost(string lobbyId, Action<string> callback)
@@ -166,13 +181,14 @@ public class SQLDatabaseManager : IDatabaseManager
 			playerIds = JsonConvert.DeserializeObject<string[]>(result);
 		});
 
-		if(playerIds != null)
+		yield return GetAllPlayers(playerIds, (result) =>
 		{
-			yield return GetAllPlayers(playerIds, (result) =>
+			if (result != null)
 			{
 				callback.Invoke(result);
-			});
-		}
+			}
+			else callback.Invoke(new List<Player>());
+		});
 	}
 
 	public IEnumerator GetPlayerById(string id, Action<Player> callback)
@@ -205,7 +221,15 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator GetPlayerColor(string lobbyId, string playerId, Action<PlayerColor> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("LobbyId", lobbyId);
+		formdata.AddField("PlayerId", playerId);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "getplayerdata", (result) =>
+		{
+			LobbyPlayerData lpd = JsonConvert.DeserializeObject<LobbyPlayerData>(result);
+			callback.Invoke(lpd.Color);
+		});
 	}
 
 	public IEnumerator Login(Player newPlayer, Action<Player> callback)
@@ -267,12 +291,27 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator RemoveEmptyLobbies()
 	{
-		throw new NotImplementedException();
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, "removeemptylobbies", (result) => 
+		{
+			if (result.Length > 0)
+				Debug.Log($"RemoveEmptyLobbies returned: {result}");
+		});
 	}
+
 	public IEnumerator RemoveInactivePlayersFromLobby(string lobbyId, int secondsTimeout)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("LobbyId", lobbyId);
+		formdata.AddField("TimeoutTime", secondsTimeout);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "removeinactiveplayers", (result) =>
+		{
+			if(result.Length > 0)
+				Debug.Log($"RemoveInactivePlayersFromLobby returned: {result}");
+		});
 	}
+
 	public IEnumerator RemoveLobby(string lobbyId)
 	{
 		throw new NotImplementedException();
@@ -289,21 +328,39 @@ public class SQLDatabaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
-	public IEnumerator UpdateLastSeen(string playerId, Timestamp timestamp)
+	public IEnumerator UpdateLastSeen(string playerId, DateTime timestamp)
 	{
 		throw new NotImplementedException();
 	}
-	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp)
+
+	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("PlayerId", playerId);
+		formdata.AddField("LobbyId", lobbyId);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "setplayerlastseen", (result) =>
+		{
+
+		});
 	}
+
 	public IEnumerator UpdateLobbyMap(string lobbyId, string mapId)
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator UpdatePlayerColor(string lobbyId, string playerId, PlayerColor color)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("LobbyId", lobbyId);
+		formdata.AddField("PlayerId", playerId);
+		formdata.AddField("Color", (int)color);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "setplayercolor", (result) =>
+		{
+
+		});
 	}
 
 
@@ -340,20 +397,13 @@ public class SQLDatabaseManager : IDatabaseManager
 			callback.Invoke(result);
 		});
 	}
-	private IEnumerator SendPostRequest(string url, object jsonData, Action<string> callback)
+	private IEnumerator SendPostRequest(string url, string action, Action<string> callback)
 	{
-		string jsonString = JsonUtility.ToJson(jsonData);
-
-		UnityWebRequest webrequest = UnityWebRequest.Post(url, jsonString);
-
-		webrequest.SetRequestHeader("Content-Type", "application/json");
-
-		yield return webrequest.SendWebRequest();
-
-		if (webrequest.result.Equals(UnityWebRequest.Result.Success))
+		WWWForm formdata = new WWWForm();
+		formdata.AddField("action", action);
+		yield return SendPostRequest(url, formdata, (result) =>
 		{
-			var result = webrequest.downloadHandler.text;
 			callback.Invoke(result);
-		}
+		});
 	}
 }

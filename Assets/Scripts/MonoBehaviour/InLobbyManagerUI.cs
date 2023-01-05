@@ -41,7 +41,7 @@ public class InLobbyManagerUI : MonoBehaviour
 			currentLobbyId = value;
 			CurrentPlayers.Clear();
 			ClearPlayerListUI();
-			UpdateInLobbyUI();
+			StartUpdatingLobbyUI();
 		}
 	}
 
@@ -111,8 +111,16 @@ public class InLobbyManagerUI : MonoBehaviour
 		{
 			if (e.ChangedLobbies[CurrentLobbyId].Equals(LobbyChangeState.Deleted))
 				uiPageSwitcher.SwitchPage("LobbyPage");
-			else UpdateInLobbyUI();
+			else StartUpdatingLobbyUI();
 		}
+	}
+
+	private Coroutine co_UpdateInLobbyUI;
+	private void StartUpdatingLobbyUI()
+	{
+		if (co_UpdateInLobbyUI != null) StopCoroutine(co_UpdateInLobbyUI);
+
+		co_UpdateInLobbyUI = StartCoroutine(UpdateInLobbyUI());
 	}
 
 	private void FixedUpdate()
@@ -122,7 +130,10 @@ public class InLobbyManagerUI : MonoBehaviour
 			if (inLobbyRefreshTimeElapsed > inLobbyRefreshTime)
 			{
 				if (refreshAndUpdateCoroutine != null) StopCoroutine(refreshAndUpdateCoroutine);
+
 				refreshAndUpdateCoroutine = StartCoroutine(RefreshAndUpdate());
+
+				inLobbyRefreshTimeElapsed = 0;
 			}
 			else
 			{
@@ -135,7 +146,9 @@ public class InLobbyManagerUI : MonoBehaviour
 	{
 		Debug.Log("Updating Lobbies from inLobbyUI");
 		yield return lobbyManager.RefreshLobbies();
-		yield return lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, CurrentLobbyId, Timestamp.GetCurrentTimestamp());
+
+		yield return lobbyManager.UpdateLobbyLastSeen(playerManager.Client.Id, CurrentLobbyId);
+
 		yield return UpdatePlayerListUI();
 		inLobbyRefreshTimeElapsed = 0;
 	}
@@ -191,6 +204,9 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
+	private Dictionary<string, Coroutine> co_AddPlayerToLobbyUI = new Dictionary<string, Coroutine>();
+	private Dictionary<string, Coroutine> co_UpdatePlayerInLobbyUI = new Dictionary<string, Coroutine>();
+
 	private IEnumerator UpdatePlayerListUI()
 	{
 		//Change Player area
@@ -213,10 +229,20 @@ public class InLobbyManagerUI : MonoBehaviour
 			switch (playerChange.Value)
 			{
 				case LobbyChangeState.New:
-					AddPlayerToLobbyUI(playerChange.Key);
+					if (co_AddPlayerToLobbyUI.ContainsKey(playerChange.Key))
+					{
+						StopCoroutine(co_AddPlayerToLobbyUI[playerChange.Key]);
+						co_AddPlayerToLobbyUI.Remove(playerChange.Key);
+					}
+					co_AddPlayerToLobbyUI.Add(playerChange.Key, StartCoroutine(AddPlayerToLobbyUI(playerChange.Key)));
 					break;
 				case LobbyChangeState.Changed:
-					UpdatePlayerInLobbyUI(playerChange.Key);
+					if (co_UpdatePlayerInLobbyUI.ContainsKey(playerChange.Key))
+					{
+						StopCoroutine(co_UpdatePlayerInLobbyUI[playerChange.Key]);
+						co_UpdatePlayerInLobbyUI.Remove(playerChange.Key);
+					}
+					co_UpdatePlayerInLobbyUI.Add(playerChange.Key, StartCoroutine(UpdatePlayerInLobbyUI(playerChange.Key)));
 					break;
 				case LobbyChangeState.Deleted:
 					RemovePlayerFromLobbyUI(playerChange.Key);
@@ -253,16 +279,16 @@ public class InLobbyManagerUI : MonoBehaviour
 			Destroy(objectToRemove);
 	}
 
-	public void AddPlayerToLobbyUI(string playerId)
+	public IEnumerator AddPlayerToLobbyUI(string playerId)
 	{
 		GameObject newPlayerUI = Instantiate(playerUIPrefab, playerUIPrefabParent.transform);
 
 		newPlayerUI.GetComponent<Player_UI>().PlayerId = playerId;
 
-		SetPlayerObject(newPlayerUI, playerId);
+		yield return SetPlayerObject(newPlayerUI, playerId);
 	}
 
-	public void UpdatePlayerInLobbyUI(string playerId)
+	public IEnumerator UpdatePlayerInLobbyUI(string playerId)
 	{
 		Transform parent = playerUIPrefabParent.transform;
 
@@ -271,7 +297,7 @@ public class InLobbyManagerUI : MonoBehaviour
 		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
 			if (playerUI.PlayerId.Equals(playerId)) objectToUpdate = playerUI.gameObject;
 
-		SetPlayerObject(objectToUpdate, playerId);
+		yield return SetPlayerObject(objectToUpdate, playerId);
 	}
 
 	private IEnumerator SetPlayerObject(GameObject playerObj, string playerId)
@@ -315,9 +341,9 @@ public class InLobbyManagerUI : MonoBehaviour
 		LayoutRebuilder.ForceRebuildLayoutImmediate(playerObj.transform.Find("NameAndIcon").GetComponent<RectTransform>());
 	}
 
-	public void PromotePlayer(string playerId)
+	public IEnumerator PromotePlayer(string playerId)
 	{
-		lobbyManager.SetHost(currentLobbyId, playerId);
+		yield return lobbyManager.SetHost(currentLobbyId, playerId);
 	}
 
 	public IEnumerator ChangePlayerColor()

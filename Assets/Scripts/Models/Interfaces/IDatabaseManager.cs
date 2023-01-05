@@ -98,7 +98,7 @@ public interface IDatabaseManager
 	/// <param name="timestamp"></param>
 	/// <param name="lobbyId"></param>
 	/// <returns></returns>
-	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId, Timestamp timestamp);
+	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId);
 
 	/// <summary>
 	/// Updates the last seen field for a player
@@ -106,7 +106,7 @@ public interface IDatabaseManager
 	/// <param name="playerId"></param>
 	/// <param name="timestamp"></param>
 	/// <returns></returns>
-	public IEnumerator UpdateLastSeen(string playerId, Timestamp timestamp);
+	public IEnumerator UpdateLastSeen(string playerId, DateTime timestamp);
 
 	/// <summary>
 	/// Removes players when they have been inactive for <paramref name="secondsTimeout"/> time

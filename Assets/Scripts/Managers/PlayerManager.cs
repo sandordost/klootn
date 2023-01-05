@@ -49,7 +49,7 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 	private IEnumerator UpdateLastSeen()
 	{
 		Client.LastSeen = Timestamp.GetCurrentTimestamp().ToString();
-		yield return databaseManager.UpdateLastSeen(Client.Id, Timestamp.FromDateTime(DateTime.Parse(Client.LastSeen)));
+		yield return databaseManager.UpdateLastSeen(Client.Id, DateTime.Parse(Client.LastSeen));
 	}
 
 	public IEnumerator GetPlayer(string playerId, Action<Player> callback)
