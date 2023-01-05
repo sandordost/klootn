@@ -29,6 +29,6 @@ public class LobbyClick : MonoBehaviour
 
 	private void ButtonClicked()
 	{
-		lobbyManagerUI.OpenLobbyUI(LobbyId);
+		lobbyManagerUI.StartOpenLobbyUI(LobbyId);
 	}
 }

@@ -101,6 +101,14 @@ public class LobbyManagerUI : MonoBehaviour
 		alertManager.CloseLoadingAlert();
 	}
 
+	Coroutine co_OpenLobbyUI;
+	public void StartOpenLobbyUI(string lobbyId)
+	{
+		if (co_OpenLobbyUI != null) StopCoroutine(co_OpenLobbyUI);
+
+		co_OpenLobbyUI = StartCoroutine(OpenLobbyUI(lobbyId));
+	}
+
 	public IEnumerator OpenLobbyUI(string lobbyId)
 	{
 		yield return lobbyManager.RefreshLobbies();
