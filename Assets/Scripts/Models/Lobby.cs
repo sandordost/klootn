@@ -4,28 +4,36 @@ using System.Linq;
 using Firebase.Firestore;
 
 [FirestoreData]
+[Serializable]
 public class Lobby
 {
-	[FirestoreDocumentId]
-	public string Id { get; set; }
+	//[FirestoreDocumentId]
+	//public string Id { get; set; }
+	public string Id;
 
-	[FirestoreProperty]
-	public List<string> Players { get; set; }
+	//[FirestoreProperty]
+	//public List<string> Players { get; set; }
+	public List<string> Players;
 
-	[FirestoreProperty]
-	public Dictionary<string, LobbyPlayerData> LobbyPlayersData { get; set; }
+	//[FirestoreProperty]
+	//public Dictionary<string, LobbyPlayerData> LobbyPlayersData { get; set; }
+	public Dictionary<string, LobbyPlayerData> LobbyPlayersData;
 
-	[FirestoreProperty]
-	public string HostId { get; set; }
+	//[FirestoreProperty]
+	//public string HostId { get; set; }
+	public string HostId;
 
-	[FirestoreProperty]
-	public string Name { get; set; }
+	//[FirestoreProperty]
+	//public string Name { get; set; }
+	public string Name;
 
-	[FirestoreProperty]
-	public string MapId { get; set; }
+	//[FirestoreProperty]
+	//public string MapId { get; set; }
+	public string MapId;
 
-	[FirestoreProperty]
-	public string Description { get; set; }
+	//[FirestoreProperty]
+	//public string Description { get; set; }
+	public string Description;
 }
 
 public static class LobbyExtensions

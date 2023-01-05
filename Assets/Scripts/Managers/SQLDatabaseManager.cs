@@ -12,15 +12,40 @@ public class SQLDatabaseManager : IDatabaseManager
 	private const string klootnUrl = "https://sandordost.nl/klootn/database/";
 	private const string motdsUrl = "motds.php";
 	private const string playersUrl = "players.php";
+	private const string lobbiesUrl = "lobbies.php";
 
 	public IEnumerator AddPlayerToLobby(string lobbyId, string playerId)
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator CreateLobby(Player host, string name, string description, string mapId, Action<Lobby> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Name", name);
+		formdata.AddField("Description", description);
+		formdata.AddField("HostId", host.Id);
+		formdata.AddField("MapId", mapId);
+
+		string lobbyId = null;
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "createlobby", (result) =>
+		{
+			if (int.TryParse(result, out int parsedId))
+			{
+				lobbyId = parsedId.ToString();
+			}
+		});
+
+		if(lobbyId is not null)
+		{
+			yield return GetLobby(lobbyId, (lobby) =>
+			{
+				callback.Invoke(lobby);
+			});
+		}
 	}
+
 	public IEnumerator GetAllPlayers(Action<List<Player>> callback)
 	{
 		throw new NotImplementedException();
@@ -46,10 +71,21 @@ public class SQLDatabaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator GetLobby(string id, Action<Lobby> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Id", id);
+
+		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "getlobbybyid", (result) =>
+		{
+			if (result.Length > 0)
+				callback.Invoke(JsonUtility.FromJson<Lobby>(result));
+			else callback.Invoke(null);
+		});
 	}
+
 	public IEnumerator GetLobbyColors(string lobbyId, Action<Dictionary<string, PlayerColor>> callback)
 	{
 		throw new NotImplementedException();
@@ -71,7 +107,7 @@ public class SQLDatabaseManager : IDatabaseManager
 	{
 		WWWForm formdata = new WWWForm();
 
-		formdata.AddField("Name", id);
+		formdata.AddField("Id", id);
 
 		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "getplayerbyid", (result) =>
 		{
@@ -83,8 +119,18 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator GetPlayerByName(string name, Action<Player> callback)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Name", name);
+
+		yield return SendPostRequest(klootnUrl + playersUrl, formdata, "getplayerbyname", (result) =>
+		{
+			if (result.Length > 0)
+				callback.Invoke(JsonUtility.FromJson<Player>(result));
+			else callback.Invoke(null);
+		});
 	}
+
 	public IEnumerator GetPlayerColor(string lobbyId, string playerId, Action<PlayerColor> callback)
 	{
 		throw new NotImplementedException();
