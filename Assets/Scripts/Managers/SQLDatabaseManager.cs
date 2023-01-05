@@ -21,7 +21,7 @@ public class SQLDatabaseManager : IDatabaseManager
 		formdata.AddField("LobbyId", lobbyId);
 		formdata.AddField("PlayerId", playerId);
 
-		yield return SendPostRequest(klootnUrl + lobbiesUrl, "addplayertolobby", (result) => { });
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "addplayertolobby", (result) => { });
 	}
 
 	public IEnumerator CreateLobby(Player host, string name, string description, string mapId, Action<Lobby> callback)
@@ -156,18 +156,11 @@ public class SQLDatabaseManager : IDatabaseManager
 		WWWForm formdata = new WWWForm();
 		formdata.AddField("Id", lobbyId);
 
-		string mapId = null;
-
 		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "getlobbymap", (result) =>
 		{
-			if (int.TryParse(result, out int parsedId))
-			{
-				mapId = parsedId.ToString();
-			}
+			callback.Invoke(result);
 		});
-
-		if (mapId != null)
-			callback.Invoke(mapId);
+			
 	}
 
 	public IEnumerator GetLobbyPlayers(string lobbyId, Action<List<Player>> callback)

@@ -43,7 +43,7 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 
 	private void UpdateLastSeenTimer_Elapsed(object sender, ElapsedEventArgs e)
 	{
-		UpdateLastSeen();
+		//UpdateLastSeen();
 	}
 
 	private IEnumerator UpdateLastSeen()
@@ -67,7 +67,7 @@ public class PlayerManager : MonoBehaviour, IDataRecievable
 
 	private IEnumerator SetTestClient()
 	{
-		yield return databaseManager.GetPlayerByName("sandor", (player) => 
+		yield return databaseManager.GetPlayerByName("mrpoopoohead", (player) => 
 		{
 			Client = player;
 		});

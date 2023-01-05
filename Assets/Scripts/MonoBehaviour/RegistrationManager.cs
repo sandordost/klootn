@@ -1,7 +1,7 @@
 using System.Collections;
-using System.Diagnostics;
 using TMPro;
 using UnityEngine;
+using System.Diagnostics;
 
 public class RegistrationManager : MonoBehaviour
 {

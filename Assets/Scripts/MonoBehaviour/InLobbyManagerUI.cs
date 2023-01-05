@@ -158,7 +158,10 @@ public class InLobbyManagerUI : MonoBehaviour
 		alertManager.ShowLoadingAlert("Loading lobby ...");
 
 		Lobby lobby = null;
-		yield return lobbyManager.GetLobby(CurrentLobbyId, (dbLobby) => lobby = dbLobby);
+		yield return lobbyManager.GetLobby(CurrentLobbyId, (dbLobby) =>
+		{
+			lobby = dbLobby;
+		});
 
 		if (lobby is null)
 		{
@@ -180,7 +183,7 @@ public class InLobbyManagerUI : MonoBehaviour
 
 		titleText.text = lobby.Name;
 
-		UpdateHostControls(ClientIsHost);
+		yield return UpdateHostControls(ClientIsHost);
 
 		alertManager.CloseLoadingAlert();
 	}
