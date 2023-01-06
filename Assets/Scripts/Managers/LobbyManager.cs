@@ -209,7 +209,7 @@ public class LobbyManager : MonoBehaviour, IDataRecievable
 
 	public IEnumerator KickPlayer(string lobbyId, string playerId)
 	{
-		yield return databaseManager.RemovePlayerFromLobby(lobbyId, playerId);
+		yield return databaseManager.RemoveLobbyPlayerData(lobbyId, playerId);
 	}
 
 	public IEnumerator UpdateLobbyLastSeen(string playerId, string lobbyId)

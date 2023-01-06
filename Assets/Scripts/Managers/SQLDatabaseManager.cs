@@ -309,18 +309,39 @@ public class SQLDatabaseManager : IDatabaseManager
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator RemoveLobbyPlayerData(string lobbyId, string playerId)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("LobbyId", lobbyId);
+		formdata.AddField("PlayerId", playerId);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "removeplayerdata", (result) =>
+		{
+			Debug.Log($"kick player with id: {playerId}, response: {result}");
+		});
 	}
+
 	public IEnumerator RemovePlayerFromLobby(string lobbyId, string playerId)
 	{
 		throw new NotImplementedException();
 	}
+
 	public IEnumerator SetHost(string lobbyId, string playerId)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Id", lobbyId);
+		formdata.AddField("HostId", playerId);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "sethost", (result) => 
+		{
+			Debug.Log($"Made host of player with id: {playerId}, response: {result}");
+		});
+
 	}
+
 	public IEnumerator UpdateLastSeen(string playerId, DateTime timestamp)
 	{
 		throw new NotImplementedException();
