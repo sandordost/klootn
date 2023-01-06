@@ -133,7 +133,7 @@ public class LobbyManagerUI : MonoBehaviour
 
 		yield return lobbyManager.JoinLobby(lobbyId);
 
-		yield return inLobbyManagerUI.ChangePlayerColor();
+		yield return inLobbyManagerUI.ChangeHostColor();
 
 		pageSwitcher.SwitchPage(inLobbyPage);
 	}

@@ -271,12 +271,7 @@ public class InLobbyManagerUI : MonoBehaviour
 			return;
 		}
 
-		Transform parent = playerUIPrefabParent.transform;
-
-		GameObject objectToRemove = null;
-
-		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
-			if (playerUI.PlayerId.Equals(playerId)) objectToRemove = playerUI.gameObject;
+		GameObject objectToRemove = GetPlayerObject(playerId);
 
 		if (objectToRemove != null)
 			Destroy(objectToRemove);
@@ -293,14 +288,7 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	public IEnumerator UpdatePlayerInLobbyUI(string playerId)
 	{
-		Transform parent = playerUIPrefabParent.transform;
-
-		GameObject objectToUpdate = null;
-
-		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
-			if (playerUI.PlayerId.Equals(playerId)) objectToUpdate = playerUI.gameObject;
-
-		yield return SetPlayerObject(objectToUpdate, playerId);
+		yield return SetPlayerObject(GetPlayerObject(playerId), playerId);
 	}
 
 	private IEnumerator SetPlayerObject(GameObject playerObj, string playerId)
@@ -349,8 +337,34 @@ public class InLobbyManagerUI : MonoBehaviour
 		yield return lobbyManager.SetHost(currentLobbyId, playerId);
 	}
 
-	public IEnumerator ChangePlayerColor()
+	Coroutine co_ChangePlayerColor;
+	public void StartChangePlayerColor()
 	{
-		yield return lobbyManager.GetNextPlayerColor(playerManager.Client.Id, CurrentLobbyId, (color) => { });
+		if (co_ChangePlayerColor != null) StopCoroutine(co_ChangePlayerColor);
+
+		co_ChangePlayerColor = StartCoroutine(ChangeHostColor(true));
+
+
+	}
+
+	public IEnumerator ChangeHostColor(bool changeInLobbyHostObj = false)
+	{
+		yield return lobbyManager.GetNextPlayerColor(playerManager.Client.Id, CurrentLobbyId, (color) => 
+		{
+			if(changeInLobbyHostObj)
+				GetPlayerObject(playerManager.Client.Id).transform.Find("NameAndIcon").Find("PlayerNameHolder").Find("PlayerName").GetComponent<TMP_Text>().color = color;
+		});
+	}
+
+	private GameObject GetPlayerObject(string playerId)
+	{
+		Transform parent = playerUIPrefabParent.transform;
+
+		GameObject objectToUpdate = null;
+
+		foreach (Player_UI playerUI in parent.GetComponentsInChildren<Player_UI>())
+			if (playerUI.PlayerId.Equals(playerId)) objectToUpdate = playerUI.gameObject;
+
+		return objectToUpdate;
 	}
 }

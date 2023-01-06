@@ -15,21 +15,21 @@
 //		firestore = FirebaseFirestore.DefaultInstance;
 //	}
 
-//	public async Task<Motd> GetLatestMotd()
-//	{
-//		CollectionReference collectionReference = firestore.Collection("Motds");
+//public async Task<Motd> GetLatestMotd()
+//{
+//	CollectionReference collectionReference = firestore.Collection("Motds");
 
-//		var task = await collectionReference.OrderByDescending("Uploaddate").GetSnapshotAsync();
+//	var task = await collectionReference.OrderByDescending("Uploaddate").GetSnapshotAsync();
 
-//		QuerySnapshot result = task;
+//	QuerySnapshot result = task;
 
-//		Motd motd = null;
+//	Motd motd = null;
 
-//		if (result.Count > 0)
-//			motd = result[0].ConvertTo<Motd>();
+//	if (result.Count > 0)
+//		motd = result[0].ConvertTo<Motd>();
 
-//		return motd;
-//	}
+//	return motd;
+//}
 
 //	public async Task<List<Lobby>> GetLobbies()
 //	{

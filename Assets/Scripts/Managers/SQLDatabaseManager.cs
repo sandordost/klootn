@@ -370,6 +370,8 @@ public class SQLDatabaseManager : IDatabaseManager
 			var result = webrequest.downloadHandler.text;
 			callback.Invoke(result);
 		}
+
+		webrequest.Dispose();
 	}
 	private IEnumerator SendPostRequest(string url, WWWForm formdata, Action<string> callback)
 	{
@@ -381,6 +383,8 @@ public class SQLDatabaseManager : IDatabaseManager
 		{
 			callback.Invoke(webrequest.downloadHandler.text);
 		}
+
+		webrequest.Dispose();
 	}
 	private IEnumerator SendPostRequest(string url, WWWForm formdata, string action, Action<string> callback)
 	{
