@@ -361,7 +361,15 @@ public class SQLDatabaseManager : IDatabaseManager
 
 	public IEnumerator UpdateLobbyMap(string lobbyId, string mapId)
 	{
-		throw new NotImplementedException();
+		WWWForm formdata = new WWWForm();
+
+		formdata.AddField("Id", lobbyId);
+		formdata.AddField("MapId", mapId);
+
+		yield return SendPostRequest(klootnUrl + lobbiesUrl, formdata, "updatelobbymap", (result) =>
+		{
+			Debug.Log($"Updated map of lobby {lobbyId} to {mapId}, response: {result}");
+		});
 	}
 
 	public IEnumerator UpdatePlayerColor(string lobbyId, string playerId, PlayerColor color)

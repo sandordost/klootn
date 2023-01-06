@@ -41,8 +41,11 @@ public class MapSelectionManager : MonoBehaviour
 		}
 	}
 
+	Coroutine co_UpdateMapId;
 	public void SelectMap(string mapId)
 	{
-		mapManager.UpdateMapId(inLobbyManagerUI.CurrentLobbyId, mapId);
+		if (co_UpdateMapId != null) StopCoroutine(co_UpdateMapId);
+
+		co_UpdateMapId = StartCoroutine(mapManager.UpdateMapId(inLobbyManagerUI.CurrentLobbyId, mapId));
 	}
 }
