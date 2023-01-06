@@ -257,9 +257,17 @@ public class InLobbyManagerUI : MonoBehaviour
 		CurrentPlayers = lobbyPlayers;
 	}
 
-	public void KickPlayer(string playerId)
+	Coroutine co_KickPlayer;
+	public void StartKickPlayer(string playerId)
 	{
-		lobbyManager.KickPlayer(CurrentLobbyId, playerId);
+		if (co_KickPlayer != null) StopCoroutine(co_KickPlayer);
+
+		co_KickPlayer = StartCoroutine(KickPlayer(playerId));
+	}
+
+	public IEnumerator KickPlayer(string playerId)
+	{
+		yield return lobbyManager.KickPlayer(CurrentLobbyId, playerId);
 	}
 
 	private void RemovePlayerFromLobbyUI(string playerId)
@@ -330,6 +338,14 @@ public class InLobbyManagerUI : MonoBehaviour
 		yield return new WaitForSeconds(0.02f);
 
 		LayoutRebuilder.ForceRebuildLayoutImmediate(playerObj.transform.Find("NameAndIcon").GetComponent<RectTransform>());
+	}
+
+	Coroutine co_PromotePlayer;
+	public void StartPromotePlayer(string playerId)
+	{
+		if (co_PromotePlayer != null) StopCoroutine(co_PromotePlayer);
+
+		co_PromotePlayer = StartCoroutine(PromotePlayer(playerId));
 	}
 
 	public IEnumerator PromotePlayer(string playerId)

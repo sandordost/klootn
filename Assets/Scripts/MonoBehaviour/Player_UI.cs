@@ -15,13 +15,13 @@ public class Player_UI : MonoBehaviour
 
 	public void KickPlayer()
 	{
-		inLobbyManagerUI.KickPlayer(PlayerId);
+		inLobbyManagerUI.StartKickPlayer(PlayerId);
 		Debug.Log($"Kicked player {PlayerId}");
 	}
 
 	public void PromotePlayer()
 	{
-		inLobbyManagerUI.PromotePlayer(PlayerId);
+		inLobbyManagerUI.StartPromotePlayer(PlayerId);
 		Debug.Log($"Promote player {PlayerId} to host");
 	}
 }
