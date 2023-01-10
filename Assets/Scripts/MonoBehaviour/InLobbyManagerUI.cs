@@ -16,6 +16,7 @@ public class InLobbyManagerUI : MonoBehaviour
 	public GameObject playerUIPrefab;
 	public GameObject mapGameObj;
 	public GameObject mapChangeButton;
+	public GameObject playersText;
 
 	private MapManager mapManager;
 	private LobbyManager lobbyManager;
@@ -81,6 +82,10 @@ public class InLobbyManagerUI : MonoBehaviour
 
 	private Coroutine refreshAndUpdateCoroutine;
 
+	private Dictionary<string, Coroutine> co_AddPlayerToLobbyUI = new Dictionary<string, Coroutine>();
+	private Dictionary<string, Coroutine> co_UpdatePlayerInLobbyUI = new Dictionary<string, Coroutine>();
+
+
 	private void Start()
 	{
 		GameManager gameManager = GameManager.GetInstance();
@@ -113,14 +118,6 @@ public class InLobbyManagerUI : MonoBehaviour
 				uiPageSwitcher.SwitchPage("LobbyPage");
 			else StartUpdatingLobbyUI();
 		}
-	}
-
-	private Coroutine co_UpdateInLobbyUI;
-	private void StartUpdatingLobbyUI()
-	{
-		if (co_UpdateInLobbyUI != null) StopCoroutine(co_UpdateInLobbyUI);
-
-		co_UpdateInLobbyUI = StartCoroutine(UpdateInLobbyUI());
 	}
 
 	private void FixedUpdate()
@@ -207,9 +204,6 @@ public class InLobbyManagerUI : MonoBehaviour
 		}
 	}
 
-	private Dictionary<string, Coroutine> co_AddPlayerToLobbyUI = new Dictionary<string, Coroutine>();
-	private Dictionary<string, Coroutine> co_UpdatePlayerInLobbyUI = new Dictionary<string, Coroutine>();
-
 	private IEnumerator UpdatePlayerListUI()
 	{
 		//Change Player area
@@ -255,14 +249,8 @@ public class InLobbyManagerUI : MonoBehaviour
 
 		CurrentPlayerColors = newColors;
 		CurrentPlayers = lobbyPlayers;
-	}
 
-	Coroutine co_KickPlayer;
-	public void StartKickPlayer(string playerId)
-	{
-		if (co_KickPlayer != null) StopCoroutine(co_KickPlayer);
-
-		co_KickPlayer = StartCoroutine(KickPlayer(playerId));
+		yield return UpdatePlayersText();
 	}
 
 	public IEnumerator KickPlayer(string playerId)
@@ -340,27 +328,9 @@ public class InLobbyManagerUI : MonoBehaviour
 		LayoutRebuilder.ForceRebuildLayoutImmediate(playerObj.transform.Find("NameAndIcon").GetComponent<RectTransform>());
 	}
 
-	Coroutine co_PromotePlayer;
-	public void StartPromotePlayer(string playerId)
-	{
-		if (co_PromotePlayer != null) StopCoroutine(co_PromotePlayer);
-
-		co_PromotePlayer = StartCoroutine(PromotePlayer(playerId));
-	}
-
 	public IEnumerator PromotePlayer(string playerId)
 	{
 		yield return lobbyManager.SetHost(currentLobbyId, playerId);
-	}
-
-	Coroutine co_ChangePlayerColor;
-	public void StartChangePlayerColor()
-	{
-		if (co_ChangePlayerColor != null) StopCoroutine(co_ChangePlayerColor);
-
-		co_ChangePlayerColor = StartCoroutine(ChangeHostColor(true));
-
-
 	}
 
 	public IEnumerator ChangeHostColor(bool changeInLobbyHostObj = false)
@@ -382,5 +352,61 @@ public class InLobbyManagerUI : MonoBehaviour
 			if (playerUI.PlayerId.Equals(playerId)) objectToUpdate = playerUI.gameObject;
 
 		return objectToUpdate;
+	}
+
+	private IEnumerator UpdatePlayersText()
+	{
+		KlootnMap map = null;
+		yield return GetCurrentMap((result) =>
+		{
+			map = result;
+		});
+
+		playersText.GetComponent<TMP_Text>().text = $"{CurrentPlayers.Count}/{map.maxPlayers}";
+	}
+
+	private IEnumerator GetCurrentMap(Action<KlootnMap> callback)
+	{
+		Lobby lobby = null;
+		yield return lobbyManager.GetLobby(currentLobbyId, (result) =>
+		{
+			lobby = result;
+		});
+
+		callback.Invoke(mapManager.GetMap(lobby.MapId));
+	}
+
+	Coroutine co_UpdateInLobbyUI;
+	private void StartUpdatingLobbyUI()
+	{
+		if (co_UpdateInLobbyUI != null) StopCoroutine(co_UpdateInLobbyUI);
+
+		co_UpdateInLobbyUI = StartCoroutine(UpdateInLobbyUI());
+	}
+
+	Coroutine co_KickPlayer;
+	public void StartKickPlayer(string playerId)
+	{
+		if (co_KickPlayer != null) StopCoroutine(co_KickPlayer);
+
+		co_KickPlayer = StartCoroutine(KickPlayer(playerId));
+	}
+
+	Coroutine co_ChangePlayerColor;
+	public void StartChangePlayerColor()
+	{
+		if (co_ChangePlayerColor != null) StopCoroutine(co_ChangePlayerColor);
+
+		co_ChangePlayerColor = StartCoroutine(ChangeHostColor(true));
+
+
+	}
+
+	Coroutine co_PromotePlayer;
+	public void StartPromotePlayer(string playerId)
+	{
+		if (co_PromotePlayer != null) StopCoroutine(co_PromotePlayer);
+
+		co_PromotePlayer = StartCoroutine(PromotePlayer(playerId));
 	}
 }
